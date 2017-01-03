@@ -90,7 +90,12 @@ namespace MediaPortal.Plugins.SlimTv.Interfaces.ResourceProvider
       if (tv != null)
         tv.DisposeSlot(_slotIndex);
     }
+        // TODO: Added to fix compilation error - talk to @morpheus_xx about the SlimTV changes
+        public static IResourceAccessor GetResourceAccessor(string path)
+        {
+            throw new NotImplementedException();
+        }
 
-    #endregion
-  }
+        #endregion
+    }
 }
