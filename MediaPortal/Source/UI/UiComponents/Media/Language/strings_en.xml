@@ -212,6 +212,7 @@
 
   <!-- Playlists -->
   <string name="Media.ManagePlaylists">Playlists</string>
+  <string name="Media.AddSingleToPlaylist">Add to playlist</string>
   <string name="Media.AddAllToPlaylist">Add all to playlist</string>
   <string name="Media.NoItemsToAddHeader">No items to add</string>
   <string name="Media.NoItemsToAddText">There are no items in the current view</string>
@@ -318,6 +319,8 @@
   <string name="Media.AudioYearLabel">Year: </string>
   <string name="Media.AudioDurationLabel">Duration: </string>
   <string name="Media.AudioGenresLabel">Genre(s): </string>
+  <string name="Media.AudioTrackLabel">Track: </string>
+  <string name="Media.AudioDiscLabel">Disc: </string>
 
   <string name="Media.AudioPlaylistHeader">Audio playlist</string>
   <string name="Media.VideoImagePlaylistHeader">Video/image playlist</string>
