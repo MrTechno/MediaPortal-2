@@ -50,7 +50,11 @@ namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
 
     public override void Initialise()
     {
-      Title = MediaServerUtils.GetAttributeValue(Item.Aspects, MediaAspect.ATTR_TITLE).ToString();
+      string value;
+      if (MediaItemAspect.TryGetAttribute(Item.Aspects, MediaAspect.ATTR_TITLE, out value))
+      {
+        Title = value;
+      }
       ChildCount = MediaLibraryBrowse().Count;
     }
 
