@@ -35,7 +35,7 @@ using MediaPortal.Plugins.Transcoding.Aspects;
 
 namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
 {
-  internal static class MediaLibraryHelper
+  public static class MediaLibraryHelper
   {
     public const string CONTAINER_ROOT_KEY = "0";
     public const string CONTAINER_AUDIO_KEY = "A";

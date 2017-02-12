@@ -234,7 +234,7 @@ namespace Test.MediaServer
       Guid id = new Guid(shareId);
       ProviderPathSegment segment = new ProviderPathSegment(LocalFsResourceProviderBase.LOCAL_FS_RESOURCE_PROVIDER_ID, directory, true);
       ResourcePath path = new ResourcePath(new[] { segment });
-      _shares[id] = new Share(id, systemId, path, name, categories);
+      _shares[id] = new Share(id, systemId, path, name, false, categories);
     }
 
     public MediaItem LoadItem(string systemId, ResourcePath path, IEnumerable<Guid> necessaryRequestedMIATypeIDs, IEnumerable<Guid> optionalRequestedMIATypeIDs, Guid? userProfile = null)
@@ -288,6 +288,16 @@ namespace Test.MediaServer
     }
 
     public void UserDataUpdated(Guid userProfileId, Guid mediaItemId, string userDataKey, string userData)
+    {
+      throw new NotImplementedException();
+    }
+
+    public Guid CreateShare(string systemId, ResourcePath baseResourcePath, string shareName, bool useShareWatcher, IEnumerable<string> mediaCategories)
+    {
+      throw new NotImplementedException();
+    }
+
+    public int UpdateShare(Guid shareId, ResourcePath baseResourcePath, string shareName, bool useShareWatcher, IEnumerable<string> mediaCategories, RelocationMode relocationMode)
     {
       throw new NotImplementedException();
     }
