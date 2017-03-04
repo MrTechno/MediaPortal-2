@@ -149,9 +149,7 @@ namespace MediaPortal.Backend.Services.MediaLibrary
       {
         try
         {
-          if(!_parent._shareDeleteSync.ContainsKey(path))
-            _parent._shareDeleteSync.Add(path, new object());
-          lock (_parent._shareDeleteSync[basePath])
+          lock (_parent.GetResourcePathLock(basePath))
           {
             return _parent.AddOrUpdateMediaItem(parentDirectoryId, _parent.LocalSystemId, path, null, updatedAspects, true, isRefresh, cancelToken);
           }
@@ -321,7 +319,8 @@ namespace MediaPortal.Backend.Services.MediaLibrary
     protected AsynchronousMessageQueue _messageQueue;
     protected bool _shutdown = false;
     protected readonly Dictionary<Guid, ShareWatcher> _shareWatchers = new Dictionary<Guid, ShareWatcher>();
-    protected Dictionary<ResourcePath, object> _shareDeleteSync = new Dictionary<ResourcePath, object>();
+    // Should be accessed only by GetResourcePathLock
+    private readonly Dictionary<ResourcePath, object> _shareDeleteSync = new Dictionary<ResourcePath, object>();
     protected List<RelationshipHierarchy> _hierarchies = new List<RelationshipHierarchy>();
     protected object _shareImportSync = new object();
     protected Dictionary<Guid, ShareImportState> _shareImportStates = new Dictionary<Guid, ShareImportState>();
@@ -492,6 +491,16 @@ namespace MediaPortal.Backend.Services.MediaLibrary
     }
 
     #region Protected methods
+
+    protected object GetResourcePathLock(ResourcePath path)
+    {
+      lock (_syncObj)
+      {
+        if (!_shareDeleteSync.ContainsKey(path))
+          _shareDeleteSync.Add(path, new object());
+        return _shareDeleteSync[path];
+      }
+    }
 
     protected MediaItemQuery BuildLoadItemQuery(string systemId, ResourcePath path)
     {
@@ -2995,14 +3004,16 @@ namespace MediaPortal.Backend.Services.MediaLibrary
         IDictionary<Guid, Share> shares = GetShares(_localSystemId);
         foreach (Share share in shares.Values)
         {
-          // Needs to be created for all shares
-          _shareDeleteSync[share.BaseResourcePath]= new object();
-
           if (!share.UseShareWatcher)
           {
             Logger.Info("MediaLibrary: Share watcher not enabled for path {0}", share.BaseResourcePath);
             continue;
           }
+
+          // This should never happen, as the share ID is unique. But error reports show duplicate keys when adding a watcher?
+          if (_shareWatchers.ContainsKey(share.ShareId))
+            continue;
+
           try
           {
             ShareWatcher watcher = null;
@@ -3012,8 +3023,7 @@ namespace MediaPortal.Backend.Services.MediaLibrary
             }
             catch (Exception e)
             {
-              Logger.Debug("MediaLibrary: Error initializing share watcher for {0}", e, share.BaseResourcePath);
-              Logger.Warn("MediaLibrary: Share watcher cannot be used for path {0}", share.BaseResourcePath);
+              Logger.Warn("MediaLibrary: Share watcher cannot be used for path {0}", e, share.BaseResourcePath);
               continue;
             }
             _shareWatchers.Add(share.ShareId, watcher);
@@ -3040,7 +3050,7 @@ namespace MediaPortal.Backend.Services.MediaLibrary
         }
         catch (Exception e)
         {
-          Logger.Error("MediaLibrary: Error initializing shares", e);
+          Logger.Error("MediaLibrary: Error when removing share watchers", e);
           throw;
         }
       }
@@ -3075,10 +3085,6 @@ namespace MediaPortal.Backend.Services.MediaLibrary
         ContentDirectoryMessaging.SendRegisteredSharesChangedMessage();
 
         TryScheduleLocalShareImport(share);
-
-        ShareWatcher watcher = new ShareWatcher(share, this, false);
-        _shareWatchers.Add(share.ShareId, watcher);
-        _shareDeleteSync.Add(share.BaseResourcePath, new object());
       }
       catch (Exception e)
       {
@@ -3104,9 +3110,7 @@ namespace MediaPortal.Backend.Services.MediaLibrary
       Share share = GetShare(shareId);
       TryCancelLocalImportJobs(share);
 
-      if (!_shareDeleteSync.ContainsKey(share.BaseResourcePath))
-        _shareDeleteSync.Add(share.BaseResourcePath, new object());
-      lock (_shareDeleteSync[share.BaseResourcePath])
+      lock (GetResourcePathLock(share.BaseResourcePath))
       {
         ISQLDatabase database = ServiceRegistration.Get<ISQLDatabase>();
         ITransaction transaction = database.BeginTransaction();
@@ -3119,9 +3123,6 @@ namespace MediaPortal.Backend.Services.MediaLibrary
 
           transaction.Commit();
 
-          _shareWatchers[shareId].Dispose();
-          _shareWatchers.Remove(shareId);
-
           ContentDirectoryMessaging.SendRegisteredSharesChangedMessage();
         }
         catch (Exception e)
@@ -3131,7 +3132,8 @@ namespace MediaPortal.Backend.Services.MediaLibrary
           throw;
         }
       }
-      _shareDeleteSync.Remove(share.BaseResourcePath);
+      lock (_syncObj)
+        _shareDeleteSync.Remove(share.BaseResourcePath);
     }
 
     public void RemoveSharesOfSystem(string systemId)
@@ -3151,13 +3153,6 @@ namespace MediaPortal.Backend.Services.MediaLibrary
         DeleteAllMediaItemsUnderPath(transaction, systemId, null, true);
 
         transaction.Commit();
-
-        foreach (Guid shareId in _shareWatchers.Keys)
-        {
-          _shareWatchers[shareId].Dispose();
-        }
-        _shareWatchers.Clear();
-        _shareDeleteSync.Clear();
 
         ContentDirectoryMessaging.SendRegisteredSharesChangedMessage();
       }

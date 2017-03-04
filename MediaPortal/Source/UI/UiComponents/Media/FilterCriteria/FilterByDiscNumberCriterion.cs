@@ -22,18 +22,26 @@
 
 #endregion
 
-using MediaPortal.Common.MediaManagement.DefaultItemAspects;
-using MediaPortal.UiComponents.Media.FilterCriteria;
-using MediaPortal.UiComponents.Media.Models.Navigation;
+using MediaPortal.Common.Localization;
+using MediaPortal.Common.MediaManagement;
+using MediaPortal.UiComponents.Media.General;
 
-namespace MediaPortal.UiComponents.Media.Models.ScreenData
+namespace MediaPortal.UiComponents.Media.FilterCriteria
 {
-  public abstract class AbstractVideosFilterScreenData<T> : AbstractFiltersScreenData<T> where T : FilterItem, new()
+  public class FilterByDiscNumberCriterion : SimpleMLFilterCriterion
   {
-    protected AbstractVideosFilterScreenData(string screen, string menuItemLabel, string navbarSubViewNavigationDisplayLabel,
-        MLFilterCriterion filterCriterion) : base(screen, menuItemLabel, navbarSubViewNavigationDisplayLabel, filterCriterion)
+    public FilterByDiscNumberCriterion(MediaItemAspectMetadata.AttributeSpecification attributeType)
+      : base(attributeType)
     {
-      _filteredMias = new[] { VideoAspect.ASPECT_ID };
     }
+
+    #region Base overrides
+
+    protected override string GetDisplayName(object groupKey)
+    {
+      return groupKey != null ? LocalizationHelper.CreateResourceString(Consts.RES_DISC_NUMBER_FILTER).Evaluate(groupKey.ToString()) : "";
+    }
+
+    #endregion
   }
 }

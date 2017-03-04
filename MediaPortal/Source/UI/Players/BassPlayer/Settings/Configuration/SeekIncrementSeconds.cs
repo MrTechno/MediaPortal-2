@@ -1,4 +1,4 @@
-#region Copyright (C) 2007-2017 Team MediaPortal
+﻿#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
     Copyright (C) 2007-2017 Team MediaPortal
@@ -19,21 +19,32 @@
     You should have received a copy of the GNU General Public License
     along with MediaPortal 2. If not, see <http://www.gnu.org/licenses/>.
 */
-
 #endregion
 
-using MediaPortal.Common.MediaManagement.DefaultItemAspects;
-using MediaPortal.UiComponents.Media.FilterCriteria;
-using MediaPortal.UiComponents.Media.Models.Navigation;
+using MediaPortal.Common.Configuration.ConfigurationClasses;
 
-namespace MediaPortal.UiComponents.Media.Models.ScreenData
+namespace MediaPortal.UI.Players.BassPlayer.Settings.Configuration
 {
-  public abstract class AbstractVideosFilterScreenData<T> : AbstractFiltersScreenData<T> where T : FilterItem, new()
+  public class SeekIncrementSeconds : LimitedNumberSelect
   {
-    protected AbstractVideosFilterScreenData(string screen, string menuItemLabel, string navbarSubViewNavigationDisplayLabel,
-        MLFilterCriterion filterCriterion) : base(screen, menuItemLabel, navbarSubViewNavigationDisplayLabel, filterCriterion)
+    #region Base overrides
+
+    public override void Load()
     {
-      _filteredMias = new[] { VideoAspect.ASPECT_ID };
+      _type = NumberType.Integer;
+      _step = 1;
+      _lowerLimit = 0;
+      _upperLimit = 20;
+      _value = SettingsManager.Load<BassPlayerSettings>().SeekIncrementSeconds;
     }
+
+    public override void Save()
+    {
+      BassPlayerSettings settings = SettingsManager.Load<BassPlayerSettings>();
+      settings.SeekIncrementSeconds = (int)_value;
+      SettingsManager.Save(settings);
+    }
+
+    #endregion
   }
 }

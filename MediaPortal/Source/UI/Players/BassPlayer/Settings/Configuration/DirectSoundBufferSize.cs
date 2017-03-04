@@ -1,4 +1,4 @@
-#region Copyright (C) 2007-2017 Team MediaPortal
+﻿#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
     Copyright (C) 2007-2017 Team MediaPortal
@@ -22,18 +22,30 @@
 
 #endregion
 
-using MediaPortal.Common.MediaManagement.DefaultItemAspects;
-using MediaPortal.UiComponents.Media.FilterCriteria;
-using MediaPortal.UiComponents.Media.Models.Navigation;
+using MediaPortal.Common.Configuration.ConfigurationClasses;
 
-namespace MediaPortal.UiComponents.Media.Models.ScreenData
+namespace MediaPortal.UI.Players.BassPlayer.Settings.Configuration
 {
-  public abstract class AbstractVideosFilterScreenData<T> : AbstractFiltersScreenData<T> where T : FilterItem, new()
+  public class DirectSoundBufferSize : LimitedNumberSelect
   {
-    protected AbstractVideosFilterScreenData(string screen, string menuItemLabel, string navbarSubViewNavigationDisplayLabel,
-        MLFilterCriterion filterCriterion) : base(screen, menuItemLabel, navbarSubViewNavigationDisplayLabel, filterCriterion)
+    #region Base overrides
+
+    public override void Load()
     {
-      _filteredMias = new[] { VideoAspect.ASPECT_ID };
+      _type = NumberType.Integer;
+      _step = 1;
+      _lowerLimit = 0;
+      _upperLimit = 200;
+      _value = SettingsManager.Load<BassPlayerSettings>().DirectSoundBufferSizeMilliSecs;
     }
+
+    public override void Save()
+    {
+      BassPlayerSettings settings = SettingsManager.Load<BassPlayerSettings>();
+      settings.DirectSoundBufferSizeMilliSecs = (int)_value;
+      SettingsManager.Save(settings);
+    }
+
+   #endregion
   }
 }

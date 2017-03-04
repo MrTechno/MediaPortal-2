@@ -30,20 +30,20 @@ using System.Linq;
 
 namespace MediaPortal.UiComponents.Media.Models.ScreenData
 {
-  public class MovieFilterByGenreScreenData : AbstractMovieFilterScreenData<MovieGenreFilterItem>
+  public class AudioFilterByDiscNumberScreenData : AbstractAudioFilterScreenData<FilterItem>
   {
-    public MovieFilterByGenreScreenData() :
-        base(Consts.SCREEN_MOVIES_FILTER_BY_GENRE, Consts.RES_COMMON_BY_GENRE_MENU_ITEM,
-        Consts.RES_FILTER_VIDEO_GENRE_NAVBAR_DISPLAY_LABEL, new SimpleMLFilterCriterion(GenreAspect.ATTR_ID, GenreAspect.ATTR_GENRE, Consts.NECESSARY_MOVIE_GENRE_MIAS))
+    public AudioFilterByDiscNumberScreenData() :
+        base(Consts.SCREEN_AUDIO_FILTER_BY_DISC_NUMBER, Consts.RES_COMMON_BY_DISC_NUMBER_MENU_ITEM,
+        Consts.RES_FILTER_AUDIO_DISC_NUMBER_NAVBAR_DISPLAY_LABEL, new FilterByDiscNumberCriterion(AudioAspect.ATTR_DISCID))
     {
-      _availableMias = Consts.NECESSARY_MOVIES_MIAS;
-      if (Consts.OPTIONAL_MOVIES_MIAS != null)
-        _availableMias = _availableMias.Union(Consts.OPTIONAL_MOVIES_MIAS);
+      _availableMias = Consts.NECESSARY_AUDIO_MIAS;
+      if (Consts.OPTIONAL_AUDIO_MIAS != null)
+        _availableMias = _availableMias.Union(Consts.OPTIONAL_AUDIO_MIAS);
     }
 
-    public override AbstractFiltersScreenData<MovieGenreFilterItem> Derive()
+    public override AbstractFiltersScreenData<FilterItem> Derive()
     {
-      return new MovieFilterByGenreScreenData();
+      return new AudioFilterByDiscNumberScreenData();
     }
   }
 }
