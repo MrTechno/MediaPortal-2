@@ -51,6 +51,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Database\MediaServerClientManager.cs" />
     <Compile Include="Database\MediaServer_SubSchema.cs" />
     <Compile Include="DIDL\PacketVideoDidlMessageBuilder.cs" />
     <Compile Include="DIDL\PropertyFilter.cs" />
@@ -133,6 +134,8 @@
     <Compile Include="Protocols\XBoxProtocolHandler.cs" />
     <Compile Include="ResourceAccess\DlnaResourceAccessUtils.cs" />
     <Compile Include="ResourceAccess\DlnaResourceAccessModule.cs" />
+    <Compile Include="ResourceAccess\StreamControl.cs" />
+    <Compile Include="ResourceAccess\StreamItem.cs" />
     <Compile Include="Settings\MediaServerSettings.cs" />
     <Compile Include="Settings\ProfileLinks.cs" />
     <Compile Include="Tree\Tree.cs" />
@@ -171,16 +174,21 @@
       <Project>{455E7D70-1C85-4D7F-9F01-DC801B8B8C34}</Project>
       <Name>UPnP</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Source\UI\FanArt\FanArtService.Interfaces\FanArtService.Interfaces.csproj">
+      <Project>{587b806e-9afc-47d7-a024-1cec38c4d1d3}</Project>
+      <Name>FanArtService.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Source\UI\TV\SlimTvInterfaces\SlimTv.Interfaces.csproj">
       <Project>{f31c71fa-4a24-4d33-b0ee-52cf667dcef4}</Project>
       <Name>SlimTv.Interfaces</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TranscodingService\TranscodingService.csproj">
-      <Project>{38eded2d-21cc-4ffc-b1f4-2597e4823b7a}</Project>
-      <Name>TranscodingService</Name>
+    <ProjectReference Include="..\TranscodingService.Interfaces\TranscodingService.Interfaces.csproj">
+      <Project>{5057ebd5-a262-42a6-a975-360730cfe322}</Project>
+      <Name>TranscodingService.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Language\strings_en.xml" />
     <Content Include="plugin.xml" />
     <Content Include="Profiles\DLNAProfiles.xml">
       <SubType>Designer</SubType>

@@ -32,7 +32,7 @@ using MediaPortal.Common.MediaManagement;
 using MediaPortal.Common.MediaManagement.DefaultItemAspects;
 using MediaPortal.Plugins.MediaServer.Objects.Basic;
 using MediaPortal.Plugins.MediaServer.Profiles;
-using MediaPortal.Plugins.Transcoding.Aspects;
+using MediaPortal.Plugins.Transcoding.Interfaces.Aspects;
 
 namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
 {
@@ -91,13 +91,7 @@ namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
         }
         catch (Exception e)
         {
-          // Get stack trace for the exception with source file information
-          var st = new StackTrace(e, true);
-          // Get the top stack frame
-          var frame = st.GetFrame(2);
-          // Get the line number from the stack frame
-          var line = frame.GetFileLineNumber();
-          ServiceRegistration.Get<ILogger>().Error("Search failed, Key: {0}, Frame: {1}, Line: {2}", e, Key, frame, line);
+          ServiceRegistration.Get<ILogger>().Error("Search failed adding media item {0}", e, item.MediaItemId);
         }
       }
       return result;

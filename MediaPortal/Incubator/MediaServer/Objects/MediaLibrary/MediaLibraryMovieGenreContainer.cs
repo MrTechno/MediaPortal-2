@@ -32,8 +32,7 @@ using MediaPortal.Common;
 using System.Collections.Generic;
 using MediaPortal.Common.Logging;
 using MediaPortal.Plugins.MediaServer.Tree;
-using MediaPortal.Common.MediaManagement;
-using MediaPortal.Plugins.Transcoding.Aspects;
+using MediaPortal.Plugins.Transcoding.Interfaces.Aspects;
 
 namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
 {

@@ -28,10 +28,10 @@ using MediaPortal.Common;
 using MediaPortal.Common.Logging;
 using MediaPortal.Common.MediaManagement;
 using MediaPortal.Common.MediaManagement.DefaultItemAspects;
-using MediaPortal.Plugins.MediaServer.Objects.Basic;
 using MediaPortal.Plugins.MediaServer.Tree;
 using MediaPortal.Plugins.MediaServer.DLNA;
-using MediaPortal.Plugins.Transcoding.Aspects;
+using MediaPortal.Plugins.MediaServer.Objects.Basic;
+using MediaPortal.Plugins.Transcoding.Interfaces.Aspects;
 
 namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
 {
@@ -42,6 +42,8 @@ namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
     public const string CONTAINER_VIDEO_KEY = "V";
     public const string CONTAINER_IMAGES_KEY = "I";
     public const string CONTAINER_MEDIA_SHARES_KEY = "M";
+    public const string CONTAINER_BROADCAST_KEY = "B";
+    public const string CONTAINER_SERIES_KEY = "S";
 
     public static Guid GetObjectId(string key)
     {
@@ -75,6 +77,8 @@ namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
                                    TranscodeItemAudioAspect.ASPECT_ID,
                                    TranscodeItemImageAspect.ASPECT_ID,
                                    TranscodeItemVideoAspect.ASPECT_ID,
+                                   TranscodeItemVideoAudioAspect.ASPECT_ID,
+                                   TranscodeItemVideoEmbeddedAspect.ASPECT_ID
                                  };
 
       return library.GetMediaItem(id, necessaryMIATypeIDs, optionalMIATypeIDs);
@@ -88,6 +92,7 @@ namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
     public static IDirectoryObject InstansiateMediaLibraryObject(MediaItem item, string baseKey, BasicContainer parent, string title)
     {
       IDirectoryObject obj;
+      Logger.Debug("Instantiate media library object from {0} {1} {2}", item != null ? item.MediaItemId.ToString() : "null", parent != null ? parent.Key : "null", title ?? "null");
       // Choose the appropiate MediaLibrary* object for the media item
       try
       {

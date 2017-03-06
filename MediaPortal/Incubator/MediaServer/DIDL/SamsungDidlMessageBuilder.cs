@@ -23,18 +23,12 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MediaPortal.Plugins.MediaServer.Objects;
-using MediaPortal.Plugins.MediaServer.Objects.MediaLibrary;
-using MediaPortal.Plugins.MediaServer.ResourceAccess;
-using MediaPortal.Common;
-using MediaPortal.Common.Logging;
 using System.IO;
-using System.Globalization;
+using MediaPortal.Common.MediaManagement;
 using MediaPortal.Common.MediaManagement.DefaultItemAspects;
 using MediaPortal.Common.ResourceAccess;
+using MediaPortal.Plugins.MediaServer.Objects;
+using MediaPortal.Plugins.MediaServer.Objects.MediaLibrary;
 
 namespace MediaPortal.Plugins.MediaServer.DIDL
 {

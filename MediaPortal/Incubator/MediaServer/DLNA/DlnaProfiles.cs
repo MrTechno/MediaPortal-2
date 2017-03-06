@@ -22,10 +22,10 @@
 
 #endregion
 
-using MediaPortal.Plugins.MediaServer.Profiles;
-using MediaPortal.Plugins.Transcoding.Service;
 using System;
 using System.Collections.Generic;
+using MediaPortal.Plugins.MediaServer.Profiles;
+using MediaPortal.Plugins.Transcoding.Interfaces;
 
 namespace MediaPortal.Plugins.MediaServer.DLNA
 {
@@ -209,6 +209,14 @@ namespace MediaPortal.Plugins.MediaServer.DLNA
       else if (container == AudioContainer.Ogg)
       {
         valuesProfiles.Add("OGG");
+      }
+      else if (container == AudioContainer.Rtsp)
+      {
+        valuesProfiles.Add("RTSP");
+      }
+      else if (container == AudioContainer.Rtp)
+      {
+        valuesProfiles.Add("RTP");
       }
       else
       {
@@ -1037,9 +1045,17 @@ namespace MediaPortal.Plugins.MediaServer.DLNA
           valuesProfiles.Add("HLS");
         }
       }
+      else if (container == VideoContainer.Rtsp)
+      {
+        valuesProfiles.Add("RTSP");
+      }
+      else if (container == VideoContainer.Rtp)
+      {
+        valuesProfiles.Add("RTP");
+      }
       else
       {
-        throw new Exception("Video does not match any supported DLNA profile");
+        throw new Exception("Video container " + container + " does not match any supported DLNA profile");
       }
       return valuesProfiles;
     }

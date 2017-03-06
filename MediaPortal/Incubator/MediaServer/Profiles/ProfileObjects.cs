@@ -33,8 +33,12 @@ using MediaPortal.Plugins.MediaServer.Filters;
 using MediaPortal.Plugins.MediaServer.Objects.Basic;
 using MediaPortal.Plugins.MediaServer.Objects.MediaLibrary;
 using MediaPortal.Plugins.MediaServer.Protocols;
-using MediaPortal.Plugins.Transcoding.Service.Profiles;
-using MediaPortal.Plugins.Transcoding.Service.Profiles.Setup;
+using MediaPortal.Plugins.Transcoding.Interfaces.Profiles;
+using MediaPortal.Plugins.Transcoding.Interfaces.Profiles.Setup;
+using MediaPortal.Common;
+using MediaPortal.Plugins.SlimTv.Interfaces;
+using MediaPortal.Common.Localization;
+using MediaPortal.Utilities;
 
 namespace MediaPortal.Plugins.MediaServer.Profiles
 {
@@ -139,10 +143,11 @@ namespace MediaPortal.Plugins.MediaServer.Profiles
     public string PreferredAudioLanguages = null;
     public string ClientId = null;
     public bool EstimateTransodedSize = true;
+    public bool AutoProfile = true;
     public BasicContainer RootContainer = null;
     public Dictionary<Guid, DlnaMediaItem> DlnaMediaItems = new Dictionary<Guid, DlnaMediaItem>();
 
-    public DlnaMediaItem GetDlnaItem(MediaItem item, bool live)
+    public DlnaMediaItem GetDlnaItem(MediaItem item, bool isLive)
     {
       lock (DlnaMediaItems)
       {
@@ -150,7 +155,7 @@ namespace MediaPortal.Plugins.MediaServer.Profiles
         if (DlnaMediaItems.TryGetValue(item.MediaItemId, out dlnaItem))
           return dlnaItem;
 
-        dlnaItem = new DlnaMediaItem(ClientId, item, this, live);
+        dlnaItem = new DlnaMediaItem(ClientId, item, this, isLive);
         DlnaMediaItems.Add(item.MediaItemId, dlnaItem);
         return dlnaItem;
       }
@@ -160,24 +165,64 @@ namespace MediaPortal.Plugins.MediaServer.Profiles
     {
       if (Profile == null) return;
 
-      RootContainer = new BasicContainer(MediaLibraryHelper.CONTAINER_ROOT_KEY, this) { Title = "MediaPortal Media Library" };
+      const string RES_ROOT = "[MediaServer.RootContainter]";
+      const string RES_AUDIO = "[MediaServer.AudiotContainter]";
+      const string RES_ALBUM = "[MediaServer.AlbumContainter]";
+      const string RES_RECENT = "[MediaServer.RecentContainter]";
+      const string RES_ARTIST = "[MediaServer.ArtistContainter]";
+      const string RES_GENRE = "[MediaServer.GenreContainter]";
+      const string RES_YEAR = "[MediaServer.YearContainter]";
+      const string RES_SHARE = "[MediaServer.ShareContainter]";
+      const string RES_IMAGE = "[MediaServer.ImageContainter]";
+      const string RES_VIDEO = "[MediaServer.VideoContainter]";
+      const string RES_TITLE = "[MediaServer.TitleContainter]";
+      const string RES_MOVIE = "[MediaServer.MovieContainter]";
+      const string RES_UNWATCHED = "[MediaServer.UnwatchedContainter]";
+      const string RES_ACTOR = "[MediaServer.ActorContainter]";
+      const string RES_SERIES = "[MediaServer.SeriesContainter]";
+      const string RES_BROADCAST = "[MediaServer.BroadcastContainter]";
 
-      var audioContainer = new BasicContainer(MediaLibraryHelper.CONTAINER_AUDIO_KEY, this) { Title = "Audio" };
-      audioContainer.Add(new MediaLibraryAlbumContainer(MediaLibraryHelper.CONTAINER_AUDIO_KEY + "A", this) { Title = "Albums" });
-      audioContainer.Add(new MediaLibraryMusicGenreContainer(MediaLibraryHelper.CONTAINER_AUDIO_KEY + "G", this) { Title = "Genres" });
-      audioContainer.Add(new MediaLibraryShareContainer(MediaLibraryHelper.CONTAINER_AUDIO_KEY + "AS", this, "Audio") { Title = "Shares" });
+      ILocalization language = ServiceRegistration.Get<ILocalization>();
+
+      RootContainer = new BasicContainer(MediaLibraryHelper.CONTAINER_ROOT_KEY, this)
+      { Title = StringUtils.TrimToNull(language.ToString(RES_ROOT)) ?? "MediaPortal Media Library" };
+
+      var audioContainer = new BasicContainer(MediaLibraryHelper.CONTAINER_AUDIO_KEY, this)
+      { Title = StringUtils.TrimToNull(language.ToString(RES_AUDIO)) ?? "Audio" };
+      audioContainer.Add(new MediaLibraryAlbumContainer(MediaLibraryHelper.CONTAINER_AUDIO_KEY + "AL", this)
+      { Title = StringUtils.TrimToNull(language.ToString(RES_ALBUM)) ?? "Albums" });
+      audioContainer.Add(new MediaLibraryMusicGenreContainer(MediaLibraryHelper.CONTAINER_AUDIO_KEY + "G", this)
+      { Title = StringUtils.TrimToNull(language.ToString(RES_GENRE)) ?? "Genres" });
+      audioContainer.Add(new MediaLibraryShareContainer(MediaLibraryHelper.CONTAINER_AUDIO_KEY + "AS", this, "Audio")
+      { Title = StringUtils.TrimToNull(language.ToString(RES_SHARE)) ?? "Shares" });
       RootContainer.Add(audioContainer);
 
-      var pictureContainer = new BasicContainer(MediaLibraryHelper.CONTAINER_IMAGES_KEY, this) { Title = "Images" };
-      pictureContainer.Add(new MediaLibraryShareContainer(MediaLibraryHelper.CONTAINER_IMAGES_KEY + "IS", this, "Image") { Title = "Shares" });
+      var pictureContainer = new BasicContainer(MediaLibraryHelper.CONTAINER_IMAGES_KEY, this)
+      { Title = StringUtils.TrimToNull(language.ToString(RES_IMAGE)) ?? "Images" };
+      pictureContainer.Add(new MediaLibraryShareContainer(MediaLibraryHelper.CONTAINER_IMAGES_KEY + "IS", this, "Image")
+      { Title = StringUtils.TrimToNull(language.ToString(RES_SHARE)) ?? "Shares" });
       RootContainer.Add(pictureContainer);
 
-      var videoContainer = new BasicContainer(MediaLibraryHelper.CONTAINER_VIDEO_KEY, this) { Title = "Video" };
-      videoContainer.Add(new MediaLibraryMovieGenreContainer(MediaLibraryHelper.CONTAINER_VIDEO_KEY + "G", this) { Title = "Genres" });
-      videoContainer.Add(new MediaLibraryShareContainer(MediaLibraryHelper.CONTAINER_VIDEO_KEY + "VS", this, "Video") { Title = "Shares" });
+      var videoContainer = new BasicContainer(MediaLibraryHelper.CONTAINER_VIDEO_KEY, this)
+      { Title = StringUtils.TrimToNull(language.ToString(RES_VIDEO)) ?? "Video" };
+      var movieContainer = new BasicContainer(MediaLibraryHelper.CONTAINER_VIDEO_KEY + "M", this)
+      { Title = StringUtils.TrimToNull(language.ToString(RES_MOVIE)) ?? "Movies" };
+      movieContainer.Add(new MediaLibraryMovieGenreContainer(MediaLibraryHelper.CONTAINER_VIDEO_KEY + "MG", this)
+      { Title = StringUtils.TrimToNull(language.ToString(RES_GENRE)) ?? "Genres" });
+      videoContainer.Add(movieContainer);
+      var seriesContainer = new BasicContainer(MediaLibraryHelper.CONTAINER_VIDEO_KEY + "S", this)
+      { Title = StringUtils.TrimToNull(language.ToString(RES_SERIES)) ?? "Series" };
+      videoContainer.Add(seriesContainer);
+      videoContainer.Add(new MediaLibraryShareContainer(MediaLibraryHelper.CONTAINER_VIDEO_KEY + "VS", this, "Video")
+      { Title = StringUtils.TrimToNull(language.ToString(RES_SHARE)) ?? "Shares" });
       RootContainer.Add(videoContainer);
 
-      RootContainer.Add(new MediaLibraryShareContainer(MediaLibraryHelper.CONTAINER_MEDIA_SHARES_KEY, this) { Title = "Shares" });
+      if (ServiceRegistration.IsRegistered<ITvProvider>())
+      {
+      }
+
+      RootContainer.Add(new MediaLibraryShareContainer(MediaLibraryHelper.CONTAINER_MEDIA_SHARES_KEY, this)
+      { Title = StringUtils.TrimToNull(language.ToString(RES_SHARE)) ?? "Shares" });
     }
   }
 
