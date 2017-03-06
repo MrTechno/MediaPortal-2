@@ -18,15 +18,11 @@
 
 #endregion
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MediaPortal.Common.Settings;
 using MediaPortal.Common;
 using MediaPortal.Common.PathManager;
-using System.Collections.ObjectModel;
+using MediaPortal.Plugins.Transcoding.Interfaces;
 
 namespace MediaPortal.Plugins.Transcoding.Service.Settings
 {
@@ -91,6 +87,6 @@ namespace MediaPortal.Plugins.Transcoding.Service.Settings
     [Setting(SettingScope.Global)]
     public List<VideoCodec> IntelHWSupportedCodecs { get; private set; }
     [Setting(SettingScope.Global)]
-    public List<VideoCodec> NvidiaHWSupportedCodecs { get; private set; }   
+    public List<VideoCodec> NvidiaHWSupportedCodecs { get; private set; }
   }
 }
