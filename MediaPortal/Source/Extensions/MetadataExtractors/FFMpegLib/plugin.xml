@@ -16,7 +16,11 @@
   </Runtime>
 
   <DependsOn>
+<<<<<<< HEAD
     <CoreDependency Name="MediaPortal.Common" CompatibleAPI="2" />
+=======
+    <CoreDependency Name="MediaPortal.Common" CompatibleAPI="1" />
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
     <CoreDependency Name="MediaPortal.Utilities" CompatibleAPI="1" />
   </DependsOn>
 

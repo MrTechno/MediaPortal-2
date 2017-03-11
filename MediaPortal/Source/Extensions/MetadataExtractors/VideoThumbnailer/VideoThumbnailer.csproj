@@ -13,6 +13,12 @@
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\</SolutionDir>
+<<<<<<< HEAD
+=======
+    <RestorePackages>true</RestorePackages>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>f34f6082</NuGetPackageImportStamp>
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -90,10 +96,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="build.targets" />
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="build.targets" />
+<<<<<<< HEAD
   <Import Project="..\..\..\..\Packages\ffmpeg.2.8.20150913\build\ffmpeg.targets" Condition="Exists('..\..\..\..\Packages\ffmpeg.2.8.20150913\build\ffmpeg.targets')" />
 </Project>
 
+=======
+</Project>
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2

@@ -50,7 +50,10 @@ namespace MediaPortal.Plugins.SlimTv.Client.Helpers
     public AbstractProperty EpisodeNumberProperty { get; set; }
     public AbstractProperty EpisodeTitleProperty { get; set; }
     public AbstractProperty SeriesProperty { get; set; }
+<<<<<<< HEAD
     public AbstractProperty ChannelNameProperty { get; set; }
+=======
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
 
     /// <summary>
     /// Gets or Sets the Title.
@@ -170,6 +173,7 @@ namespace MediaPortal.Plugins.SlimTv.Client.Helpers
       set { SeriesProperty.SetValue(value); }
     }
 
+<<<<<<< HEAD
     /// <summary>
     /// Gets or Sets the channel name.
     /// </summary>
@@ -179,6 +183,8 @@ namespace MediaPortal.Plugins.SlimTv.Client.Helpers
       set { ChannelNameProperty.SetValue(value); }
     }
 
+=======
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
     public ProgramProperties()
     {
       ProgramIdProperty = new WProperty(typeof(int), 0);
@@ -194,7 +200,10 @@ namespace MediaPortal.Plugins.SlimTv.Client.Helpers
       SeasonNumberProperty = new WProperty(typeof(String), String.Empty);
       EpisodeTitleProperty = new WProperty(typeof(String), String.Empty);
       SeriesProperty = new WProperty(typeof(String), String.Empty);
+<<<<<<< HEAD
       ChannelNameProperty = new WProperty(typeof(String), String.Empty);
+=======
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
       Attach();
     }
 

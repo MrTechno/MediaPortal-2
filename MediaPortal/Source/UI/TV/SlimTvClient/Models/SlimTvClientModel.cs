@@ -526,7 +526,11 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
         SlotPlayer.Pause();
 
       // Set the current index of the tuned channel
+<<<<<<< HEAD
       if (ChannelContext.Instance.Channels.MoveTo(c => ChannelContext.IsSameChannel(c, channel)))
+=======
+      if (ChannelContext.Instance.Channels.MoveTo(c => IsSameChannel(c, channel)))
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
         _zapChannelIndex = ChannelContext.Instance.Channels.CurrentIndex; // Needs to be the same to start zapping from current offset
       else
         _zapChannelIndex = 0;
@@ -699,7 +703,11 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
     {
       CloseOSD();
 
+<<<<<<< HEAD
       if (!ChannelContext.IsSameChannel(ChannelContext.Instance.Channels[_zapChannelIndex], _lastTunedChannel))
+=======
+      if (!IsSameChannel(ChannelContext.Instance.Channels[_zapChannelIndex], _lastTunedChannel))
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
       {
         ChannelContext.Instance.Channels.SetIndex(_zapChannelIndex);
         Tune(ChannelContext.Instance.Channels[_zapChannelIndex]);
@@ -926,6 +934,7 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
       base.Dispose();
     }
 
+<<<<<<< HEAD
     #endregion
 
     #region Channel, groups and programs
@@ -950,6 +959,30 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
 
       bool isOneSelected = false;
       lock (_channelList.SyncRoot)
+=======
+
+    /// <summary>
+    /// Helper method to make sure the model updates the channel list when opening the MiniGuide.
+    /// Usually the update logic is done in Workflow events, but the MiniGuide is opened as dialog
+    /// in current workflow state (which doesn't invoke workflow transistions).
+    /// </summary>
+    public void UpdateChannelsMiniGuide()
+    {
+      UpdateChannels();
+    }
+    protected virtual void UpdateGuiProperties()
+    {
+      CurrentGroupName = CurrentChannelGroup != null ? CurrentChannelGroup.Name : string.Empty;
+    }
+
+    protected void UpdateChannels()
+    {
+      UpdateGuiProperties();
+      _channelList.Clear();
+
+      bool isOneSelected = false;
+      foreach (IChannel channel in ChannelContext.Instance.Channels)
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
       {
         _channelList.Clear();
         foreach (IChannel channel in ChannelContext.Instance.Channels)
@@ -970,7 +1003,11 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
         }
       }
       // Adjust channel list position
+<<<<<<< HEAD
       ChannelContext.Instance.Channels.MoveTo(c => ChannelContext.IsSameChannel(c, _lastTunedChannel));
+=======
+      ChannelContext.Instance.Channels.MoveTo(c => IsSameChannel(c, _lastTunedChannel));
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
 
       // If the current watched channel is not part of the channel group, set the "selected" property to first list item to make sure focus will be set to the list view
       if (!isOneSelected && _channelList.Count > 0)

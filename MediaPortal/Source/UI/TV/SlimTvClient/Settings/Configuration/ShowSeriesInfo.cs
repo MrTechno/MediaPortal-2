@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 #region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
     Copyright (C) 2007-2017 Team MediaPortal
+=======
+#region Copyright (C) 2007-2015 Team MediaPortal
+
+/*
+    Copyright (C) 2007-2015 Team MediaPortal
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2

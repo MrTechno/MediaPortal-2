@@ -18,8 +18,13 @@
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+<<<<<<< HEAD
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+=======
+    <NuGetPackageImportStamp>568041ba</NuGetPackageImportStamp>
+    <RestorePackages>true</RestorePackages>
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -87,6 +92,7 @@
   <Import Project="..\..\..\Packages\bass.alac.2.4.3\build\bass.alac.targets" Condition="Exists('..\..\..\Packages\bass.alac.2.4.3\build\bass.alac.targets')" />
   <Import Project="..\..\..\Packages\bass.ofr.2.4.0.2\build\bass.ofr.targets" Condition="Exists('..\..\..\Packages\bass.ofr.2.4.0.2\build\bass.ofr.targets')" />
   <Import Project="..\..\..\Packages\bass.tags.0.0.17\build\bass.tags.targets" Condition="Exists('..\..\..\Packages\bass.tags.0.0.17\build\bass.tags.targets')" />
+<<<<<<< HEAD
   <Import Project="..\..\..\Packages\BASS.2.4.12.1\build\bass.targets" Condition="Exists('..\..\..\Packages\BASS.2.4.12.1\build\bass.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -124,4 +130,16 @@
   <Import Project="..\..\..\Packages\bass.wasapi.2.4.1.2\build\bass.wasapi.targets" Condition="Exists('..\..\..\Packages\bass.wasapi.2.4.1.2\build\bass.wasapi.targets')" />
   <Import Project="..\..\..\Packages\bass.wma.2.4.5.1\build\bass.wma.targets" Condition="Exists('..\..\..\Packages\bass.wma.2.4.5.1\build\bass.wma.targets')" />
   <Import Project="..\..\..\Packages\bass.wv.2.4.6.0\build\bass.wv.targets" Condition="Exists('..\..\..\Packages\bass.wv.2.4.6.0\build\bass.wv.targets')" />
+=======
+  <Import Project="..\..\..\Packages\bass.tta.2.4.0\build\bass.tta.targets" Condition="Exists('..\..\..\Packages\bass.tta.2.4.0\build\bass.tta.targets')" />
+  <Import Project="..\..\..\Packages\bass.wma.2.4.4\build\bass.wma.targets" Condition="Exists('..\..\..\Packages\bass.wma.2.4.4\build\bass.wma.targets')" />
+  <Import Project="..\..\..\Packages\bass.wv.2.4.4\build\bass.wv.targets" Condition="Exists('..\..\..\Packages\bass.wv.2.4.4\build\bass.wv.targets')" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
 </Project>

@@ -152,11 +152,14 @@
         HelpText="[SlimTvClient.AutoStartTv.Help]"
         ClassName="MediaPortal.Plugins.SlimTv.Client.Settings.Configuration.AutoStartTvSetting"/>
     <ConfigSetting
+<<<<<<< HEAD
         Id="HideAllChannelsGroupSetting"
         Text="[SlimTvClient.HideAllChannelsGroup]"
         HelpText="[SlimTvClient.HideAllChannelsGroup.Help]"
         ClassName="MediaPortal.Plugins.SlimTv.Client.Settings.Configuration.HideAllChannelsGroupSetting"/>
     <ConfigSetting
+=======
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
         Id="ShowSeriesInfoSetting"
         Text="[SlimTvClient.ShowSeriesInfo]"
         HelpText="[SlimTvClient.ShowSeriesInfo.Help]"

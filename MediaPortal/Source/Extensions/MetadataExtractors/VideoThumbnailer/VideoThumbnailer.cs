@@ -32,6 +32,11 @@ using MediaPortal.Common.Logging;
 using MediaPortal.Common.MediaManagement;
 using MediaPortal.Common.MediaManagement.DefaultItemAspects;
 using MediaPortal.Common.ResourceAccess;
+<<<<<<< HEAD
+=======
+using MediaPortal.Common.Services.ResourceAccess.ImpersonationService;
+using MediaPortal.Extensions.MetadataExtractors.FFMpegLib;
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
 using MediaPortal.Utilities.FileSystem;
 using MediaPortal.Extensions.MetadataExtractors.FFMpegLib;
 using MediaPortal.Utilities.Process;
@@ -178,8 +183,12 @@ namespace MediaPortal.Extensions.MetadataExtractors.VideoThumbnailer
 
       // ToDo: Move creation of temp file names to FileUtils class
       string tempFileName = Path.GetTempPath() + Guid.NewGuid() + ".jpg";
+<<<<<<< HEAD
       string executable = FileUtils.BuildAssemblyRelativePath("ffmpeg.exe");
       string arguments = string.Format("-ss {0} -i \"{1}\" -vframes 1 -an -dn -vf \"yadif='mode=send_frame:parity=auto:deint=all',scale=iw*sar:ih,setsar=1/1{3}\" -y \"{2}\"",
+=======
+      string arguments = string.Format("-ss {0} -i \"{1}\" -vframes 1 -an -dn -vf \"yadif='mode=send_frame:parity=auto:deint=all',scale=iw*sar:ih,setsar=1/1,scale=iw/2:-1\" -y \"{2}\"",
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
         defaultVideoOffset,
         // Calling EnsureLocalFileSystemAccess not necessary; access for external process ensured by ExecuteWithResourceAccess
         lfsra.LocalFileSystemPath,
@@ -190,10 +199,17 @@ namespace MediaPortal.Extensions.MetadataExtractors.VideoThumbnailer
 
       try
       {
+<<<<<<< HEAD
         Task<ProcessExecutionResult> executionResult = null;
         FFMPEG_THROTTLE_LOCK.Wait();
         executionResult = FFMpegBinary.FFMpegExecuteWithResourceAccessAsync(lfsra, arguments, ProcessPriorityClass.BelowNormal, PROCESS_TIMEOUT_MS);
         if (executionResult.Result.Success && File.Exists(tempFileName))
+=======
+        bool success;
+        lock (FFMPEG_THROTTLE_LOCK)
+          success = FFMpegBinary.FFMpegExecuteWithResourceAccessAsync(lfsra, arguments, ProcessPriorityClass.Idle, PROCESS_TIMEOUT_MS).Result.Success;
+        if (success && File.Exists(tempFileName))
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
         {
           var binary = FileUtils.ReadFile(tempFileName);
           MediaItemAspect.SetAttribute(extractedAspectData, ThumbnailLargeAspect.ATTR_THUMBNAIL, binary);
@@ -213,7 +229,7 @@ namespace MediaPortal.Extensions.MetadataExtractors.VideoThumbnailer
         {
           if (e is TaskCanceledException)
           {
-            ServiceRegistration.Get<ILogger>().Warn("VideoThumbnailer.ExtractThumbnail: External process aborted due to timeout: Executable='{0}', Arguments='{1}', Timeout='{2}'", executable, arguments, PROCESS_TIMEOUT_MS);
+            ServiceRegistration.Get<ILogger>().Warn("VideoThumbnailer.ExtractThumbnail: External process aborted due to timeout: Executable='FFMpeg', Arguments='{0}', Timeout='{1}'", arguments, PROCESS_TIMEOUT_MS);
             return true;
           }
           return false;

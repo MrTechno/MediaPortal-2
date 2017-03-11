@@ -47,12 +47,20 @@ namespace MediaPortal.Extensions.MetadataExtractors
     /// <summary>
     /// GUID string for the Tve3 Recording metadata extractor.
     /// </summary>
+<<<<<<< HEAD
     private const string TVE_SERIES_METADATAEXTRACTOR_ID_STR = "53033EC6-52BB-4032-A822-2573C66D0ACE";
+=======
+    private const string METADATAEXTRACTOR_ID_STR = "53033EC6-52BB-4032-A822-2573C66D0ACE";
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
 
     /// <summary>
     /// Tve3 metadata extractor GUID.
     /// </summary>
+<<<<<<< HEAD
     public new static Guid METADATAEXTRACTOR_ID = new Guid(TVE_SERIES_METADATAEXTRACTOR_ID_STR);
+=======
+    public new static Guid METADATAEXTRACTOR_ID = new Guid(METADATAEXTRACTOR_ID_STR);
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
 
     protected static IList<MediaCategory> SERIES_MEDIA_CATEGORIES = new List<MediaCategory>();
 
@@ -68,6 +76,7 @@ namespace MediaPortal.Extensions.MetadataExtractors
     public Tve3RecordingSeriesMetadataExtractor()
     {
       _metadata = new MetadataExtractorMetadata(METADATAEXTRACTOR_ID, "TVEngine3 recordings series metadata extractor", MetadataExtractorPriority.Extended, false,
+<<<<<<< HEAD
         SERIES_MEDIA_CATEGORIES, new[]
         {
           MediaAspect.Metadata,
@@ -77,14 +86,24 @@ namespace MediaPortal.Extensions.MetadataExtractors
     }
 
     public override bool TryExtractMetadata(IResourceAccessor mediaItemAccessor, IDictionary<Guid, IList<MediaItemAspect>> extractedAspectData, bool importOnly)
+=======
+        SERIES_MEDIA_CATEGORIES, new[] { SeriesAspect.Metadata });
+    }
+
+    public override bool TryExtractMetadata(IResourceAccessor mediaItemAccessor, IDictionary<Guid, MediaItemAspect> extractedAspectData, bool forceQuickMode)
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
     {
       try
       {
         IResourceAccessor metaFileAccessor;
+<<<<<<< HEAD
         if (!CanExtract(mediaItemAccessor, extractedAspectData, out metaFileAccessor))
           return false;
         if (extractedAspectData.ContainsKey(EpisodeAspect.ASPECT_ID))
           return false;
+=======
+        if (!CanExtract(mediaItemAccessor, extractedAspectData, out metaFileAccessor)) return false;
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
 
         Tags tags;
         using (metaFileAccessor)
@@ -94,6 +113,7 @@ namespace MediaPortal.Extensions.MetadataExtractors
         }
 
         // Handle series information
+<<<<<<< HEAD
         EpisodeInfo episodeInfo = GetSeriesFromTags(tags);
         if (episodeInfo.IsBaseInfoPresent)
         {
@@ -102,6 +122,17 @@ namespace MediaPortal.Extensions.MetadataExtractors
             episodeInfo.SetMetadata(extractedAspectData);
         }
         return episodeInfo.IsBaseInfoPresent;
+=======
+        SeriesInfo seriesInfo = GetSeriesFromTags(tags);
+        if (seriesInfo.IsCompleteMatch)
+        {
+          if (!forceQuickMode)
+            SeriesTvDbMatcher.Instance.FindAndUpdateSeries(seriesInfo);
+
+          seriesInfo.SetMetadata(extractedAspectData);
+        }
+        return true;
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
       }
       catch (Exception e)
       {
@@ -147,7 +178,7 @@ namespace MediaPortal.Extensions.MetadataExtractors
     /// <summary>
     /// GUID string for the Tve3Recording metadata extractor.
     /// </summary>
-    public const string METADATAEXTRACTOR_ID_STR = "C7080745-8EAE-459E-8A9A-25D87DF8565F";
+    private const string METADATAEXTRACTOR_ID_STR = "C7080745-8EAE-459E-8A9A-25D87DF8565F";
 
     /// <summary>
     /// Tve3 metadata extractor GUID.
@@ -258,15 +289,23 @@ namespace MediaPortal.Extensions.MetadataExtractors
       get { return _metadata; }
     }
 
+<<<<<<< HEAD
     public virtual bool TryExtractMetadata(IResourceAccessor mediaItemAccessor, IDictionary<Guid, IList<MediaItemAspect>> extractedAspectData, bool importOnly)
+=======
+    public virtual bool TryExtractMetadata(IResourceAccessor mediaItemAccessor, IDictionary<Guid, MediaItemAspect> extractedAspectData, bool forceQuickMode)
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
     {
       try
       {
         IResourceAccessor metaFileAccessor;
+<<<<<<< HEAD
         if (!CanExtract(mediaItemAccessor, extractedAspectData, out metaFileAccessor))
           return false;
         if (extractedAspectData.ContainsKey(RecordingAspect.ASPECT_ID))
           return false;
+=======
+        if (!CanExtract(mediaItemAccessor, extractedAspectData, out metaFileAccessor)) return false;
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
 
         Tags tags;
         using (metaFileAccessor)
@@ -274,9 +313,12 @@ namespace MediaPortal.Extensions.MetadataExtractors
           using (Stream metaStream = ((IFileSystemResourceAccessor)metaFileAccessor).OpenRead())
             tags = (Tags)GetTagsXmlSerializer().Deserialize(metaStream);
         }
+<<<<<<< HEAD
 
         MediaItemAspect.SetAttribute(extractedAspectData, MediaAspect.ATTR_ISVIRTUAL, false);
         MediaItemAspect.SetAttribute(extractedAspectData, VideoAspect.ATTR_ISDVD, false);
+=======
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
 
         string value;
         if (TryGet(tags, TAG_TITLE, out value) && !string.IsNullOrEmpty(value))
@@ -326,7 +368,11 @@ namespace MediaPortal.Extensions.MetadataExtractors
       return false;
     }
 
+<<<<<<< HEAD
     protected static bool CanExtract(IResourceAccessor mediaItemAccessor, IDictionary<Guid, IList<MediaItemAspect>> extractedAspectData, out IResourceAccessor metaFileAccessor)
+=======
+    protected static bool CanExtract(IResourceAccessor mediaItemAccessor, IDictionary<Guid, MediaItemAspect> extractedAspectData, out IResourceAccessor metaFileAccessor)
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
     {
       metaFileAccessor = null;
       IFileSystemResourceAccessor fsra = mediaItemAccessor as IFileSystemResourceAccessor;

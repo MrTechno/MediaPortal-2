@@ -48,12 +48,20 @@ namespace MediaPortal.Extensions.MetadataExtractors
     /// <summary>
     /// GUID string for the WTV Recording metadata extractor.
     /// </summary>
+<<<<<<< HEAD
     private const string WTV_SERIES_METADATAEXTRACTOR_ID_STR = "2E1493A6-4898-429C-AF56-D6D7EA2AFEF3";
+=======
+    private const string METADATAEXTRACTOR_ID_STR = "2E1493A6-4898-429C-AF56-D6D7EA2AFEF3";
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
 
     /// <summary>
     /// Tve3 metadata extractor GUID.
     /// </summary>
+<<<<<<< HEAD
     public new static Guid METADATAEXTRACTOR_ID = new Guid(WTV_SERIES_METADATAEXTRACTOR_ID_STR);
+=======
+    public new static Guid METADATAEXTRACTOR_ID = new Guid(METADATAEXTRACTOR_ID_STR);
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
 
     protected static IList<MediaCategory> SERIES_MEDIA_CATEGORIES = new List<MediaCategory>();
 
@@ -69,6 +77,7 @@ namespace MediaPortal.Extensions.MetadataExtractors
     public WTVRecordingSeriesMetadataExtractor()
     {
       _metadata = new MetadataExtractorMetadata(METADATAEXTRACTOR_ID, "WTV series recordings metadata extractor", MetadataExtractorPriority.Extended, false,
+<<<<<<< HEAD
           SERIES_MEDIA_CATEGORIES, new[]
           {
             MediaAspect.Metadata,
@@ -120,6 +129,40 @@ namespace MediaPortal.Extensions.MetadataExtractors
           episodeInfo.SetMetadata(extractedAspectData);
       }
       return episodeInfo.IsBaseInfoPresent;
+=======
+          SERIES_MEDIA_CATEGORIES, new[] { SeriesAspect.Metadata });
+    }
+
+    public SeriesInfo GetSeriesFromTags(IDictionary metadata)
+    {
+      SeriesInfo seriesInfo = new SeriesInfo();
+      string tmpString;
+
+      if (TryGet(metadata, TAG_TITLE, out tmpString))
+        seriesInfo.Series = tmpString;
+
+      if (TryGet(metadata, TAG_EPISODENAME, out tmpString))
+        seriesInfo.Episode = tmpString;
+
+      return seriesInfo;
+    }
+
+    protected override bool ExtractMetadata(ILocalFsResourceAccessor lfsra, IDictionary<Guid, MediaItemAspect> extractedAspectData, bool forceQuickMode)
+    {
+      if (!CanExtract(lfsra, extractedAspectData) || forceQuickMode)
+        return false;
+
+      using (var rec = new MCRecMetadataEditor(lfsra.LocalFileSystemPath))
+      {
+        // Handle series information
+        IDictionary tags = rec.GetAttributes();
+        SeriesInfo seriesInfo = GetSeriesFromTags(tags);
+
+        if (SeriesTvDbMatcher.Instance.FindAndUpdateSeries(seriesInfo))
+          seriesInfo.SetMetadata(extractedAspectData);
+      }
+      return true;
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
     }
   }
 
@@ -133,7 +176,7 @@ namespace MediaPortal.Extensions.MetadataExtractors
     /// <summary>
     /// GUID string for the Tve3Recording metadata extractor.
     /// </summary>
-    public const string METADATAEXTRACTOR_ID_STR = "8FB55236-C567-4233-ABFF-754F5A0BBD1C";
+    private const string METADATAEXTRACTOR_ID_STR = "8FB55236-C567-4233-ABFF-754F5A0BBD1C";
 
     /// <summary>
     /// Tve3 metadata extractor GUID.
@@ -181,7 +224,11 @@ namespace MediaPortal.Extensions.MetadataExtractors
                 MediaAspect.Metadata,
                 ProviderResourceAspect.Metadata,
                 VideoAspect.Metadata,
+<<<<<<< HEAD
                 RecordingAspect.Metadata
+=======
+                RecordingAspect.Metadata,
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
               });
     }
 
@@ -236,17 +283,24 @@ namespace MediaPortal.Extensions.MetadataExtractors
       return false;
     }
 
+<<<<<<< HEAD
     protected virtual bool ExtractMetadata(ILocalFsResourceAccessor lfsra, IDictionary<Guid, IList<MediaItemAspect>> extractedAspectData, bool importOnly)
     {
       if (!CanExtract(lfsra, extractedAspectData))
         return false;
       if (extractedAspectData.ContainsKey(RecordingAspect.ASPECT_ID))
+=======
+    protected virtual bool ExtractMetadata(ILocalFsResourceAccessor lfsra, IDictionary<Guid, MediaItemAspect> extractedAspectData, bool forceQuickMode)
+    {
+      if (!CanExtract(lfsra, extractedAspectData))
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
         return false;
 
       using (var rec = new MCRecMetadataEditor(lfsra.LocalFileSystemPath))
       {
         // Handle series information
         IDictionary tags = rec.GetAttributes();
+<<<<<<< HEAD
 
         // Force MimeType
         IList<MultipleMediaItemAspect> providerAspects;
@@ -255,6 +309,8 @@ namespace MediaPortal.Extensions.MetadataExtractors
         {
           aspect.SetAttribute(ProviderResourceAspect.ATTR_MIME_TYPE, "slimtv/wtv");
         }
+=======
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
 
         MediaItemAspect.SetAttribute(extractedAspectData, MediaAspect.ATTR_ISVIRTUAL, false);
         MediaItemAspect.SetAttribute(extractedAspectData, VideoAspect.ATTR_ISDVD, false);
@@ -302,7 +358,11 @@ namespace MediaPortal.Extensions.MetadataExtractors
       return true;
     }
 
+<<<<<<< HEAD
     protected static bool CanExtract(ILocalFsResourceAccessor lfsra, IDictionary<Guid, IList<MediaItemAspect>> extractedAspectData)
+=======
+    protected static bool CanExtract(ILocalFsResourceAccessor lfsra, IDictionary<Guid, MediaItemAspect> extractedAspectData)
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
     {
       if (lfsra == null || !lfsra.IsFile)
         return false;

@@ -115,10 +115,16 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
     {
       UpdateGuiProperties();
       _programsList.Clear();
+<<<<<<< HEAD
       IChannel channel = CurrentChannel;
       if (channel != null)
       {
         if (_tvHandler.ProgramInfo.GetPrograms(channel, DateTime.Now.AddHours(-2), DateTime.Now.AddHours(24), out _programs))
+=======
+      if (CurrentChannel != null)
+      {
+        if (_tvHandler.ProgramInfo.GetPrograms(CurrentChannel, DateTime.Now.AddHours(-2), DateTime.Now.AddHours(24), out _programs))
+>>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
         {
           foreach (IProgram program in _programs)
           {
