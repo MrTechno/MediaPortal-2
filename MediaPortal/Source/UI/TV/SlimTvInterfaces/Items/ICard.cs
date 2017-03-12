@@ -22,68 +22,88 @@
 
 #endregion
 
-using System;
-
 namespace MediaPortal.Plugins.SlimTv.Interfaces.Items
 {
+
+  public enum SlimTvCamType
+  {
+    Default = 0,
+    Astoncrypt2 = 1
+  }
+
   /// <summary>
-  /// IProgram represents a single program on a channel.
+  /// ICard represents a card.
   /// </summary>
-  public interface IProgram
+  public interface ICard
   {
     /// <summary>
-    /// Gets or Sets the Program ID.
-    /// </summary>
-    int ProgramId { get; set; }
+    /// Gets or Sets the Channel ID.
+    /// </summary>    
+    int CardId { get; set; }
 
     /// <summary>
-    /// Gets or Sets the Channel ID where this program is on.
-    /// </summary>
-    int ChannelId { get; set; }
+    /// Gets or Sets the Name.
+    /// </summary>      
+    string Name { get; set; }
 
     /// <summary>
-    /// Gets or Sets the Title.
+    /// Gets or Sets if EPG is grabbing on this card.
     /// </summary>
-    String Title { get; set; }
+    bool EpgIsGrabbing { get; set; }
 
     /// <summary>
-    /// Gets or Sets the Long Description.
+    /// Gets or Sets if the Card has a cam
     /// </summary>
-    String Description { get; set; }
+    bool HasCam { get; set; }
 
     /// <summary>
-    /// Gets or Sets the Genre.
+    /// Gets or Sets the Cam Type
     /// </summary>
-    String Genre { get; set; }
+    SlimTvCamType CamType { get; set; }
 
     /// <summary>
-    /// Gets or Sets the Start time.
+    /// Gets or Sets the Decrypt Limit
     /// </summary>
-    DateTime StartTime { get; set; }
+    int DecryptLimit { get; set; }
 
     /// <summary>
-    /// Gets or Sets the End time.
+    /// Gets or Sets the Device Path
     /// </summary>
-    DateTime EndTime { get; set; }
+    string DevicePath { get; set; }
 
     /// <summary>
-    /// Gets or Sets the Original Air Date.
+    /// Gets or Sets if the Card is enabled
     /// </summary>
-    DateTime? OriginalAirDate { get; set; }
+    bool Enabled { get; set; }
 
     /// <summary>
-    /// Gets or Sets the Classification.
+    /// Gets or Sets the Recording Folder
     /// </summary>
-    String Classification { get; set; }
+    string RecordingFolder { get; set; }
 
     /// <summary>
-    /// Gets or Sets the Parental Rating.
+    /// Gets or Sets the Recording format
     /// </summary>
-    int ParentalRating { get; set; }
+    int RecordingFormat { get; set; }
 
     /// <summary>
-    /// Gets or Sets the Star Rating.
+    /// Gets or Sets the Timeshifting Folder
     /// </summary>
-    int StarRating { get; set; }
+    string TimeshiftFolder { get; set; }
+
+    /// <summary>
+    /// Gets or Sets the Card priority
+    /// </summary>
+    int Priority { get; set; }
+
+    /// <summary>
+    /// Gets or Sets if the Card is preloaded
+    /// </summary>
+    bool PreloadCard { get; set; }
+
+    /// <summary>
+    /// Gets or Sets if Subchannels are supported
+    /// </summary>
+    bool SupportSubChannels { get; set; }
   }
 }

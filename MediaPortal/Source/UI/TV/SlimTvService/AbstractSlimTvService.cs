@@ -481,9 +481,13 @@ namespace MediaPortal.Plugins.SlimTv.Service
 
     public abstract bool CreateScheduleByTime(IChannel channel, DateTime from, DateTime to, out ISchedule schedule);
 
+    public abstract bool EditSchedule(ISchedule schedule, IChannel channel = null, string title = null, DateTime? from = null, DateTime? to = null, ScheduleRecordingType? recordingType = null, TimeSpan? preRecordInterval = null, TimeSpan? postRecordInterval = null, PriorityType? priority = null);
+
     public abstract bool RemoveScheduleForProgram(IProgram program, ScheduleRecordingType recordingType);
 
     public abstract bool RemoveSchedule(ISchedule schedule);
+
+    public abstract bool UnCancelSchedule(IProgram program);
 
     public abstract bool GetRecordingStatus(IProgram program, out RecordingStatus recordingStatus);
 

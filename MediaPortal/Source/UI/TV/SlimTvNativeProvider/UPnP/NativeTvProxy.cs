@@ -539,6 +539,11 @@ namespace MediaPortal.Plugins.SlimTv.Providers.UPnP
       }
     }
 
+    public bool EditSchedule(ISchedule schedule, IChannel channel = null, string title = null, DateTime? from = null, DateTime? to = null, ScheduleRecordingType? recordingType = null, TimeSpan? preRecordInterval = null, TimeSpan? postRecordInterval = null, PriorityType? priority = null)
+    {
+      throw new NotImplementedException();
+    }
+
     public bool RemoveScheduleForProgram(IProgram program, ScheduleRecordingType recordingType)
     {
       try
@@ -569,6 +574,11 @@ namespace MediaPortal.Plugins.SlimTv.Providers.UPnP
         NotifyException(ex);
         return false;
       }
+    }
+
+    public bool UnCancelSchedule(IProgram program)
+    {
+      throw new NotImplementedException();
     }
 
     public bool GetRecordingStatus(IProgram program, out RecordingStatus recordingStatus)
