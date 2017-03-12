@@ -1,5 +1,5 @@
 ﻿using System;
-using MediaPortal.Plugins.Transcoding.Service.Transcoders.Base;
+using MediaPortal.Plugins.Transcoding.Interfaces.Transcoding;
 
 namespace MediaPortal.Plugins.MP2Extended.WSS.General
 {

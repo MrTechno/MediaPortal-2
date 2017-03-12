@@ -3,11 +3,11 @@ using HttpServer;
 using HttpServer.Exceptions;
 using MediaPortal.Common;
 using MediaPortal.Common.Logging;
-using MediaPortal.Extensions.UserServices.FanArtService.Interfaces;
 using MediaPortal.Plugins.MP2Extended.Attributes;
 using MediaPortal.Plugins.MP2Extended.MAS.OnlineVideos;
 using MediaPortal.Plugins.MP2Extended.OnlineVideos;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Cache;
+using MediaPortal.Common.FanArt;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images
 {
@@ -53,7 +53,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images
       if (!Enum.TryParse(mediatype, out mediaTypeEnum))
         throw new BadRequestException("GetOnlineVideosArtworkResized: Error parsing mediatype");
 
-      ImageCache.CacheIdentifier identifier = ImageCache.GetIdentifier(StringToGuid(id), false, maxWidthInt, maxHeightInt, borders, 0, FanArtConstants.FanArtType.Thumbnail, FanArtConstants.FanArtMediaType.Undefined);
+      ImageCache.CacheIdentifier identifier = ImageCache.GetIdentifier(StringToGuid(id), false, maxWidthInt, maxHeightInt, borders, 0, FanArtTypes.Thumbnail, FanArtMediaTypes.Undefined);
 
       byte[] data;
       if (ImageCache.TryGetImageFromCache(identifier, out data))

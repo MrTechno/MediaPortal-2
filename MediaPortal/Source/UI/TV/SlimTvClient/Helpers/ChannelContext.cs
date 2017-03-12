@@ -24,16 +24,11 @@
 
 using System;
 using System.Collections.Generic;
-<<<<<<< HEAD
 using System.Linq;
 using MediaPortal.Common;
 using MediaPortal.Common.Services.Settings;
 using MediaPortal.Common.Settings;
 using MediaPortal.Plugins.SlimTv.Client.Settings;
-=======
-using MediaPortal.Common;
-using MediaPortal.Plugins.SlimTv.Client.Messaging;
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
 using MediaPortal.Plugins.SlimTv.Interfaces;
 using MediaPortal.Plugins.SlimTv.Interfaces.Items;
 
@@ -76,22 +71,14 @@ namespace MediaPortal.Plugins.SlimTv.Client.Helpers
       InitChannelGroups();
     }
 
-<<<<<<< HEAD
     public void InitChannelGroups()
-=======
-    private void InitChannelGroups()
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
     {
       IList<IChannelGroup> channelGroups;
       var tvHandler = ServiceRegistration.Get<ITvHandler>(false);
       if (tvHandler != null && tvHandler.ChannelAndGroupInfo.GetChannelGroups(out channelGroups))
       {
         ChannelGroups.Clear();
-<<<<<<< HEAD
         ChannelGroups.AddRange(FilterGroups(channelGroups));
-=======
-        ChannelGroups.AddRange(channelGroups);
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
         ChannelGroups.FireListChanged();
 
         int selectedChannelGroupId = tvHandler.ChannelAndGroupInfo.SelectedChannelGroupId;
@@ -102,7 +89,6 @@ namespace MediaPortal.Plugins.SlimTv.Client.Helpers
       }
     }
 
-<<<<<<< HEAD
     public static bool IsSameChannel(IChannel channel1, IChannel channel2)
     {
       if (channel1 == channel2)
@@ -125,8 +111,6 @@ namespace MediaPortal.Plugins.SlimTv.Client.Helpers
       return channelGroups.Where(g => g.Name != "All Channels").ToList();
     }
 
-=======
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
     /// <summary>
     /// Reload all channels if channel group is changed.
     /// </summary>
@@ -138,7 +122,6 @@ namespace MediaPortal.Plugins.SlimTv.Client.Helpers
       var tvHandler = ServiceRegistration.Get<ITvHandler>(false);
       if (tvHandler != null && tvHandler.ChannelAndGroupInfo.GetChannels(ChannelGroups.Current, out channels))
       {
-<<<<<<< HEAD
         Channels.ClearAndReset();
         Channels.AddRange(channels);
         Channels.FireListChanged();
@@ -149,21 +132,11 @@ namespace MediaPortal.Plugins.SlimTv.Client.Helpers
           for (int i = 0; i < Channels.Count; i++)
             Channels[i].ChannelNumber = i + 1;
         }
-=======
-        Channels.Clear();
-        Channels.AddRange(channels);
-        Channels.FireListChanged();
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
         // Check if the current channel is part of new group and select it
         int selectedChannelId = tvHandler.ChannelAndGroupInfo.SelectedChannelId;
         if (tvHandler.ChannelAndGroupInfo != null && selectedChannelId != 0)
           Channels.MoveTo(channel => channel.ChannelId == selectedChannelId);
       }
-<<<<<<< HEAD
-=======
-      // Notify listeners about group change
-      SlimTvClientMessaging.SendSlimTvClientMessage(SlimTvClientMessaging.MessageType.GroupChanged);
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
     }
   }
 
@@ -246,7 +219,6 @@ namespace MediaPortal.Plugins.SlimTv.Client.Helpers
         FireCurrentChanged(oldIndex);
         return true;
       }
-      FireCurrentChanged(oldIndex);
       return false;
     }
 

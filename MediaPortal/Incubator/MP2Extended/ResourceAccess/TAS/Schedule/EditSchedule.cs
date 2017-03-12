@@ -63,6 +63,11 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.TAS.Schedule
 
       int priorityInt = -1;
       int.TryParse(priority, out priorityInt);
+      PriorityType priorityType = PriorityType.Highest;
+      if(priorityInt >= 0)
+      {
+        priorityType = (PriorityType)priorityInt;
+      }
 
       ScheduleRecordingType scheduleRecordingType = ScheduleRecordingType.Once;
       if (scheduleType != null)
@@ -86,17 +91,16 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.TAS.Schedule
       {
         scheduleSrc = schedules.Single(x => x.ScheduleId == scheduleIdInt);
       }
-      
+
       bool result = scheduleControl.EditSchedule(scheduleSrc, 
         (channelId != null) ? channel : null, 
         title, 
         (startTime != null) ? startDateTime : (DateTime?)null,
         (endTime != null) ? endDateTime : (DateTime?)null,
         (scheduleType != null) ? scheduleRecordingType: (ScheduleRecordingType?)null,
-        (preRecordInterval != null) ? preRecordIntervalInt : (int?)null,
-        (postRecordInterval != null) ? postRecordIntervalInt : (int?)null,
-        directory,
-        (priority != null) ? priorityInt : (int?)null);
+        (preRecordInterval != null) ? TimeSpan.FromMinutes(preRecordIntervalInt) : (TimeSpan?)null,
+        (postRecordInterval != null) ? TimeSpan.FromMinutes(postRecordIntervalInt) : (TimeSpan?)null,
+        (priority != null) ? priorityType : (PriorityType?)null);
 
 
       return new WebBoolResult { Result = result };

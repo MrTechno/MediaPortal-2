@@ -40,7 +40,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.Movie
 
       foreach (var item in items)
       {
-        var videoGenres = (HashSet<object>)item[VideoAspect.ASPECT_ID][VideoAspect.ATTR_GENRES];
+        var videoGenres = (HashSet<object>)MP2ExtendedUtils.GetCollectionAttributeValues<object>(item.Aspects, GenreAspect.ATTR_GENRE);
         List<string> videoGenresList = new List<string>();
         if (videoGenres != null)
           videoGenresList = videoGenres.Cast<string>().ToList();

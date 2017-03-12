@@ -11,9 +11,7 @@ using MediaPortal.Common.MediaManagement.DefaultItemAspects;
 using MediaPortal.Common.ResourceAccess;
 using MediaPortal.Plugins.MP2Extended.Attributes;
 using MediaPortal.Plugins.MP2Extended.MAS.General;
-using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.BaseClasses;
-using MediaPortal.Plugins.MP2Extended.TAS.Tv;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.General
 {
@@ -38,7 +36,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.General
       if (item == null)
         throw new BadRequestException("GetFileInfo: no media tiem found");
 
-      var resourcePathStr = item.Aspects[ProviderResourceAspect.ASPECT_ID].GetAttributeValue(ProviderResourceAspect.ATTR_RESOURCE_ACCESSOR_PATH);
+      var resourcePathStr = MP2ExtendedUtils.GetAttributeValue(item.Aspects, ProviderResourceAspect.ATTR_RESOURCE_ACCESSOR_PATH);
       var resourcePath = ResourcePath.Deserialize(resourcePathStr.ToString());
 
       var ra = GetResourceAccessor(resourcePath);

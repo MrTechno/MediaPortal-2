@@ -8,7 +8,6 @@ using MediaPortal.Common.Logging;
 using MediaPortal.Common.MediaManagement;
 using MediaPortal.Plugins.MP2Extended.Attributes;
 using MediaPortal.Plugins.MP2Extended.MAS.General;
-using MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.General;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.Playlist
 {

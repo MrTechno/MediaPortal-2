@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using HttpServer;
 using HttpServer.Exceptions;
 using HttpServer.Sessions;
@@ -9,7 +7,6 @@ using MediaPortal.Common.Logging;
 using MediaPortal.Plugins.MP2Extended.Attributes;
 using MediaPortal.Plugins.MP2Extended.MAS.OnlineVideos;
 using MediaPortal.Plugins.MP2Extended.OnlineVideos;
-using MediaPortal.Plugins.MP2Extended.Utils;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.OnlineVideos
 {

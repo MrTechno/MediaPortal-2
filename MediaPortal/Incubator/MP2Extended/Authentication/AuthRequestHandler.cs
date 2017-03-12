@@ -29,7 +29,6 @@ using HttpServer.Exceptions;
 using MediaPortal.Common;
 using MediaPortal.Common.Logging;
 using MediaPortal.Common.ResourceAccess;
-using MediaPortal.Common.UserProfileDataManagement;
 using MediaPortal.Plugins.MP2Extended.Settings;
 
 namespace MediaPortal.Plugins.MP2Extended.Authentication

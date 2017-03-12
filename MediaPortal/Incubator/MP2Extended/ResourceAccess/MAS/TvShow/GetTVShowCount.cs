@@ -37,12 +37,12 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.TvShow
 
       foreach (var item in items)
       {
-        var seriesAspect = item.Aspects[SeriesAspect.ASPECT_ID];
-        int index = output.FindIndex(x => x.Title == (string)seriesAspect[SeriesAspect.ATTR_SERIESNAME]);
+        var episodeAspect = MediaItemAspect.GetAspect(item.Aspects, SeriesAspect.Metadata);
+        int index = output.FindIndex(x => x.Title == (string)episodeAspect[EpisodeAspect.ATTR_SERIES_NAME]);
         if (index == -1)
         {
           WebTVShowBasic webTVShowBasic = new WebTVShowBasic();
-          webTVShowBasic.Title = (string)seriesAspect[SeriesAspect.ATTR_SERIESNAME];
+          webTVShowBasic.Title = (string)episodeAspect[EpisodeAspect.ATTR_SERIES_NAME];
 
           output.Add(webTVShowBasic);
         }

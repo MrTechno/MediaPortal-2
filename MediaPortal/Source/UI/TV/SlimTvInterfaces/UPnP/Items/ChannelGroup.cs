@@ -41,10 +41,6 @@ namespace MediaPortal.Plugins.SlimTv.Interfaces.UPnP.Items
 
     public string Name { get; set; }
 
-    public MediaType MediaType { get; set; }
-
-    public int SortOrder { get; set; }
-
     #endregion
 
     /// <summary>

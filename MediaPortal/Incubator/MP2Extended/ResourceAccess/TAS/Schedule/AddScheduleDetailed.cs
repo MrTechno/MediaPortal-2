@@ -10,6 +10,7 @@ using MediaPortal.Plugins.MP2Extended.TAS;
 using MediaPortal.Plugins.SlimTv.Interfaces;
 using MediaPortal.Plugins.SlimTv.Interfaces.Items;
 using Newtonsoft.Json;
+using MediaPortal.Plugins.SlimTv.Interfaces.UPnP.Items;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.TAS.Schedule
 {
@@ -67,6 +68,11 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.TAS.Schedule
 
       int priorityInt = -1;
       int.TryParse(priority, out priorityInt);
+      PriorityType priorityType = PriorityType.Highest;
+      if(priorityInt >= 0)
+      {
+        priorityType = (PriorityType)priorityInt;
+      }
 
       ScheduleRecordingType scheduleRecordingType = (ScheduleRecordingType)JsonConvert.DeserializeObject(scheduleType, typeof(ScheduleRecordingType));
 
@@ -81,7 +87,25 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.TAS.Schedule
       IChannel channel;
       ISchedule schedule;
       if (channelAndGroupInfo.GetChannel(channelIdInt, out channel))
-        result = scheduleControl.CreateScheduleDetailed(channel, title, startDateTime, endDateTime, scheduleRecordingType, preRecordIntervalInt, postRecordIntervalInt, directory, priorityInt, out schedule);
+      {
+        IProgram program = new Program
+        {
+          ChannelId = channel.ChannelId,
+          Title = title,
+          StartTime = startDateTime,
+          EndTime = endDateTime
+        };
+        result = scheduleControl.CreateSchedule(program, scheduleRecordingType, out schedule);
+        result &= scheduleControl.EditSchedule(schedule,
+          null,
+          title,
+          null,
+          null,
+          null,
+          TimeSpan.FromMinutes(preRecordIntervalInt),
+          TimeSpan.FromMinutes(postRecordIntervalInt),
+          priorityType);
+      }
 
 
       return new WebBoolResult { Result = result };

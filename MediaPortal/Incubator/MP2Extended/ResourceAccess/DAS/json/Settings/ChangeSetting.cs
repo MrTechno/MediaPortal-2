@@ -1,7 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
+﻿using System.Linq;
 using HttpServer;
 using HttpServer.Exceptions;
 using HttpServer.Sessions;
@@ -10,10 +7,8 @@ using MediaPortal.Common.Logging;
 using MediaPortal.Plugins.MP2Extended.Attributes;
 using MediaPortal.Plugins.MP2Extended.Authentication;
 using MediaPortal.Plugins.MP2Extended.Common;
-using MediaPortal.Plugins.MP2Extended.ResourceAccess.DAS.html.Settings.Pages;
 using MediaPortal.Plugins.MP2Extended.Settings;
 using MediaPortal.Plugins.MP2Extended.Utils;
-using MediaPortal.Utilities;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.DAS.json.Settings
 {

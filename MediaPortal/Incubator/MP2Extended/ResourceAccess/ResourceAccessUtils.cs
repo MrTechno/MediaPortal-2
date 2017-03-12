@@ -1,10 +1,6 @@
-﻿using System;
-using System.Text;
-using MediaPortal.Common;
-using MediaPortal.Common.Logging;
+﻿using System.Text;
 using MediaPortal.Common.MediaManagement;
 using MediaPortal.Common.MediaManagement.DefaultItemAspects;
-using MediaPortal.Common.Services.Threading;
 using MediaPortal.Plugins.MP2Extended.Common;
 using Newtonsoft.Json;
 

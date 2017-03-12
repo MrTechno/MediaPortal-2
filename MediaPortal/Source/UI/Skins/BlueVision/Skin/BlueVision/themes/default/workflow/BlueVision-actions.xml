@@ -29,26 +29,13 @@
       TargetState="CB5D4851-27D2-4222-B6A0-703EDC2071B5"
       DisplayTitle="[SlimTvClient.ProgramSearch]"/>
 
-    <PushNavigationTransition Id="D91738E9-3F85-443B-ABBD-EF01731734AD"
-      Name="SlimTvClient->ProgramSearch"
-      DisplayCategory="A-2SlimTvClientProgramSearch"
-      SortOrder="c"
-      SourceStates="7F702D9C-F2DD-42da-9ED8-0BA92F07787F"
-      TargetState="CB5D4851-27D2-4222-B6A0-703EDC2071B5"
-      DisplayTitle="[SlimTvClient.ProgramSearch]"/>
-
     <WorkflowContributorAction Id="7F52D0A1-B7F8-46A1-A56B-1110BBFB7D51"
       Name="SlimTvClient->Recordings"
       DisplayCategory="A-2Recordings"
       SortOrder="d"
       SourceStates="7F702D9C-F2DD-42da-9ED8-0BA92F07787F"
-<<<<<<< HEAD
       ContributorModelId="117A9807-8B10-47F1-8780-C748DBCF45BA"
       HelpText="[SlimTvClient.Recordings.Help]"/>  <!-- Recordings action -->
-=======
-      ContributorModelId="117A9807-8B10-47F1-8780-C748DBCF45BA"/>
-    <!-- Recordings action -->
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
 
   </MenuActions>
 </Workflow>

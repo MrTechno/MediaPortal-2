@@ -10,10 +10,10 @@ using MediaPortal.Common.Logging;
 using MediaPortal.Common.MediaManagement;
 using MediaPortal.Common.MediaManagement.DefaultItemAspects;
 using MediaPortal.Common.ResourceAccess;
-using MediaPortal.Extensions.UserServices.FanArtService.Interfaces;
 using MediaPortal.Plugins.MP2Extended.Attributes;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Cache;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.BaseClasses;
+using MediaPortal.Common.FanArt;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images
 {
@@ -51,7 +51,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images
       necessaryMIATypes.Add(ImageAspect.ASPECT_ID);
       MediaItem item = GetMediaItems.GetMediaItemById(idGuid, necessaryMIATypes);
 
-      var resourcePathStr = item.Aspects[ProviderResourceAspect.ASPECT_ID].GetAttributeValue(ProviderResourceAspect.ATTR_RESOURCE_ACCESSOR_PATH);
+      var resourcePathStr = MP2ExtendedUtils.GetAttributeValue(item.Aspects, ProviderResourceAspect.ATTR_RESOURCE_ACCESSOR_PATH);
       var resourcePath = ResourcePath.Deserialize(resourcePathStr.ToString());
 
       var ra = GetResourceAccessor(resourcePath);
@@ -72,7 +72,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images
         throw new BadRequestException(String.Format("GetImageResized: Couldn't convert maxHeight to int: {0}", maxHeight));
       }
 
-      ImageCache.CacheIdentifier identifier = ImageCache.GetIdentifier(idGuid, false, maxWidthInt, maxHeightInt, borders, 0, FanArtConstants.FanArtType.Undefined, FanArtConstants.FanArtMediaType.Image);
+      ImageCache.CacheIdentifier identifier = ImageCache.GetIdentifier(idGuid, false, maxWidthInt, maxHeightInt, borders, 0, FanArtTypes.Undefined, FanArtMediaTypes.Image);
       byte[] resizedImage;
 
       if (ImageCache.TryGetImageFromCache(identifier, out resizedImage))

@@ -23,15 +23,12 @@
 #endregion
 
 using System;
-using System.Linq;
-using MediaPortal.Common.Utils;
 using MediaPortal.Plugins.SlimTv.Interfaces;
 using MediaPortal.Plugins.SlimTv.Interfaces.Items;
 #if TVE3
 #else
 using Mediaportal.TV.Server.TVDatabase.Entities;
 using Mediaportal.TV.Server.TVDatabase.TVBusinessLayer.Entities;
-using Mediaportal.TV.Server.TVControl.Interfaces.Services;
 #endif
 using Channel = MediaPortal.Plugins.SlimTv.Interfaces.UPnP.Items.Channel;
 using ChannelGroup = MediaPortal.Plugins.SlimTv.Interfaces.UPnP.Items.ChannelGroup;
@@ -57,22 +54,9 @@ namespace MediaPortal.Plugins.SlimTv.Service
         Description = tvProgram.Description,
         StartTime = tvProgram.StartTime,
         EndTime = tvProgram.EndTime,
-<<<<<<< HEAD
         SeasonNumber = tvProgram.SeriesNum,
         EpisodeNumber = tvProgram.EpisodeNum,
         EpisodeTitle = tvProgram.EpisodeName
-=======
-        OriginalAirDate = tvProgram.OriginalAirDate,
-        Classification = tvProgram.Classification,
-        ParentalRating = tvProgram.ParentalRating,
-        StarRating = tvProgram.StarRating,
-        SeasonNumber = tvProgram.SeriesNum,
-        EpisodeNumber = tvProgram.EpisodeNum,
-        EpisodeNumberDetailed = tvProgram.EpisodeNumber,
-        EpisodePart = tvProgram.EpisodePart,
-        EpisodeTitle = tvProgram.EpisodeName,
-        Genre = tvProgram.Genre
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
       };
 
       program.RecordingStatus = tvProgram.IsRecording ? RecordingStatus.Recording : RecordingStatus.None;
@@ -80,14 +64,6 @@ namespace MediaPortal.Plugins.SlimTv.Service
         program.RecordingStatus |= RecordingStatus.Scheduled;
       if (tvProgram.IsRecordingSeriesPending)
         program.RecordingStatus |= RecordingStatus.SeriesScheduled;
-      if (tvProgram.IsRecordingOnce)
-        program.RecordingStatus |= RecordingStatus.RecordingOnce;
-      if (tvProgram.IsRecordingSeries)
-        program.RecordingStatus |= RecordingStatus.RecordingSeries;
-      if (tvProgram.IsRecordingManual)
-        program.RecordingStatus |= RecordingStatus.RecordingManual;
-      program.HasConflict = tvProgram.HasConflict;
-      program.IsScheduled = TvDatabase.Schedule.ListAll().Count(schedule => schedule.IdChannel == tvProgram.IdChannel && schedule.IsRecordingProgram(tvProgram, true)) > 0;
 
       return program;
     }
@@ -99,22 +75,9 @@ namespace MediaPortal.Plugins.SlimTv.Service
       return new Channel
       {
         ChannelId = tvChannel.IdChannel,
-<<<<<<< HEAD
         ChannelNumber = tvChannel.ChannelNumber,
         Name = tvChannel.DisplayName,
         MediaType = tvChannel.IsTv ? MediaType.TV : MediaType.Radio
-=======
-        Name = tvChannel.DisplayName,
-        MediaType = tvChannel.IsTv ? MediaType.TV : MediaType.Radio,
-        EpgHasGaps = tvChannel.EpgHasGaps,
-        ExternalId = tvChannel.ExternalId,
-        GrapEpg = tvChannel.GrabEpg,
-        LastGrabTime = tvChannel.LastGrabTime,
-        TimesWatched = tvChannel.TimesWatched,
-        TotalTimeWatched = tvChannel.TotalTimeWatched,
-        VisibleInGuide = tvChannel.VisibleInGuide,
-        GroupNames = tvChannel.GroupNames.ToList()
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
       };
     }
 
@@ -122,7 +85,7 @@ namespace MediaPortal.Plugins.SlimTv.Service
     {
       if (tvGroup == null)
         return null;
-      return new ChannelGroup { ChannelGroupId = tvGroup.IdGroup, Name = tvGroup.GroupName, MediaType = MediaType.TV, SortOrder = tvGroup.SortOrder};
+      return new ChannelGroup { ChannelGroupId = tvGroup.IdGroup, Name = tvGroup.GroupName };
     }
 
     public static IChannelGroup ToChannelGroup(this TvDatabase.RadioChannelGroup radioGroup)
@@ -131,7 +94,7 @@ namespace MediaPortal.Plugins.SlimTv.Service
         return null;
       // Note: this temporary workaround uses negative group ids to be able to separate them later. This can be removed once there is a 
       // dedicated radio group interface (if required).
-      return new ChannelGroup { ChannelGroupId = -radioGroup.IdGroup, Name = radioGroup.GroupName, MediaType = MediaType.Radio, SortOrder = radioGroup.SortOrder};
+      return new ChannelGroup { ChannelGroupId = -radioGroup.IdGroup, Name = radioGroup.GroupName };
     }
 
     public static ISchedule ToSchedule(this TvDatabase.Schedule schedule)
@@ -167,22 +130,9 @@ namespace MediaPortal.Plugins.SlimTv.Service
           Description = tvProgram.Description,
           StartTime = tvProgram.StartTime,
           EndTime = tvProgram.EndTime,
-<<<<<<< HEAD
           SeasonNumber = tvProgram.SeriesNum,
           EpisodeNumber = tvProgram.EpisodeNum,
           EpisodeTitle = tvProgram.EpisodeName
-=======
-          OriginalAirDate = tvProgram.OriginalAirDate,
-          Classification = tvProgram.Classification,
-          ParentalRating = tvProgram.ParentalRating,
-          StarRating = tvProgram.StarRating,
-          SeasonNumber = tvProgram.SeriesNum,
-          EpisodeNumber = tvProgram.EpisodeNum,
-          EpisodeNumberDetailed = tvProgram.EpisodeNum,  // TVE3.5 doesn't have Episode.Number?
-          EpisodePart = tvProgram.EpisodePart,
-          EpisodeTitle = tvProgram.EpisodeName,
-          Genre = tvProgram.ProgramCategory.Category
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
         };
 
       ProgramBLL programLogic = new ProgramBLL(tvProgram);
@@ -191,14 +141,6 @@ namespace MediaPortal.Plugins.SlimTv.Service
         program.RecordingStatus |= RecordingStatus.Scheduled;
       if (programLogic.IsRecordingSeriesPending)
         program.RecordingStatus |= RecordingStatus.SeriesScheduled;
-      if (programLogic.IsRecordingOnce)
-        program.RecordingStatus |= RecordingStatus.RecordingOnce;
-      if (programLogic.IsRecordingSeries)
-        program.RecordingStatus |= RecordingStatus.RecordingSeries;
-      if (programLogic.IsRecordingManual)
-        program.RecordingStatus |= RecordingStatus.RecordingManual;
-      program.HasConflict = programLogic.HasConflict;
-      program.IsScheduled = GlobalServiceProvider.Instance.Get<IScheduleService>().ListAllSchedules().Count(schedule => schedule.IdChannel == tvProgram.IdChannel && schedule.ProgramName == tvProgram.Title) > 0;
 
       return program;
     }
@@ -208,28 +150,15 @@ namespace MediaPortal.Plugins.SlimTv.Service
       return new Channel
       {
         ChannelId = tvChannel.IdChannel,
-<<<<<<< HEAD
         ChannelNumber = tvChannel.ChannelNumber,
         Name = tvChannel.DisplayName,
         MediaType = (MediaType)tvChannel.MediaType
-=======
-        Name = tvChannel.DisplayName,
-        MediaType = (MediaType)tvChannel.MediaType,
-        EpgHasGaps = tvChannel.EpgHasGaps,
-        ExternalId = tvChannel.ExternalId,
-        GrapEpg = tvChannel.GrabEpg,
-        LastGrabTime = tvChannel.LastGrabTime,
-        TimesWatched = tvChannel.TimesWatched,
-        TotalTimeWatched = tvChannel.TotalTimeWatched,
-        VisibleInGuide = tvChannel.VisibleInGuide,
-        GroupNames = tvChannel.GroupMaps.Select(group => group.ChannelGroup.GroupName).ToList()
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
       };
     }
 
     public static IChannelGroup ToChannelGroup(this Mediaportal.TV.Server.TVDatabase.Entities.ChannelGroup radioGroup)
     {
-      return new ChannelGroup { ChannelGroupId = radioGroup.IdGroup, Name = radioGroup.GroupName, MediaType = radioGroup.MediaType == 0 ? MediaType.TV : MediaType.Radio, SortOrder = radioGroup.SortOrder};
+      return new ChannelGroup { ChannelGroupId = radioGroup.IdGroup, Name = radioGroup.GroupName };
     }
 
     public static ISchedule ToSchedule(this Mediaportal.TV.Server.TVDatabase.Entities.Schedule schedule)

@@ -8,6 +8,7 @@ using MediaPortal.Plugins.MP2Extended.Attributes;
 using MediaPortal.Plugins.MP2Extended.Common;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images.BaseClasses;
 using Newtonsoft.Json;
+using MediaPortal.Common.FanArt;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images
 {
@@ -42,15 +43,15 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images
         int.TryParse(offset, out offsetInt);
 
 
-      FanArtConstants.FanArtType fanartType;
-      FanArtConstants.FanArtMediaType fanArtMediaType;
+      string fanartType;
+      string fanArtMediaType;
       MapTypes(artworktype, mediatype, out fanartType, out fanArtMediaType);
 
       // if teh Id contains a ':' it is a season
       if (id.Contains(":"))
         isSeason = true;
 
-      bool isTvRadio = fanArtMediaType == FanArtConstants.FanArtMediaType.ChannelTv || fanArtMediaType == FanArtConstants.FanArtMediaType.ChannelRadio;
+      bool isTvRadio = fanArtMediaType == FanArtMediaTypes.ChannelTv || fanArtMediaType == FanArtMediaTypes.ChannelRadio;
       bool isRecording = (WebMediaType)JsonConvert.DeserializeObject(mediatype, typeof(WebMediaType)) == WebMediaType.Recording;
 
       IList<FanArtImage> fanart = GetFanArtImages(id, showId, seasonId, isSeason, isTvRadio, isRecording, fanartType, fanArtMediaType);

@@ -12,7 +12,6 @@ using MediaPortal.Common.MediaManagement.DefaultItemAspects;
 using MediaPortal.Common.MediaManagement.MLQueries;
 using MediaPortal.Plugins.MP2Extended.Attributes;
 using MediaPortal.Plugins.MP2Extended.Common;
-using MediaPortal.Plugins.MP2Extended.MAS;
 using MediaPortal.Plugins.MP2Extended.MAS.TvShow;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.TvShow.BaseClasses;
 using Newtonsoft.Json;
@@ -52,7 +51,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.TvShow
       string showName;
       try
       {
-        showName = (string)showItem[MediaAspect.ASPECT_ID][MediaAspect.ATTR_TITLE];
+        showName = (string)MP2ExtendedUtils.GetAttributeValue(showItem.Aspects, MediaAspect.ATTR_TITLE);
       }
       catch (Exception ex)
       {
@@ -74,11 +73,11 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.TvShow
       necessaryMIATypesEpisodes.Add(ProviderResourceAspect.ASPECT_ID);
 
       IFilter searchFilter = BooleanCombinationFilter.CombineFilters(BooleanOperator.And,
-        new RelationalFilter(SeriesAspect.ATTR_SEASON, RelationalOperator.EQ, seasonNumber),
-        new RelationalFilter(SeriesAspect.ATTR_SERIESNAME, RelationalOperator.EQ, showName));
+        new RelationalFilter(EpisodeAspect.ATTR_SEASON, RelationalOperator.EQ, seasonNumber),
+        new RelationalFilter(EpisodeAspect.ATTR_SERIES_NAME, RelationalOperator.EQ, showName));
       MediaItemQuery searchQuery = new MediaItemQuery(necessaryMIATypesEpisodes, null, searchFilter);
 
-      IList<MediaItem> episodes = ServiceRegistration.Get<IMediaLibrary>().Search(searchQuery, false);
+      IList<MediaItem> episodes = ServiceRegistration.Get<IMediaLibrary>().Search(searchQuery, false, null, false);
 
       if (episodes.Count == 0)
         throw new BadRequestException("No Tv Episodes found");

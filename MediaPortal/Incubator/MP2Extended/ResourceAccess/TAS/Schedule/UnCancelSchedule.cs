@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using HttpServer;
+﻿using HttpServer;
 using HttpServer.Exceptions;
 using HttpServer.Sessions;
 using MediaPortal.Common;

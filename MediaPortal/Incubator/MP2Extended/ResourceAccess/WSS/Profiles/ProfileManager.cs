@@ -30,8 +30,8 @@ using System.Xml;
 using MediaPortal.Common;
 using MediaPortal.Common.Logging;
 using MediaPortal.Common.PathManager;
+using MediaPortal.Plugins.Transcoding.Interfaces.Profiles;
 using MediaPortal.Utilities.FileSystem;
-using MediaPortal.Plugins.Transcoding.Service.Profiles;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Profiles
 {

@@ -18,13 +18,8 @@
 
 #endregion
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MediaPortal.Common.Settings;
-using MediaPortal.Plugins.MP2Extended.Authentication;
 
 namespace MediaPortal.Plugins.MP2Extended.Settings
 {

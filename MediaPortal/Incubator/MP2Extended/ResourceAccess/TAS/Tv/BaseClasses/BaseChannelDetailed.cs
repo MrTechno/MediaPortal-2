@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MediaPortal.Common;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.TAS.EPG.BaseClasses;
 using MediaPortal.Plugins.MP2Extended.TAS.Tv;

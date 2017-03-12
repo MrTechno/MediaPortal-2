@@ -52,7 +52,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.TvShow
       necessaryMIATypes.Add(MediaAspect.ASPECT_ID);
       necessaryMIATypes.Add(ProviderResourceAspect.ASPECT_ID);
       necessaryMIATypes.Add(ImporterAspect.ASPECT_ID);
-      necessaryMIATypes.Add(SeriesAspect.ASPECT_ID);
+      necessaryMIATypes.Add(EpisodeAspect.ASPECT_ID);
 
       IList<MediaItem> items = GetMediaItems.GetMediaItemsByAspect(necessaryMIATypes);
 
@@ -63,25 +63,25 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.TvShow
 
       foreach (var item in items)
       {
-        var seriesAspect = item.Aspects[SeriesAspect.ASPECT_ID];
-        int index = output.FindIndex(x => x.Title == (string)seriesAspect[SeriesAspect.ATTR_SERIESNAME]);
+        var seriesAspect = MediaItemAspect.GetAspect(item.Aspects, EpisodeAspect.Metadata);
+        int index = output.FindIndex(x => x.Title == (string)seriesAspect[EpisodeAspect.ATTR_SERIES_NAME]);
         if (index == -1)
         {
-          var episodesInThisShow = items.ToList().FindAll(x => (string)x.Aspects[SeriesAspect.ASPECT_ID][SeriesAspect.ATTR_SERIESNAME] == (string)seriesAspect[SeriesAspect.ATTR_SERIESNAME]);
-          var episodesInThisShowUnwatched = episodesInThisShow.FindAll(x => x.Aspects[MediaAspect.ASPECT_ID][MediaAspect.ATTR_PLAYCOUNT] == null || (int)x.Aspects[MediaAspect.ASPECT_ID][MediaAspect.ATTR_PLAYCOUNT] == 0);
+          var episodesInThisShow = items.ToList().FindAll(x => (string)MP2ExtendedUtils.GetAttributeValue(x.Aspects, EpisodeAspect.ATTR_SERIES_NAME) == (string)seriesAspect[EpisodeAspect.ATTR_SERIES_NAME]);
+          var episodesInThisShowUnwatched = episodesInThisShow.FindAll(x => MP2ExtendedUtils.GetAttributeValue(x.Aspects, MediaAspect.ATTR_PLAYCOUNT) == null || (int)MP2ExtendedUtils.GetAttributeValue(x.Aspects, MediaAspect.ATTR_PLAYCOUNT) == 0);
           necessaryMIATypes = new HashSet<Guid>();
           necessaryMIATypes.Add(MediaAspect.ASPECT_ID);
-          MediaItem show = GetMediaItems.GetMediaItemByName((string)seriesAspect[SeriesAspect.ATTR_SERIESNAME], necessaryMIATypes);
+          MediaItem show = GetMediaItems.GetMediaItemByName((string)seriesAspect[EpisodeAspect.ATTR_SERIES_NAME], necessaryMIATypes);
 
           if (show == null)
           {
-            Logger.Warn("GetTVShowsBasic: Couldn't find show: {0}", (string)seriesAspect[SeriesAspect.ATTR_SERIESNAME]);
+            Logger.Warn("GetTVShowsBasic: Couldn't find show: {0}", (string)seriesAspect[EpisodeAspect.ATTR_SERIES_NAME]);
             continue;
           }
 
           WebTVShowBasic webTVShowBasic = new WebTVShowBasic();
           webTVShowBasic.Id = show.MediaItemId.ToString();
-          webTVShowBasic.Title = (string)seriesAspect[SeriesAspect.ATTR_SERIESNAME];
+          webTVShowBasic.Title = (string)seriesAspect[EpisodeAspect.ATTR_SERIES_NAME];
           webTVShowBasic.EpisodeCount = episodesInThisShow.Count;
           webTVShowBasic.UnwatchedEpisodeCount = episodesInThisShowUnwatched.Count;
 

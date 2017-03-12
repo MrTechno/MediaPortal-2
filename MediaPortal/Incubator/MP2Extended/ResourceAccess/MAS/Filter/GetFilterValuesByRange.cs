@@ -9,9 +9,6 @@ using MediaPortal.Common.Logging;
 using MediaPortal.Plugins.MP2Extended.Attributes;
 using MediaPortal.Plugins.MP2Extended.Common;
 using MediaPortal.Plugins.MP2Extended.Extensions;
-using MediaPortal.Plugins.MP2Extended.MAS.General;
-using MediaPortal.Plugins.MP2Extended.ResourceAccess.TAS.EPG;
-using MediaPortal.Plugins.MP2Extended.TAS.Tv;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.Filter
 {

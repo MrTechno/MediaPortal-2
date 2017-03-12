@@ -24,24 +24,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Net;
 using System.Reflection;
-using System.Text;
 using HttpServer;
-using HttpServer.Authentication;
-using HttpServer.Exceptions;
 using HttpServer.HttpModules;
 using HttpServer.Sessions;
 using MediaPortal.Common;
 using MediaPortal.Common.Logging;
-using MediaPortal.Common.ResourceAccess;
 using MediaPortal.Plugins.MP2Extended.Authentication;
-using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.BaseClasses;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS;
-using MediaPortal.Plugins.Transcoding.Service;
-using MediaPortal.Plugins.Transcoding.Service.Transcoders.Base;
 using MediaPortal.Utilities.SystemAPI;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream;
 using MediaPortal.Plugins.MP2Extended.ErrorPages;

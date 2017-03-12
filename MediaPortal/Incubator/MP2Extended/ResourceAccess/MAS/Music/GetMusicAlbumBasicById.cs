@@ -41,12 +41,12 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.Music
       IFilter searchFilter = new RelationalFilter(AudioAspect.ATTR_ALBUM, RelationalOperator.EQ, id);
       MediaItemQuery searchQuery = new MediaItemQuery(necessaryMIATypes, null, searchFilter);
 
-      IList<MediaItem> tracks = ServiceRegistration.Get<IMediaLibrary>().Search(searchQuery, false);
+      IList<MediaItem> tracks = ServiceRegistration.Get<IMediaLibrary>().Search(searchQuery, false, null, true);
 
       if (tracks.Count == 0)
         throw new BadRequestException("No Tracks found");
 
-      MediaItemAspect audioAspects = tracks[0].Aspects[AudioAspect.ASPECT_ID];
+      MediaItemAspect audioAspects = MediaItemAspect.GetAspect(tracks[0].Aspects, AudioAspect.Metadata);
 
       WebMusicAlbumBasic webMusicAlbumBasic = new WebMusicAlbumBasic();
       var albumArtists = (HashSet<object>)audioAspects[AudioAspect.ATTR_ALBUMARTISTS];
@@ -60,13 +60,13 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.Music
       if (trackComposers != null)
         webMusicAlbumBasic.Composer = trackComposers.Cast<string>().ToList();
       //webMusicTrackBasic.ArtistId;
-      var trackGenres = (HashSet<object>)audioAspects[AudioAspect.ATTR_GENRES];
+      var trackGenres = (HashSet<object>)MP2ExtendedUtils.GetCollectionAttributeValues<object>(tracks[0].Aspects, GenreAspect.ATTR_GENRE);
       if (trackGenres != null)
         webMusicAlbumBasic.Genres = trackGenres.Cast<string>().ToList();
       //webMusicTrackBasic.Rating = Convert.ToSingle((double)movieAspects[AudioAspect.]);
       //webMusicTrackBasic.Year;
       //webMusicTrackBasic.Artwork;
-      webMusicAlbumBasic.DateAdded = (DateTime)tracks[0].Aspects[ImporterAspect.ASPECT_ID][ImporterAspect.ATTR_DATEADDED];
+      webMusicAlbumBasic.DateAdded = (DateTime)MP2ExtendedUtils.GetAttributeValue(tracks[0].Aspects, ImporterAspect.ATTR_DATEADDED);
       webMusicAlbumBasic.Id = id_base;
       webMusicAlbumBasic.PID = 0;
       //webMusicTrackBasic.Path;

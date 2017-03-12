@@ -10,6 +10,7 @@ using MediaPortal.Plugins.MP2Extended.Common;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Cache;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images.BaseClasses;
 using Newtonsoft.Json;
+using MediaPortal.Common.FanArt;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images
 {
@@ -53,8 +54,8 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images
       if (offset != null)
         int.TryParse(offset, out offsetInt);
 
-      FanArtConstants.FanArtType fanartType;
-      FanArtConstants.FanArtMediaType fanArtMediaType;
+      string fanartType;
+      string fanArtMediaType;
       MapTypes(artworktype, mediatype, out fanartType, out fanArtMediaType);
 
       // if teh Id contains a ':' it is a season
@@ -64,7 +65,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images
         showId = id.Split(':')[0];
       }
 
-      bool isTvRadio = fanArtMediaType == FanArtConstants.FanArtMediaType.ChannelTv || fanArtMediaType == FanArtConstants.FanArtMediaType.ChannelRadio;
+      bool isTvRadio = fanArtMediaType == FanArtMediaTypes.ChannelTv || fanArtMediaType == FanArtMediaTypes.ChannelRadio;
       bool isRecording = (WebMediaType)JsonConvert.DeserializeObject(mediatype, typeof(WebMediaType)) == WebMediaType.Recording;
 
       int maxWidthInt;
@@ -83,7 +84,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images
       int idInt;
       if (!Guid.TryParse(isSeason ? showId : id, out idGuid) && !isTvRadio)
         throw new BadRequestException(String.Format("GetArtworkResized: Couldn't parse if '{0}' to Guid", isSeason ? showId : id));
-      if (int.TryParse(id, out idInt) && (fanArtMediaType == FanArtConstants.FanArtMediaType.ChannelTv || fanArtMediaType == FanArtConstants.FanArtMediaType.ChannelRadio))
+      if (int.TryParse(id, out idInt) && (fanArtMediaType == FanArtMediaTypes.ChannelTv || fanArtMediaType == FanArtMediaTypes.ChannelRadio))
         idGuid = IntToGuid(idInt);
 
       ImageCache.CacheIdentifier identifier = ImageCache.GetIdentifier(isSeason ? StringToGuid(id) : idGuid, isTvRadio, maxWidthInt, maxHeightInt, borders, offsetInt, fanartType, fanArtMediaType);

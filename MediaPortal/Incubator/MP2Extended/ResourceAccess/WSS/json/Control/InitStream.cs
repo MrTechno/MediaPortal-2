@@ -13,9 +13,7 @@ using MediaPortal.Common.MediaManagement;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.TAS.Timeshiftings;
 using System.Collections.Generic;
 using MediaPortal.Common.MediaManagement.DefaultItemAspects;
-using MediaPortal.Plugins.Transcoding.Aspects;
-using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Profiles;
-using MediaPortal.Plugins.Transcoding.Service;
+using MediaPortal.Plugins.Transcoding.Interfaces.Aspects;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.json.Control
 {
@@ -102,7 +100,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.json.Control
         {
           throw new BadRequestException(string.Format("InitStream: Couldn't init stream! No Mediaitem found with id: {0}", itemId));
         }
-        streamItem.Title = (string)mediaItem.Aspects[MediaAspect.ASPECT_ID][MediaAspect.ATTR_TITLE];
+        streamItem.Title = (string)MP2ExtendedUtils.GetAttributeValue(mediaItem.Aspects, MediaAspect.ATTR_TITLE);
       }
       streamItem.RequestedMediaItem = mediaItem;
 

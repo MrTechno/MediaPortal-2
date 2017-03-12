@@ -11,6 +11,7 @@ using MediaPortal.Plugins.MP2Extended.Common;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Cache;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images.BaseClasses;
 using Newtonsoft.Json;
+using MediaPortal.Common.FanArt;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images
 {
@@ -50,15 +51,15 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images
       if (maxHeight == null)
         throw new BadRequestException("ExtractImageResized: maxHeight is null");
 
-      FanArtConstants.FanArtType fanartType;
-      FanArtConstants.FanArtMediaType fanArtMediaType;
+      string fanartType;
+      string fanArtMediaType;
       MapTypes(artworktype, mediatype, out fanartType, out fanArtMediaType);
 
       // if teh Id contains a ':' it is a season
       if (id.Contains(":"))
         isSeason = true;
 
-      bool isTvRadio = fanArtMediaType == FanArtConstants.FanArtMediaType.ChannelTv || fanArtMediaType == FanArtConstants.FanArtMediaType.ChannelRadio;
+      bool isTvRadio = fanArtMediaType == FanArtMediaTypes.ChannelTv || fanArtMediaType == FanArtMediaTypes.ChannelRadio;
       bool isRecording = (type != null && (WebMediaType)JsonConvert.DeserializeObject(type, typeof(WebMediaType)) == WebMediaType.Recording);
 
       int maxWidthInt;
@@ -77,10 +78,10 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images
       int idInt;
       if (!Guid.TryParse(isSeason ? showId : id, out idGuid) && !isTvRadio)
         throw new BadRequestException(String.Format("ExtractImageResized: Couldn't parse if '{0}' to Guid", isSeason ? showId : id));
-      else if (int.TryParse(id, out idInt) && (fanArtMediaType == FanArtConstants.FanArtMediaType.ChannelTv || fanArtMediaType == FanArtConstants.FanArtMediaType.ChannelRadio))
+      else if (int.TryParse(id, out idInt) && (fanArtMediaType == FanArtMediaTypes.ChannelTv || fanArtMediaType == FanArtMediaTypes.ChannelRadio))
         idGuid = IntToGuid(idInt);
 
-      ImageCache.CacheIdentifier identifier = ImageCache.GetIdentifier(idGuid, isTvRadio, maxWidthInt, maxHeightInt, borders, 0, FanArtConstants.FanArtType.Thumbnail, FanArtConstants.FanArtMediaType.Undefined);
+      ImageCache.CacheIdentifier identifier = ImageCache.GetIdentifier(idGuid, isTvRadio, maxWidthInt, maxHeightInt, borders, 0, FanArtTypes.Thumbnail, FanArtMediaTypes.Undefined);
 
       byte[] data;
       if (ImageCache.TryGetImageFromCache(identifier, out data))

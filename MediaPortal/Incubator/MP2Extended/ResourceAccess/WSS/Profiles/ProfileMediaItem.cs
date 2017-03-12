@@ -25,19 +25,17 @@
 using System;
 using System.Collections.Generic;
 using MediaPortal.Common.MediaManagement;
-using MediaPortal.Common.ResourceAccess;
 using MediaPortal.Common.MediaManagement.DefaultItemAspects;
 using MediaPortal.Common;
 using MediaPortal.Common.Logging;
 using MediaPortal.Plugins.Transcoding.Service;
-using MediaPortal.Plugins.Transcoding.Aspects;
 using MediaPortal.Plugins.SlimTv.Interfaces.LiveTvMediaItem;
-using MediaPortal.Plugins.SlimTv.Interfaces.ResourceProvider;
-using MediaPortal.Plugins.Transcoding.Service.Metadata;
-using MediaPortal.Plugins.Transcoding.Service.Objects;
-using MediaPortal.Plugins.Transcoding.Service.Profiles;
-using MediaPortal.Plugins.Transcoding.Service.Metadata.Streams;
-using MediaPortal.Plugins.Transcoding.Service.Analyzers;
+using MediaPortal.Plugins.Transcoding.Interfaces;
+using MediaPortal.Plugins.Transcoding.Interfaces.Aspects;
+using MediaPortal.Plugins.Transcoding.Interfaces.Metadata;
+using MediaPortal.Plugins.Transcoding.Interfaces.Metadata.Streams;
+using MediaPortal.Plugins.Transcoding.Interfaces.Profiles;
+using MediaPortal.Plugins.Transcoding.Interfaces.Transcoding;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Profiles
 {
@@ -63,9 +61,9 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Profiles
         IsAudio = true;
         if (item.Aspects.ContainsKey(TranscodeItemAudioAspect.ASPECT_ID) == false)
         {
-          if (item.Aspects[MediaAspect.ASPECT_ID][MediaAspect.ATTR_MIME_TYPE].ToString() == LiveTvMediaItem.MIME_TYPE_RADIO)
+          if (MP2ExtendedUtils.GetAttributeValue(item.Aspects, ProviderResourceAspect.ATTR_MIME_TYPE).ToString() == LiveTvMediaItem.MIME_TYPE_RADIO)
           {
-            info = MediaItemParser.ParseLiveAudioItem(item);
+            info = MediaAnalyzer.ParseMediaItem(item);
             sourceIsLive = true;
           }
           else
@@ -76,7 +74,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Profiles
         }
         else
         {
-          info = MediaItemParser.ParseAudioItem(item);
+          info = MediaAnalyzer.ParseMediaItem(item);
         }
       }
       else if (item.Aspects.ContainsKey(ImageAspect.ASPECT_ID))
@@ -89,7 +87,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Profiles
         }
         else
         {
-          info = MediaItemParser.ParseImageItem(item);
+          info = MediaAnalyzer.ParseMediaItem(item);
         }
       }
       else if (item.Aspects.ContainsKey(VideoAspect.ASPECT_ID))
@@ -97,9 +95,9 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Profiles
         IsVideo = true;
         if (item.Aspects.ContainsKey(TranscodeItemVideoAspect.ASPECT_ID) == false)
         {
-          if (item.Aspects[MediaAspect.ASPECT_ID][MediaAspect.ATTR_MIME_TYPE].ToString() == LiveTvMediaItem.MIME_TYPE_TV)
+          if (MP2ExtendedUtils.GetAttributeValue(item.Aspects, ProviderResourceAspect.ATTR_MIME_TYPE).ToString() == LiveTvMediaItem.MIME_TYPE_TV)
           {
-            info = MediaItemParser.ParseLiveVideoItem(item);
+            info = MediaAnalyzer.ParseMediaItem(item);
             sourceIsLive = true;
           }
           else
@@ -110,7 +108,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Profiles
         }
         else
         {
-          info = MediaItemParser.ParseVideoItem(item);
+          info = MediaAnalyzer.ParseMediaItem(item);
         }
       }
       else
@@ -430,6 +428,14 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Profiles
       }
     }
     public DateTime LastUpdated { get; set; }
+    internal static IMediaConverter MediaConverter
+    {
+      get { return ServiceRegistration.Get<IMediaConverter>(); }
+    }
+    internal static IMediaAnalyzer MediaAnalyzer
+    {
+      get { return ServiceRegistration.Get<IMediaAnalyzer>(); }
+    }
     internal static ILogger Logger
     {
       get { return ServiceRegistration.Get<ILogger>(); }

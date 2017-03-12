@@ -33,7 +33,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.TvShow
       if (item == null)
         throw new BadRequestException(String.Format("GetTVShowDetailedById: No MediaItem found with id: {0}", id));
 
-      string seasonTitle = (string)item[MediaAspect.ASPECT_ID][MediaAspect.ATTR_TITLE];
+      string seasonTitle = (string)MP2ExtendedUtils.GetAttributeValue(item.Aspects, MediaAspect.ATTR_TITLE);
 
 
       // Get all episodes for this season to count them
@@ -41,7 +41,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.TvShow
       necessaryMIATypes.Add(MediaAspect.ASPECT_ID);
       necessaryMIATypes.Add(SeriesAspect.ASPECT_ID);
 
-      IList<MediaItem> episodes = GetMediaItems.GetMediaItemsByString(seasonTitle, necessaryMIATypesEpisodes, null, SeriesAspect.ATTR_SERIESNAME, null);
+      IList<MediaItem> episodes = GetMediaItems.GetMediaItemsByString(seasonTitle, necessaryMIATypesEpisodes, null, EpisodeAspect.ATTR_SERIES_NAME, null);
 
       WebTVShowDetailed webTVShowDetailed = new WebTVShowDetailed
       {

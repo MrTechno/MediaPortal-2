@@ -48,11 +48,7 @@ using MediaPortal.Common.Messaging;
 
 namespace MediaPortal.Plugins.SlimTv.Service
 {
-<<<<<<< HEAD
   public abstract class AbstractSlimTvService : ITvProvider, ITimeshiftControlEx, IProgramInfo, IChannelAndGroupInfo, IScheduleControl, IMessageReceiver
-=======
-  public abstract class AbstractSlimTvService : ITvProvider, ITimeshiftControlEx, IProgramInfo, IChannelAndGroupInfo, IScheduleControl, ITunerInfo
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
   {
     public static readonly MediaCategory Series = new MediaCategory("Series", null);
     public static readonly MediaCategory Movie = new MediaCategory("Movie", null);
@@ -485,19 +481,9 @@ namespace MediaPortal.Plugins.SlimTv.Service
 
     public abstract bool CreateScheduleByTime(IChannel channel, DateTime from, DateTime to, out ISchedule schedule);
 
-    public abstract bool CreateScheduleByTimeAndType(IChannel channel, DateTime from, DateTime to, ScheduleRecordingType recordingType, out ISchedule schedule);
-
-    public abstract bool CreateScheduleByTimeAndType(IChannel channel, string title, DateTime from, DateTime to, ScheduleRecordingType recordingType, out ISchedule schedule);
-
-    public abstract bool CreateScheduleDetailed(IChannel channel, string title, DateTime from, DateTime to, ScheduleRecordingType recordingType, int preRecordInterval, int postRecordInterval, string directory, int priority, out ISchedule schedule);
-
-    public abstract bool EditSchedule(ISchedule schedule, IChannel channel = null, string title = null, DateTime? from = null, DateTime? to = null, ScheduleRecordingType? recordingType = null, int? preRecordInterval = null, int? postRecordInterval = null, string directory = null, int? priority = null);
-
     public abstract bool RemoveScheduleForProgram(IProgram program, ScheduleRecordingType recordingType);
 
     public abstract bool RemoveSchedule(ISchedule schedule);
-
-    public abstract bool UnCancelSchedule(IProgram program);
 
     public abstract bool GetRecordingStatus(IProgram program, out RecordingStatus recordingStatus);
 
@@ -509,10 +495,6 @@ namespace MediaPortal.Plugins.SlimTv.Service
     {
       return string.Format("{0}-{1}", clientName, slotIndex);
     }
-
-    public abstract bool GetCards(out List<ICard> cards);
-
-    public abstract bool GetActiveVirtualCards(out List<IVirtualCard> cards);
 
     #endregion
   }

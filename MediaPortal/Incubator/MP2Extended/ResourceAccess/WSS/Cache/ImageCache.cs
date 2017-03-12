@@ -2,17 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MediaPortal.Common;
 using MediaPortal.Common.MediaManagement;
 using MediaPortal.Common.MediaManagement.DefaultItemAspects;
 using MediaPortal.Common.PathManager;
-using MediaPortal.Common.Services.PathManager;
-using MediaPortal.Extensions.UserServices.FanArtService.Interfaces;
-using MediaPortal.Plugins.MP2Extended.Common;
-using MediaPortal.Utilities.FileSystem;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Cache
 {
@@ -118,7 +111,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Cache
           MediaItem item = GetMediaItems.GetMediaItemById(identifier.MediaItemId, necessaryMIATypes);
           if (item == null)
             return false;
-          dateAdded = (DateTime)item.Aspects[ImporterAspect.ASPECT_ID][ImporterAspect.ATTR_DATEADDED];
+          dateAdded = (DateTime)MP2ExtendedUtils.GetAttributeValue(item.Aspects, ImporterAspect.ATTR_DATEADDED);
         }
         else
         {
@@ -129,7 +122,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Cache
       }
     }
 
-    internal static CacheIdentifier GetIdentifier(Guid id, bool isTvRadio, int width, int height, string borders, int offset, FanArtConstants.FanArtType fanArtType, FanArtConstants.FanArtMediaType fanartMediaType)
+    internal static CacheIdentifier GetIdentifier(Guid id, bool isTvRadio, int width, int height, string borders, int offset, string fanArtType, string fanartMediaType)
     {
       lock (_lockObject)
       {
@@ -160,8 +153,8 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Cache
       internal int Height { get; set; }
       internal string Borders { get; set; }
       internal int Offset { get; set; }
-      internal FanArtConstants.FanArtType FanArtType { get; set; }
-      internal FanArtConstants.FanArtMediaType FanArtMediaType { get; set; }
+      internal string FanArtType { get; set; }
+      internal string FanArtMediaType { get; set; }
     }
   }
 }

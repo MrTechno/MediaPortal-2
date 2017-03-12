@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MediaPortal.Common;
 using MediaPortal.Common.Logging;
-using MediaPortal.Common.Services.Threading;
 
 namespace MediaPortal.Plugins.MP2Extended.Utils
 {

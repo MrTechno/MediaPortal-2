@@ -36,8 +36,10 @@ using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Profiles;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream;
 using MediaPortal.Plugins.MP2Extended.Utils;
 using MediaPortal.Plugins.Transcoding.Service;
-using MediaPortal.Plugins.Transcoding.Service.Objects;
 using MediaPortal.Plugins.SlimTv.Interfaces.LiveTvMediaItem;
+using MediaPortal.Plugins.Transcoding.Interfaces;
+using MediaPortal.Plugins.Transcoding.Interfaces.Helpers;
+using MediaPortal.Plugins.Transcoding.Interfaces.Transcoding;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.json.Control
 {
@@ -80,7 +82,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.json.Control
       if (profile == null)
         throw new BadRequestException(string.Format("StartStream: unknown profile: {0}", profileName));
 
-      if (!StreamControl.ValidateIdentifie(identifier))
+      if (!StreamControl.ValidateIdentifier(identifier))
         throw new BadRequestException(string.Format("StartStream: unknown identifier: {0}", identifier));
 
 
@@ -100,7 +102,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.json.Control
       if ((streamItem.TranscoderObject.TranscodingParameter is VideoTranscoding))
       {
         ((VideoTranscoding)streamItem.TranscoderObject.TranscodingParameter).HlsBaseUrl = string.Format("RetrieveStream?identifier={0}&hls=", identifier);
-        ((VideoTranscoding)streamItem.TranscoderObject.TranscodingParameter).SourceSubtitleStreamIndex = MediaConverter.NO_SUBTITLE;
+        ((VideoTranscoding)streamItem.TranscoderObject.TranscodingParameter).SourceSubtitleStreamIndex = Subtitles.NO_SUBTITLE;
       }
 
       StreamControl.StartStreaming(identifier, startPositionLong);
@@ -110,7 +112,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.json.Control
       {
         foreach (var target in profile.MediaTranscoding.VideoTargets)
         {
-          if (target.Target.VideoContainerType == Transcoding.Service.VideoContainer.Hls)
+          if (target.Target.VideoContainerType == VideoContainer.Hls)
           {
             filePostFix = "&file=manifest.m3u8"; //Must be added for some clients to work (Android mostly)
             break;

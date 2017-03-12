@@ -10,7 +10,6 @@ using MediaPortal.Plugins.MP2Extended.Attributes;
 using MediaPortal.Plugins.MP2Extended.Common;
 using MediaPortal.Plugins.MP2Extended.Filters;
 using MediaPortal.Plugins.MP2Extended.MAS.FileSystem;
-using MediaPortal.Plugins.MP2Extended.MAS.General;
 using MediaPortal.Plugins.MP2Extended.MAS.Picture;
 using MediaPortal.Plugins.MP2Extended.MAS.Playlist;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.FileSystem;

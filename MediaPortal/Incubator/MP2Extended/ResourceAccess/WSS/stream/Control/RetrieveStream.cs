@@ -35,8 +35,10 @@ using MediaPortal.Common.ResourceAccess;
 using MediaPortal.Plugins.MP2Extended.Attributes;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Profiles;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.BaseClasses;
+using MediaPortal.Plugins.Transcoding.Interfaces;
+using MediaPortal.Plugins.Transcoding.Interfaces.Helpers;
+using MediaPortal.Plugins.Transcoding.Interfaces.Transcoding;
 using MediaPortal.Plugins.Transcoding.Service;
-using MediaPortal.Plugins.Transcoding.Service.Objects;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Control
 {
@@ -58,7 +60,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Control
       if (identifier == null)
         throw new BadRequestException("RetrieveStream: identifier is null");
 
-      if (!StreamControl.ValidateIdentifie(identifier))
+      if (!StreamControl.ValidateIdentifier(identifier))
         throw new BadRequestException("RetrieveStream: identifier is not valid");
 
       StreamItem streamItem = StreamControl.GetStreamItem(identifier);
@@ -205,7 +207,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Control
       {
         if (streamItem.TranscoderObject.WebMetadata.Metadata.Source is ILocalFsResourceAccessor)
         {
-          resourceStream = MediaConverter.GetReadyFileBuffer((ILocalFsResourceAccessor)streamItem.TranscoderObject.WebMetadata.Metadata.Source);
+          resourceStream = MediaConverter.GetFileStream((ILocalFsResourceAccessor)streamItem.TranscoderObject.WebMetadata.Metadata.Source);
         }
       }
 
@@ -326,7 +328,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Control
             }
             else if (containerEnum is SubtitleCodec)
             {
-              response.ContentType = MediaConverter.GetSubtitleMime((SubtitleCodec)containerEnum);
+              response.ContentType = Subtitles.GetSubtitleMime((SubtitleCodec)containerEnum);
             }
             bool onlyHeaders = request.Method == Method.Header || response.Status == HttpStatusCode.NotModified;
             Logger.Debug("RetrieveStream: Sending file header only: {0}", onlyHeaders.ToString());
@@ -339,6 +341,11 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Control
         }
       }
       return false;
+    }
+
+    internal static IMediaConverter MediaConverter
+    {
+      get { return ServiceRegistration.Get<IMediaConverter>(); }
     }
 
     internal static ILogger Logger

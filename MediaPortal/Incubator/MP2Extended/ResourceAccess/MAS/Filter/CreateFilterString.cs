@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using HttpServer;
 using HttpServer.Exceptions;
 using HttpServer.Sessions;

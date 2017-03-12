@@ -320,12 +320,7 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
         };
         item.AdditionalProperties["PROGRAM"] = currentProgram;
         item.Selected = _lastProgramId == program.ProgramId; // Restore focus
-<<<<<<< HEAD
         if (channel != null)
-=======
-        IChannel channel;
-        if (_tvHandler.ChannelAndGroupInfo.GetChannel(program.ChannelId, out channel))
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
           item.SetLabel("ChannelName", channel.Name);
 
         _programsList.Add(item);

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.Runtime.Serialization;
-using System.Xml;
 using System.Xml.Serialization;
 using MediaPortal.Plugins.MP2Extended.Authentication;
-using MediaPortal.Plugins.SlimTv.Interfaces.UPnP.Items;
 
 namespace MediaPortal.Plugins.MP2Extended.Settings
 {

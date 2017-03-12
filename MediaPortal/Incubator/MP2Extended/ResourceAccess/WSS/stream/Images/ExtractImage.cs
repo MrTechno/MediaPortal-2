@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using HttpServer;
 using HttpServer.Exceptions;
 using MediaPortal.Common;
@@ -10,7 +9,7 @@ using MediaPortal.Plugins.MP2Extended.Attributes;
 using MediaPortal.Plugins.MP2Extended.Common;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Cache;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images.BaseClasses;
-using Newtonsoft.Json;
+using MediaPortal.Common.FanArt;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images
 {
@@ -37,25 +36,25 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images
 
       string artworktype = ((int)WebFileType.Content).ToString();
       string mediatype = ((int)WebMediaType.File).ToString();
-      FanArtConstants.FanArtType fanartType;
-      FanArtConstants.FanArtMediaType fanArtMediaType;
+      string fanartType;
+      string fanArtMediaType;
       MapTypes(artworktype, mediatype, out fanartType, out fanArtMediaType);
 
       // if teh Id contains a ':' it is a season
       if (id.Contains(":"))
         isSeason = true;
 
-      bool isTvRadio = fanArtMediaType == FanArtConstants.FanArtMediaType.ChannelTv || fanArtMediaType == FanArtConstants.FanArtMediaType.ChannelRadio;
+      bool isTvRadio = fanArtMediaType == FanArtMediaTypes.ChannelTv || fanArtMediaType == FanArtMediaTypes.ChannelRadio;
       bool isRecording = (type != null && (WebMediaType)Enum.Parse(typeof(WebMediaType), type) == WebMediaType.Recording);
 
       Guid idGuid;
       int idInt;
       if (!Guid.TryParse(isSeason ? showId : id, out idGuid) && !isTvRadio)
         throw new BadRequestException(String.Format("ExtractImage: Couldn't parse if '{0}' to Guid", isSeason ? showId : id));
-      else if (int.TryParse(id, out idInt) && (fanArtMediaType == FanArtConstants.FanArtMediaType.ChannelTv || fanArtMediaType == FanArtConstants.FanArtMediaType.ChannelRadio))
+      else if (int.TryParse(id, out idInt) && (fanArtMediaType == FanArtMediaTypes.ChannelTv || fanArtMediaType == FanArtMediaTypes.ChannelRadio))
         idGuid = IntToGuid(idInt);
 
-      ImageCache.CacheIdentifier identifier = ImageCache.GetIdentifier(idGuid, isTvRadio, 0, 0, "undefined", 0, FanArtConstants.FanArtType.Thumbnail, FanArtConstants.FanArtMediaType.Undefined);
+      ImageCache.CacheIdentifier identifier = ImageCache.GetIdentifier(idGuid, isTvRadio, 0, 0, "undefined", 0, FanArtTypes.Thumbnail, FanArtMediaTypes.Undefined);
 
       IList<FanArtImage> fanart = GetFanArtImages(id, showId, seasonId, isSeason, isTvRadio, isRecording, fanartType, fanArtMediaType);
 

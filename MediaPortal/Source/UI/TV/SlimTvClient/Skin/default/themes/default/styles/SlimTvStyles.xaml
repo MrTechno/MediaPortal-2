@@ -280,7 +280,6 @@
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="Auto"/>
-<<<<<<< HEAD
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
@@ -293,13 +292,6 @@
       <Label x:Name="StartTime" VerticalAlignment="Center" Grid.Column="1" Content="{Binding [StartTime]}" Color="{ThemeResource TextColor}" FontSize="{ThemeResource SmallFontSize}"/>
       <Label x:Name="ItemLabel" VerticalAlignment="Center" Grid.Column="2" Content="{Binding [Name]}" Color="{ThemeResource TextColor}" FontSize="{ThemeResource SmallFontSize}" Margin="5,0,0,0"/>
       <Label x:Name="SeriesLabel" VerticalAlignment="Center" Grid.Column="3" Content="{Binding [Series]}" Color="{ThemeResource TextColor}" FontSize="{ThemeResource SmallFontSize}" Margin="5,0,0,0"/>
-=======
-        <ColumnDefinition Width="*"/>
-      </Grid.ColumnDefinitions>
-      <Label x:Name="StartTime" Grid.Column="0" Content="{Binding [StartTime]}" Color="{ThemeResource TextColor}" FontSize="{ThemeResource SmallFontSize}"/>
-      <Label x:Name="ItemLabel" Grid.Column="1" Content="{Binding [Name]}" Color="{ThemeResource TextColor}" FontSize="{ThemeResource SmallFontSize}" Margin="5,0,0,0"/>
-      <Label x:Name="SeriesLabel" Grid.Column="2" Content="{Binding [Series]}" Color="{ThemeResource TextColor}" FontSize="{ThemeResource SmallFontSize}" Margin="5,0,0,0"/>
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
     </Grid>
   </DataTemplate>
 
@@ -835,12 +827,7 @@
               <Label x:Name="ItemLabel" Content="{Binding [Name]}" VerticalAlignment="Center" Color="{ThemeResource TextColor}" FontSize="{ThemeResource SmallFontSize}"/>
 
               <Label x:Name="SeriesLabel" Grid.Column="1" Content="{Binding [Series]}" VerticalAlignment="Center" Color="{ThemeResource TextColor}" FontSize="{ThemeResource SmallFontSize}"
-<<<<<<< HEAD
                      Margin="10,0,0,0"/>
-=======
-                     Margin="10,0,0,0"
-                     FontFamily="Default"/>
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
             </Grid>
           </Button>
         </ControlTemplate>

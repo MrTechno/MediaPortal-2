@@ -393,7 +393,6 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
       base.OnCurrentGroupChanged(oldindex, newindex);
       UpdateChannels();
       UpdatePrograms();
-<<<<<<< HEAD
       // Notify listeners about group change
       SlimTvClientMessaging.SendSlimTvClientMessage(SlimTvClientMessaging.MessageType.GroupChanged);
     }
@@ -407,14 +406,11 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
       var settings = ServiceRegistration.Get<ISettingsManager>().Load<SlimTvClientSettings>();
       VisibleHours = settings.EpgVisibleHours;
       _bufferStartTime = _bufferEndTime = DateTime.MinValue;
-=======
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
     }
 
     public override void Reactivate(NavigationContext oldContext, NavigationContext newContext)
     {
       base.Reactivate(oldContext, newContext);
-<<<<<<< HEAD
       // Check if the time viewport is left already, then set it to current time.
       bool timeChanged = false;
       if (DateTime.Now >= GuideEndTime)
@@ -425,10 +421,6 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
 
       // Only recreate content if group was changed in mean time
       if (timeChanged || _bufferGroupIndex != ChannelContext.Instance.ChannelGroups.CurrentIndex)
-=======
-      // Only recreate content if group was changed in mean time
-      if (_bufferGroupIndex != ChannelContext.Instance.ChannelGroups.CurrentIndex)
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
       {
         UpdateChannels();
         UpdatePrograms();
@@ -439,12 +431,7 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
     {
       base.EnterModelContext(oldContext, newContext);
       // Init viewport to start with current time.
-<<<<<<< HEAD
       SetCurrentViewTime();
-=======
-      GuideStartTime = DateTime.Now.RoundDateTime(15, DateFormatExtension.RoundingDirection.Down);
-      _bufferStartTime = _bufferEndTime = DateTime.MinValue;
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
       UpdateChannels();
       UpdatePrograms();
     }

@@ -9,13 +9,9 @@
 // ------------------------------------------------------------------------------
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.DAS.html.Api.Pages
 {
-    using System.Linq;
-    using System.Text;
-    using System.Collections.Generic;
-    using MediaPortal.Plugins.MP2Extended.Utils;
-    using System;
-    
-    /// <summary>
+  using MediaPortal.Plugins.MP2Extended.Utils;
+
+  /// <summary>
     /// Class to produce the template output
     /// </summary>
     

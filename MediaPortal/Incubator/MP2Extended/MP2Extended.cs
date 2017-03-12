@@ -1,14 +1,9 @@
-﻿using System.Linq.Expressions;
-using MediaPortal.Common;
+﻿using MediaPortal.Common;
 using MediaPortal.Common.Logging;
 using MediaPortal.Common.PluginManager;
 using MediaPortal.Common.ResourceAccess;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.Profiles;
-using MediaPortal.Common.PathManager;
-using System.IO;
-using System.Xml;
-using System;
 using MediaPortal.Common.Settings;
 using MediaPortal.Plugins.MP2Extended.OnlineVideos;
 using MediaPortal.Plugins.MP2Extended.Settings;

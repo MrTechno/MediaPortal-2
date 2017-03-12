@@ -11,12 +11,6 @@ using MediaPortal.Common.MediaManagement;
 using MediaPortal.Common.MediaManagement.DefaultItemAspects;
 using MediaPortal.Common.MediaManagement.MLQueries;
 using MediaPortal.Plugins.MP2Extended.Attributes;
-using MediaPortal.Plugins.MP2Extended.Common;
-using MediaPortal.Plugins.MP2Extended.Extensions;
-using MediaPortal.Plugins.MP2Extended.MAS;
-using MediaPortal.Plugins.MP2Extended.MAS.General;
-using MediaPortal.Plugins.MP2Extended.MAS.Movie;
-using MediaPortal.Plugins.MP2Extended.MAS.Picture;
 using MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.Picture.BaseClasses;
 using Newtonsoft.Json;
 
@@ -46,7 +40,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.Picture
       IFilter searchFilter = new RelationalFilter(MediaAspect.ATTR_RECORDINGTIME, RelationalOperator.EQ, recordingTime);
       MediaItemQuery searchQuery = new MediaItemQuery(necessaryMIATypes, searchFilter);
 
-      IList<MediaItem> items = ServiceRegistration.Get<IMediaLibrary>().Search(searchQuery, false);
+      IList<MediaItem> items = ServiceRegistration.Get<IMediaLibrary>().Search(searchQuery, false, null, false);
 
       if (items.Count == 0)
         throw new BadRequestException("No Images found");

@@ -15,6 +15,7 @@ using MediaPortal.Plugins.MP2Extended.Common;
 using MediaPortal.Plugins.SlimTv.Interfaces;
 using MediaPortal.Plugins.SlimTv.Interfaces.Items;
 using Newtonsoft.Json;
+using MediaPortal.Common.FanArt;
 
 namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images.BaseClasses
 {
@@ -22,48 +23,48 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images.BaseC
   {
     internal const string NO_FANART_IMAGE_NAME = "B1D44E89-1EAC-4765-B9E9-EF4BBE75C774";
     
-    private static readonly Dictionary<WebMediaType, FanArtConstants.FanArtMediaType> _fanArtMediaTypeMapping = new Dictionary<WebMediaType, FanArtConstants.FanArtMediaType>
+    private static readonly Dictionary<WebMediaType, string> _fanArtMediaTypeMapping = new Dictionary<WebMediaType, string>
     {
-      { WebMediaType.Movie, FanArtConstants.FanArtMediaType.Movie },
-      { WebMediaType.TVEpisode, FanArtConstants.FanArtMediaType.Episode },
-      { WebMediaType.TVSeason, FanArtConstants.FanArtMediaType.SeriesSeason },
-      { WebMediaType.TVShow, FanArtConstants.FanArtMediaType.Series },
-      { WebMediaType.MusicTrack, FanArtConstants.FanArtMediaType.Audio },
-      { WebMediaType.MusicAlbum, FanArtConstants.FanArtMediaType.Album },
-      { WebMediaType.MusicArtist, FanArtConstants.FanArtMediaType.Artist },
-      { WebMediaType.Picture, FanArtConstants.FanArtMediaType.Image },
-      { WebMediaType.TV, FanArtConstants.FanArtMediaType.ChannelTv },
-      { WebMediaType.Radio, FanArtConstants.FanArtMediaType.ChannelRadio },
-      { WebMediaType.Recording, FanArtConstants.FanArtMediaType.Undefined },
+      { WebMediaType.Movie, FanArtMediaTypes.Movie },
+      { WebMediaType.TVEpisode, FanArtMediaTypes.Episode },
+      { WebMediaType.TVSeason, FanArtMediaTypes.SeriesSeason },
+      { WebMediaType.TVShow, FanArtMediaTypes.Series },
+      { WebMediaType.MusicTrack, FanArtMediaTypes.Audio },
+      { WebMediaType.MusicAlbum, FanArtMediaTypes.Album },
+      { WebMediaType.MusicArtist, FanArtMediaTypes.Artist },
+      { WebMediaType.Picture, FanArtMediaTypes.Image },
+      { WebMediaType.TV, FanArtMediaTypes.ChannelTv },
+      { WebMediaType.Radio, FanArtMediaTypes.ChannelRadio },
+      { WebMediaType.Recording, FanArtMediaTypes.Undefined },
     };
 
-    private static readonly Dictionary<WebFileType, FanArtConstants.FanArtType> _fanArtTypeMapping = new Dictionary<WebFileType, FanArtConstants.FanArtType>
+    private static readonly Dictionary<WebFileType, string> _fanArtTypeMapping = new Dictionary<WebFileType, string>
     {
-      { WebFileType.Backdrop, FanArtConstants.FanArtType.FanArt },
-      { WebFileType.Banner, FanArtConstants.FanArtType.Banner },
-      { WebFileType.Content, FanArtConstants.FanArtType.Thumbnail },
-      { WebFileType.Cover, FanArtConstants.FanArtType.Poster },
-      { WebFileType.Logo, FanArtConstants.FanArtType.FanArt }, // ??
-      { WebFileType.Poster, FanArtConstants.FanArtType.Poster },
+      { WebFileType.Backdrop, FanArtTypes.FanArt },
+      { WebFileType.Banner, FanArtTypes.Banner },
+      { WebFileType.Content, FanArtTypes.Thumbnail },
+      { WebFileType.Cover, FanArtTypes.Poster },
+      { WebFileType.Logo, FanArtTypes.FanArt }, // ??
+      { WebFileType.Poster, FanArtTypes.Poster },
     };
 
 
-    internal void MapTypes(string artworktype, string mediatype, out FanArtConstants.FanArtType fanartType, out FanArtConstants.FanArtMediaType fanArtMediaType)
+    internal void MapTypes(string artworktype, string mediatype, out string fanartType, out string fanArtMediaType)
     {
       WebFileType webFileType = (WebFileType)JsonConvert.DeserializeObject(artworktype, typeof(WebFileType));
       WebMediaType webMediaType = (WebMediaType)JsonConvert.DeserializeObject(mediatype, typeof(WebMediaType));
 
       // Map the Fanart Type
       if (!_fanArtTypeMapping.TryGetValue(webFileType, out fanartType))
-        fanartType = FanArtConstants.FanArtType.Undefined;
+        fanartType = FanArtTypes.Undefined;
 
 
       // Map the Fanart MediaType
       if (!_fanArtMediaTypeMapping.TryGetValue(webMediaType, out fanArtMediaType))
-        fanArtMediaType = FanArtConstants.FanArtMediaType.Undefined;
+        fanArtMediaType = FanArtMediaTypes.Undefined;
     }
 
-    internal IList<FanArtImage> GetFanArtImages(string id, string showId, string seasonId, bool isSeason, bool isTvRadio, bool isRecording, FanArtConstants.FanArtType fanartType, FanArtConstants.FanArtMediaType fanArtMediaType)
+    internal IList<FanArtImage> GetFanArtImages(string id, string showId, string seasonId, bool isSeason, bool isTvRadio, bool isRecording, string fanartType, string fanArtMediaType)
     {
       ISet<Guid> necessaryMIATypes = new HashSet<Guid>();
       necessaryMIATypes.Add(MediaAspect.ASPECT_ID);
@@ -110,20 +111,20 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images.BaseC
         name = id;
       }else
       {
-        name = (string)item.Aspects[MediaAspect.ASPECT_ID][MediaAspect.ATTR_TITLE];
+        name = (string)MP2ExtendedUtils.GetAttributeValue(item.Aspects, MediaAspect.ATTR_TITLE);
         // Tv Episode
         if (item.Aspects.ContainsKey(SeriesAspect.ASPECT_ID))
         {
           //name = (string)item.Aspects[SeriesAspect.ASPECT_ID][SeriesAspect.ATTR_EPISODENAME];
           name = item.MediaItemId.ToString();
-          fanArtMediaType = FanArtConstants.FanArtMediaType.Undefined;
-          fanartType = FanArtConstants.FanArtType.Thumbnail;
+          fanArtMediaType = FanArtMediaTypes.Undefined;
+          fanartType = FanArtTypes.Thumbnail;
         }
 
         if (isSeason)
         {
-          name = String.Format("{0} S{1}", (string)item.Aspects[MediaAspect.ASPECT_ID][MediaAspect.ATTR_TITLE], seasonId);
-          fanartType = FanArtConstants.FanArtType.Poster;
+          name = String.Format("{0} S{1}", (string)MP2ExtendedUtils.GetAttributeValue(item.Aspects, MediaAspect.ATTR_TITLE), seasonId);
+          fanartType = FanArtTypes.Poster;
         }
       }
 
@@ -131,7 +132,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.stream.Images.BaseC
 
       if (fanart == null || fanart.Count == 0)
       {
-        Logger.Debug("BaseGetArtwork: no fanart found - fanArtMediaType: {0}, fanartType: {1}, name: {2}", Enum.GetName(typeof(FanArtConstants.FanArtMediaType), fanArtMediaType), Enum.GetName(typeof(FanArtConstants.FanArtType), fanartType), name);
+        Logger.Debug("BaseGetArtwork: no fanart found - fanArtMediaType: {0}, fanartType: {1}, name: {2}", Enum.GetName(typeof(FanArtMediaTypes), fanArtMediaType), Enum.GetName(typeof(FanArtTypes), fanartType), name);
         // We return a transparent image instead of throwing an exception
         Bitmap newImage = new Bitmap(1, 1, PixelFormat.Format32bppArgb);
         Graphics graphic = Graphics.FromImage(newImage);

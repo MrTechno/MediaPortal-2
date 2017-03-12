@@ -57,7 +57,6 @@ namespace MediaPortal.Plugins.SlimTv.Client.Settings
     /// </summary>
     [Setting(SettingScope.User, DefaultValue = true)]
     public bool ShowSeriesInfo { get; set; }
-<<<<<<< HEAD
 
     /// <summary>
     /// If set to <c>true</c>, zapping uses the actual index of channel inside current group.
@@ -71,7 +70,5 @@ namespace MediaPortal.Plugins.SlimTv.Client.Settings
     /// </summary>
     [Setting(SettingScope.User, DefaultValue = false)]
     public bool HideAllChannelsGroup { get; set; }
-=======
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
   }
 }

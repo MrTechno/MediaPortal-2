@@ -364,25 +364,16 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
     {
       ProgramProperties programProperties = new ProgramProperties();
       IProgram currentProgram = program;
-<<<<<<< HEAD
       IChannel channel;
       if (!_tvHandler.ChannelAndGroupInfo.GetChannel(currentProgram.ChannelId, out channel))
         channel = null;
       programProperties.SetProgram(currentProgram, channel);
-=======
-      programProperties.SetProgram(currentProgram);
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
 
       ListItem item = new ProgramListItem(programProperties)
       {
         Command = new MethodDelegateCommand(() => ShowActions(schedule, program))
       };
-<<<<<<< HEAD
       if (channel != null)
-=======
-      IChannel channel;
-      if (_tvHandler.ChannelAndGroupInfo.GetChannel(currentProgram.ChannelId, out channel))
->>>>>>> FreakyJ/FEAT_WifiRemoteForMP2
         item.SetLabel("ChannelName", channel.Name);
       item.SetLabel("ScheduleType", string.Format("[SlimTvClient.ScheduleRecordingType_{0}]", schedule.RecordingType));
       item.AdditionalProperties["PROGRAM"] = currentProgram;

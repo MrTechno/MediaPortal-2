@@ -36,7 +36,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.Music
       if (item == null)
         throw new BadRequestException(String.Format("GetMusicTrackBasicById: No MediaItem found with id: {0}", httpParam["id"].Value));
 
-      MediaItemAspect audioAspects = item.Aspects[AudioAspect.ASPECT_ID];
+      MediaItemAspect audioAspects = MediaItemAspect.GetAspect(item.Aspects, AudioAspect.Metadata);
 
       WebMusicTrackBasic webMusicTrackBasic = new WebMusicTrackBasic();
       webMusicTrackBasic.Album = (string)audioAspects[AudioAspect.ATTR_ALBUM];
@@ -52,7 +52,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.Music
       //webMusicTrackBasic.ArtistId;
       webMusicTrackBasic.DiscNumber = audioAspects[AudioAspect.ATTR_DISCID] != null ? (int)audioAspects[AudioAspect.ATTR_DISCID] : 0;
       webMusicTrackBasic.Duration = Convert.ToInt32((long)audioAspects[AudioAspect.ATTR_DURATION]);
-      var trackGenres = (HashSet<object>)audioAspects[AudioAspect.ATTR_GENRES];
+      var trackGenres = (HashSet<object>)MP2ExtendedUtils.GetCollectionAttributeValues<object>(item.Aspects, GenreAspect.ATTR_GENRE);
       if (trackGenres != null)
         webMusicTrackBasic.Genres = trackGenres.Cast<string>().ToList();
       //webMusicTrackBasic.Rating = Convert.ToSingle((double)movieAspects[AudioAspect.]);
@@ -60,11 +60,11 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.MAS.Music
       webMusicTrackBasic.Type = WebMediaType.MusicTrack;
       //webMusicTrackBasic.Year;
       //webMusicTrackBasic.Artwork;
-      webMusicTrackBasic.DateAdded = (DateTime)item.Aspects[ImporterAspect.ASPECT_ID][ImporterAspect.ATTR_DATEADDED];
+      webMusicTrackBasic.DateAdded = (DateTime)MP2ExtendedUtils.GetAttributeValue(item.Aspects, ImporterAspect.ATTR_DATEADDED);
       webMusicTrackBasic.Id = item.MediaItemId.ToString();
       webMusicTrackBasic.PID = 0;
       //webMusicTrackBasic.Path;
-      webMusicTrackBasic.Title = (string)item.Aspects[MediaAspect.ASPECT_ID][MediaAspect.ATTR_TITLE];
+      webMusicTrackBasic.Title = (string)MP2ExtendedUtils.GetAttributeValue(item.Aspects, MediaAspect.ATTR_TITLE);
 
 
       return webMusicTrackBasic;

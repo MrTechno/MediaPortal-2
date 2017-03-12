@@ -26,7 +26,7 @@ namespace MediaPortal.Plugins.MP2Extended.ResourceAccess.WSS.json.Control
         result = false;
       }
 
-      if (!StreamControl.ValidateIdentifie(identifier))
+      if (!StreamControl.ValidateIdentifier(identifier))
       {
         Logger.Debug("FinishStream: unknown identifier: {0}", identifier);
         result = false;
