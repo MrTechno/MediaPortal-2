@@ -41,6 +41,11 @@ namespace MediaPortal.Plugins.SlimTv.Interfaces.UPnP.Items
 
     public string Name { get; set; }
 
+	// TODO: Talk to morpheus_xx about SlimTV changes
+    public MediaType MediaType { get; set; }
+
+    public int SortOrder { get; set; }
+
     #endregion
 
     /// <summary>

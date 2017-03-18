@@ -40,6 +40,7 @@ using IChannel = MediaPortal.Plugins.SlimTv.Interfaces.Items.IChannel;
 using ILogger = MediaPortal.Common.Logging.ILogger;
 using IPathManager = MediaPortal.Common.PathManager.IPathManager;
 using ScheduleRecordingType = MediaPortal.Plugins.SlimTv.Interfaces.ScheduleRecordingType;
+using IUser = TvControl.IUser;
 using MediaPortal.Plugins.SlimTv.Service3;
 using MediaPortal.Utilities;
 using TvLibrary.Implementations.DVB;
@@ -49,6 +50,7 @@ using TvEngine.Events;
 using TvLibrary.Interfaces;
 using TvService;
 using MediaPortal.Backend.ClientCommunication;
+using Channel = TvDatabase.Channel;
 
 namespace MediaPortal.Plugins.SlimTv.Service
 {
@@ -554,6 +556,59 @@ namespace MediaPortal.Plugins.SlimTv.Service
       return true;
     }
 
+    public override bool EditSchedule(ISchedule schedule, IChannel channel = null, string title = null, DateTime? from = null, DateTime? to = null, ScheduleRecordingType? recordingType = null, TimeSpan? preRecordInterval = null, TimeSpan? postRecordInterval = null, PriorityType? priority = null)
+    {
+      try
+      {
+        ServiceRegistration.Get<ILogger>().Debug("Editing schedule {0} on channel {1} for {2}, {3} till {4}, type {5}", schedule.ScheduleId, channel.ChannelId, title, from, to, recordingType);
+        TvDatabase.Schedule tvSchedule = TvDatabase.Schedule.Retrieve(schedule.ScheduleId);
+
+        tvSchedule.IdChannel = channel.ChannelId;
+        if (title != null)
+        {
+          tvSchedule.ProgramName = title;
+        }
+        if (from != null)
+        {
+          tvSchedule.StartTime = from.Value;
+        }
+        if (to != null)
+        {
+          tvSchedule.EndTime = to.Value;
+        }
+
+        if (recordingType != null)
+        {
+          ScheduleRecordingType scheduleRecType = recordingType.Value;
+          tvSchedule.ScheduleType = (int)scheduleRecType;
+        }
+
+        if (preRecordInterval != null)
+        {
+          tvSchedule.PreRecordInterval = (int)preRecordInterval.Value.TotalMinutes;
+        }
+        if (postRecordInterval != null)
+        {
+          tvSchedule.PostRecordInterval = (int)postRecordInterval.Value.TotalMinutes;
+        }
+
+        if (priority != null)
+        {
+          tvSchedule.Priority = (int)priority.Value;
+        }
+
+        tvSchedule.Persist();
+
+        _tvControl.OnNewSchedule(); // I don't think this is needed, but doesn't hurt either
+        return true;
+      }
+      catch (Exception ex)
+      {
+        ServiceRegistration.Get<ILogger>().Warn(String.Format("Failed to edit schedule {0}", schedule.ScheduleId), ex);
+        return false;
+      }
+    }
+
     public override bool RemoveScheduleForProgram(IProgram program, ScheduleRecordingType recordingType)
     {
       var canceledProgram = TvDatabase.Program.Retrieve(program.ProgramId);
@@ -590,6 +645,27 @@ namespace MediaPortal.Plugins.SlimTv.Service
       tvSchedule.Remove();
       _tvControl.OnNewSchedule(); // I don't think this is needed, but doesn't hurt either
       return true;
+    }
+
+    public override bool UnCancelSchedule(IProgram program)
+    {
+      var tvProgram = TvDatabase.Program.Retrieve(program.ProgramId);
+      try
+      {
+        ServiceRegistration.Get<ILogger>().Debug("Uncancelling schedule for programId {0}", tvProgram.IdProgram);
+        foreach (TvDatabase.Schedule schedule in TvDatabase.Schedule.ListAll().Where(schedule => schedule.IsSerieIsCanceled(program.StartTime, tvProgram.IdChannel)))
+        {
+          schedule.UnCancelSerie(program.StartTime, tvProgram.IdChannel);
+          schedule.Persist();
+        }
+
+        return true;
+      }
+      catch (Exception ex)
+      {
+        ServiceRegistration.Get<ILogger>().Warn(String.Format("Failed to uncancel schedule for programId {0}", program.ProgramId), ex);
+        return false;
+      }
     }
 
     public override bool GetRecordingStatus(IProgram program, out RecordingStatus recordingStatus)
