@@ -40,7 +40,7 @@ namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
       
       Publisher = new List<string>();
       Rights = new List<string>();
-      object oValue = MediaServerUtils.GetAttributeValue(item.Aspects, MediaAspect.ATTR_RECORDINGTIME);
+      object oValue = MediaItemHelper.GetAttributeValue(item.Aspects, MediaAspect.ATTR_RECORDINGTIME);
       if (oValue != null)
       {
         Date = Convert.ToDateTime(oValue).Date.ToString("yyyy-MM-dd");

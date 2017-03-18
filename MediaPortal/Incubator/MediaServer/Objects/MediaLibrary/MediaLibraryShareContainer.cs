@@ -69,7 +69,7 @@ namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
       if (key == Key) return this;
 
       var item = MediaLibraryHelper.GetMediaItem(MediaLibraryHelper.GetObjectId(key));
-      var parentId = new Guid(MediaServerUtils.GetAttributeValue(item.Aspects,
+      var parentId = new Guid(MediaItemHelper.GetAttributeValue(item.Aspects,
         ProviderResourceAspect.ATTR_PARENT_DIRECTORY_ID).ToString());
 
       BasicContainer parent;

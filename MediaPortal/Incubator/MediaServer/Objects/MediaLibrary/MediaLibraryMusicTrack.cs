@@ -44,19 +44,19 @@ namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
       Playlist = new List<string>();
       Contributor = new List<string>();
 
-      var album = MediaServerUtils.GetAttributeValue(item.Aspects, AudioAspect.ATTR_ALBUM);
+      var album = MediaItemHelper.GetAttributeValue(item.Aspects, AudioAspect.ATTR_ALBUM);
       if (album != null) Album.Add(album.ToString());
 
-      var artists = MediaServerUtils.GetCollectionAttributeValues<object>(item.Aspects, AudioAspect.ATTR_ARTISTS);
+      var artists = MediaItemHelper.GetCollectionAttributeValues<object>(item.Aspects, AudioAspect.ATTR_ARTISTS);
       if (artists != null) Artist = new List<string>(artists.Cast<string>());
 
-      var composers = MediaServerUtils.GetCollectionAttributeValues<object>(item.Aspects, AudioAspect.ATTR_COMPOSERS);
+      var composers = MediaItemHelper.GetCollectionAttributeValues<object>(item.Aspects, AudioAspect.ATTR_COMPOSERS);
       if (composers != null) Contributor = new List<string>(composers.Cast<string>());
 
-      var originalTrack = MediaServerUtils.GetAttributeValue(item.Aspects, AudioAspect.ATTR_TRACK);
+      var originalTrack = MediaItemHelper.GetAttributeValue(item.Aspects, AudioAspect.ATTR_TRACK);
       if (originalTrack != null) OriginalTrackNumber = Convert.ToInt32(originalTrack.ToString());
 
-      object oValue = MediaServerUtils.GetAttributeValue(item.Aspects, MediaAspect.ATTR_RECORDINGTIME);
+      object oValue = MediaItemHelper.GetAttributeValue(item.Aspects, MediaAspect.ATTR_RECORDINGTIME);
       if (oValue != null)
       {
         Date = Convert.ToDateTime(oValue).Date.ToString("yyyy-MM-dd");

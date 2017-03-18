@@ -76,15 +76,15 @@ namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
           if (item.Aspects.TryGetValue(AudioAspect.ASPECT_ID, out audioAspect))
           {
             // TODO: the attribute is defined as IEnumerable<string>, why is it here IEnumerable<object>???
-            var genreObj = MediaServerUtils.GetCollectionAttributeValues<object>(item.Aspects, GenreAspect.ATTR_GENRE);
+            var genreObj = MediaItemHelper.GetCollectionAttributeValues<object>(item.Aspects, GenreAspect.ATTR_GENRE);
             if (genreObj != null)
               CollectionUtils.AddAll(Genre, genreObj.Cast<string>());
 
-            var artistObj = MediaServerUtils.GetCollectionAttributeValues<object>(item.Aspects, AudioAspect.ATTR_ALBUMARTISTS);
+            var artistObj = MediaItemHelper.GetCollectionAttributeValues<object>(item.Aspects, AudioAspect.ATTR_ALBUMARTISTS);
             if (artistObj != null)
               CollectionUtils.AddAll(Artist, artistObj.Cast<string>());
 
-            var composerObj = MediaServerUtils.GetCollectionAttributeValues<object>(item.Aspects, AudioAspect.ATTR_COMPOSERS);
+            var composerObj = MediaItemHelper.GetCollectionAttributeValues<object>(item.Aspects, AudioAspect.ATTR_COMPOSERS);
             if (composerObj != null)
               CollectionUtils.AddAll(Contributor, composerObj.Cast<string>());
           }

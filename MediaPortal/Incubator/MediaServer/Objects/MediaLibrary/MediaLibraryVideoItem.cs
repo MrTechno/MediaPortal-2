@@ -50,24 +50,24 @@ namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
         if (item.Aspects.TryGetValue(VideoAspect.ASPECT_ID, out videoAspect))
         {
           // TODO: type issue again :-/
-          var genreObj = MediaServerUtils.GetCollectionAttributeValues<object>(item.Aspects, GenreAspect.ATTR_GENRE);
+          var genreObj = MediaItemHelper.GetCollectionAttributeValues<object>(item.Aspects, GenreAspect.ATTR_GENRE);
           if (genreObj != null)
             CollectionUtils.AddAll(Genre, genreObj.Cast<string>());
 
-          var actorObj = MediaServerUtils.GetCollectionAttributeValues<object>(item.Aspects, VideoAspect.ATTR_ACTORS);
+          var actorObj = MediaItemHelper.GetCollectionAttributeValues<object>(item.Aspects, VideoAspect.ATTR_ACTORS);
           if (actorObj != null)
             CollectionUtils.AddAll(Actor, actorObj.Cast<string>());
 
-          var directorsObj = MediaServerUtils.GetCollectionAttributeValues<object>(item.Aspects, VideoAspect.ATTR_DIRECTORS);
+          var directorsObj = MediaItemHelper.GetCollectionAttributeValues<object>(item.Aspects, VideoAspect.ATTR_DIRECTORS);
           if (directorsObj != null)
             CollectionUtils.AddAll(Director, directorsObj.Cast<string>());
 
-          var descriptionObj = MediaServerUtils.GetAttributeValue(item.Aspects, VideoAspect.ATTR_STORYPLOT);
+          var descriptionObj = MediaItemHelper.GetAttributeValue(item.Aspects, VideoAspect.ATTR_STORYPLOT);
           if (descriptionObj != null)
             Description = descriptionObj.ToString();
         }
       }
-      object oValue = MediaServerUtils.GetAttributeValue(item.Aspects, MediaAspect.ATTR_RECORDINGTIME);
+      object oValue = MediaItemHelper.GetAttributeValue(item.Aspects, MediaAspect.ATTR_RECORDINGTIME);
       if (oValue != null)
       {
         Date = Convert.ToDateTime(oValue).Date.ToString("yyyy-MM-dd");

@@ -48,7 +48,7 @@ namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
  
     public override void Initialise()
     {
-      Title = MediaServerUtils.GetAttributeValue(Item.Aspects, MediaAspect.ATTR_TITLE).ToString();
+      Title = MediaItemHelper.GetAttributeValue(Item.Aspects, MediaAspect.ATTR_TITLE).ToString();
     }
   }
 }

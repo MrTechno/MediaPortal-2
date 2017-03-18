@@ -28,7 +28,7 @@ using System.Collections.Generic;
 
 namespace MediaPortal.Plugins.MediaServer
 {
-    class MediaServerUtils
+    class MediaItemHelper
     {
 		public static object GetAttributeValue(IDictionary<Guid, IList<MediaItemAspect>> aspects, SingleMediaItemAspectMetadata.SingleAttributeSpecification attribute)
 		{

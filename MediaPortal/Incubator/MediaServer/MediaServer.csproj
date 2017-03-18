@@ -67,7 +67,7 @@
     <Compile Include="Filters\WMPContentDirectoryFilter.cs" />
     <Compile Include="Filters\XBoxContentDirectoryFilter.cs" />
     <Compile Include="MediaServerUPnPDeviceInformation.cs" />
-    <Compile Include="MediaServerUtils.cs" />
+    <Compile Include="MediaItemHelper.cs" />
     <Compile Include="Objects\Basic\BasicContainer.cs" />
     <Compile Include="Objects\Basic\BasicItem.cs" />
     <Compile Include="Objects\Basic\BasicObject.cs" />
