@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+
+  <PropertyGroup>
+    <PluginDestination>$(SolutionDir)..\Bin\$(SolutionName)\$(OutDir)Plugins\$(ProjectName)\</PluginDestination>
+    <wwwDestination>$(SolutionDir)..\Bin\$(SolutionName)\$(OutDir)Plugins\$(ProjectName)\www\</wwwDestination>
+  </PropertyGroup>
+
+  <Target Name="AfterBuild">
+    <ItemGroup>
+      <PluginFiles Include="$(TargetDir)$(ProjectName).dll" />
+      <PluginFiles Include="$(TargetDir)SlimTv.Interfaces.dll" />
+      <PluginFiles Include="$(ProjectDir)plugin.xml" />
+      <PluginFiles Include="$(ProjectDir)ResourceAccess\WSS\Profiles\*.xml" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <PluginFiles Include="$(TargetDir)*.pdb" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PluginFiles Include="$(TargetDir)Newtonsoft.Json.dll" />
+      <PluginFiles Include="$(TargetDir)OnlineVideos.dll" />
+    </ItemGroup>
+    
+    <!-- Resources for Webinterface -->
+    <ItemGroup>
+      <wwwFiles Include="$(ProjectDir)\Scripts\**\jquery-2.1.4.min.js" />
+      <wwwFiles Include="$(ProjectDir)\Scripts\**\jquery-ui-1.11.4.min.js" />
+      <wwwFiles Include="$(ProjectDir)\Content\themes\base\**\*.*" />
+      <wwwFiles Include="$(ProjectDir)\Content\themes\smoothness\**\*.*" />
+    </ItemGroup>
+    
+    <Copy SourceFiles="@(PluginFiles)" DestinationFolder="$(PluginDestination)" />
+    <Copy SourceFiles="@(wwwFiles)" DestinationFolder="$(wwwDestination)\%(RecursiveDir)" />
+  </Target>
+
+</Project>
