@@ -90,11 +90,14 @@ namespace MediaPortal.Plugins.SlimTv.Interfaces.ResourceProvider
       if (tv != null)
         tv.DisposeSlot(_slotIndex);
     }
+<<<<<<< HEAD
         public static INetworkResourceAccessor GetResourceAccessor(string path)
         {
             throw new NotImplementedException();
         }
+=======
+>>>>>>> MrTechno/FEAT_MP2.1_DLNA
 
-        #endregion
-    }
+    #endregion
+  }
 }
