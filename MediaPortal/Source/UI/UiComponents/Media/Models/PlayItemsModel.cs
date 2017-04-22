@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -321,7 +321,7 @@ namespace MediaPortal.UiComponents.Media.Models
         if (resumeState != null)
           pc.SetContextVariable(PlayerContext.KEY_RESUME_STATE, resumeState);
         pc.Play();
-        if (pc.AVType == AVType.Video)
+        if (pc.AVType == AVType.Video || pc.AVType == AVType.Audio)
           pcm.ShowFullscreenContent(true);
       }
     }

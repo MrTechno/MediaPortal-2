@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -34,26 +34,26 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
     /// <summary>
     /// Media item aspect id of the episode aspect.
     /// </summary>
-    public static readonly Guid ASPECT_ID = new Guid("287A2809-D38D-4F98-B613-E9C09904392D");
+    public static readonly Guid ASPECT_ID = new Guid("22E58B5D-77A3-4F74-95DB-4B9DD3A289F6");
 
     /// <summary>
     /// Series name.
     /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_SERIESNAME =
-        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("SeriesName", 200, Cardinality.Inline, false);
+    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_SERIES_NAME =
+        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("SeriesName", 200, Cardinality.Inline, true);
 
     /// <summary>
     /// Contains the number of the season, usually starting at 1. A value of 0 is also valid for specials.
     /// </summary>
     public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_SEASON =
-        MediaItemAspectMetadata.CreateSingleAttributeSpecification("Season", typeof(int), Cardinality.Inline, false);
+        MediaItemAspectMetadata.CreateSingleAttributeSpecification("Season", typeof(int), Cardinality.Inline, true);
 
     /// <summary>
     /// Contains a combination of <see cref="ATTR_SERIESNAME"/> and the <see cref="ATTR_SEASON"/> to allow filtering and retrieval of season banners.
     /// This name must be built in form "{0} S{1}", using SeriesName and Season.
     /// </summary>
     public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_SERIES_SEASON =
-        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("SeriesSeasonName", 200, Cardinality.Inline, false);
+        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("SeasonName", 200, Cardinality.Inline, false);
 
     /// <summary>
     /// Contains the number(s) of the episode(s). If a file contains multiple episodes, all episode numbers are added separately.
@@ -72,14 +72,8 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
     /// <summary>
     /// Name of the episode. We only store the first episode name (or combined name) if the file contains multiple episodes.
     /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_EPISODENAME =
+    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_EPISODE_NAME =
         MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("EpisodeName", 300, Cardinality.Inline, false);
-
-    /// <summary>
-    /// First aired date of episode.
-    /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_FIRSTAIRED =
-        MediaItemAspectMetadata.CreateSingleAttributeSpecification("FirstAired", typeof(DateTime), Cardinality.Inline, false);
 
     /// <summary>
     /// Contains the overall rating of the episode. Value ranges from 0 (very bad) to 10 (very good).
@@ -95,15 +89,14 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
 
     public static readonly SingleMediaItemAspectMetadata Metadata = new SingleMediaItemAspectMetadata(
         ASPECT_ID, "EpisodeItem", new[] {
-            ATTR_SERIESNAME,
+            ATTR_SERIES_NAME,
             ATTR_SEASON,
             ATTR_SERIES_SEASON,
             ATTR_EPISODE,
             ATTR_DVDEPISODE,
-            ATTR_EPISODENAME,
-            ATTR_FIRSTAIRED,
+            ATTR_EPISODE_NAME,
             ATTR_TOTAL_RATING,
-            ATTR_RATING_COUNT
+            ATTR_RATING_COUNT,
         });
 
       public static readonly Guid ROLE_EPISODE = new Guid("83C2CDF9-717E-4881-8411-3A31C2027B77");

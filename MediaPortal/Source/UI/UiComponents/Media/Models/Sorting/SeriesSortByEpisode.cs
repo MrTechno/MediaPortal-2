@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -32,9 +32,15 @@ namespace MediaPortal.UiComponents.Media.Models.Sorting
 {
   public class SeriesSortByEpisode : SortByTitle
   {
+    public SeriesSortByEpisode()
+    {
+      _includeMias = new[] { EpisodeAspect.ASPECT_ID };
+      _excludeMias = null;
+    }
+
     public override string DisplayName
     {
-      get { return Consts.RES_SORT_BY_EPISODE; }
+      get { return Consts.RES_COMMON_BY_EPISODE_MENU_ITEM; }
     }
 
     public override int Compare(MediaItem item1, MediaItem item2)
@@ -64,6 +70,23 @@ namespace MediaPortal.UiComponents.Media.Models.Sorting
           return episodeRes;
       }
       return base.Compare(item1, item2);
+    }
+
+    public override string GroupByDisplayName
+    {
+      get { return Consts.RES_COMMON_BY_EPISODE_MENU_ITEM; }
+    }
+
+    public override object GetGroupByValue(MediaItem item)
+    {
+      IList<MediaItemAspect> episodeAspect;
+      if (item.Aspects.TryGetValue(SeriesAspect.ASPECT_ID, out episodeAspect))
+      {
+        IEnumerable<int> episodes = episodeAspect.First().GetCollectionAttribute<int>(EpisodeAspect.ATTR_EPISODE);
+
+        return episodes.FirstOrDefault();
+      }
+      return base.GetGroupByValue(item);
     }
   }
 }

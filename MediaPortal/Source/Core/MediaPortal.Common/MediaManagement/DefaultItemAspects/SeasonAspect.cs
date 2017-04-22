@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -34,26 +34,19 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
     /// <summary>
     /// Media item aspect id of the season aspect.
     /// </summary>
-    public static readonly Guid ASPECT_ID = new Guid("6CA6556B-7A0F-4930-BE90-358AB6EA319B");
+    public static readonly Guid ASPECT_ID = new Guid("6EEC9FB1-C213-4BF5-9DC3-AC62025432C7");
 
     /// <summary>
     /// Series name.
     /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_SERIESNAME =
-        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("SeriesName", 200, Cardinality.Inline, false);
+    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_SERIES_NAME =
+        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("SeriesName", 200, Cardinality.Inline, true);
 
     /// <summary>
     /// Contains the number of the season, usually starting at 1. A value of 0 is also valid for specials.
     /// </summary>
     public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_SEASON =
-        MediaItemAspectMetadata.CreateSingleAttributeSpecification("Season", typeof(int), Cardinality.Inline, false);
-
-    /// <summary>
-    /// Contains a combination of <see cref="ATTR_SERIESNAME"/> and the <see cref="ATTR_SEASON"/> to allow filtering and retrieval of season banners.
-    /// This name must be built in form "{0} S{1}", using SeriesName and Season.
-    /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_SERIES_SEASON =
-        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("SeriesSeasonName", 200, Cardinality.Inline, false);
+        MediaItemAspectMetadata.CreateSingleAttributeSpecification("Season", typeof(int), Cardinality.Inline, true);
 
     /// <summary>
     /// Album description
@@ -62,32 +55,24 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
         MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("Description", 5000, Cardinality.Inline, false);
 
     /// <summary>
-    /// First aired date of episode.
+    /// Contains the number of episodes available for watching.
     /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_FIRSTAIRED =
-        MediaItemAspectMetadata.CreateSingleAttributeSpecification("FirstAired", typeof(DateTime), Cardinality.Inline, false);
+    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_AVAILABLE_EPISODES =
+        MediaItemAspectMetadata.CreateSingleAttributeSpecification("AvailEpisodes", typeof(int), Cardinality.Inline, false);
 
     /// <summary>
-    /// Contains the overall rating of the episode. Value ranges from 0 (very bad) to 10 (very good).
+    /// Contains the total number of episodes currently available for the season.
     /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_TOTAL_RATING =
-        MediaItemAspectMetadata.CreateSingleAttributeSpecification("TotalRating", typeof(double), Cardinality.Inline, true);
-
-    /// <summary>
-    /// Contains the overall number ratings of the episode.
-    /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_RATING_COUNT =
-        MediaItemAspectMetadata.CreateSingleAttributeSpecification("RatingCount", typeof(int), Cardinality.Inline, true);
+    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_NUM_EPISODES =
+        MediaItemAspectMetadata.CreateSingleAttributeSpecification("NumEpisodes", typeof(int), Cardinality.Inline, false);
 
     public static readonly SingleMediaItemAspectMetadata Metadata = new SingleMediaItemAspectMetadata(
         ASPECT_ID, "SeasonItem", new[] {
-            ATTR_SERIESNAME,
+            ATTR_SERIES_NAME,
             ATTR_SEASON,
-            ATTR_SERIES_SEASON,
             ATTR_DESCRIPTION,
-            ATTR_FIRSTAIRED,
-            ATTR_TOTAL_RATING,
-            ATTR_RATING_COUNT
+            ATTR_AVAILABLE_EPISODES,
+            ATTR_NUM_EPISODES
         });
 
     public static readonly Guid ROLE_SEASON = new Guid("830D5DCD-708C-4E30-B043-CCDCBF593E12");

@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -28,7 +28,7 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
 {
   /// <summary>
   /// Contains the metadata specification of the "Movie" media item aspect which is assigned to movie media items. It is a specialized type of the general
-  /// <see cref="VideoAspect"/> for movies, that can be looked up by online libraries like TMDB, IMDB, OFDB...
+  /// <see cref="VideoStreamAspect"/> for movies, that can be looked up by online libraries like TMDB, IMDB, OFDB...
   /// </summary>
   /// TODO: Improve documentation for attributes. Is it related to some internet service? What is the meaning of the value? Where is the source of the values?
   public static class MovieAspect
@@ -36,13 +36,13 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
     /// <summary>
     /// Media item aspect id of the series aspect.
     /// </summary>
-    public static readonly Guid ASPECT_ID = new Guid("2AD64410-5BA3-4163-AF03-F8CBBD0EC252");
+    public static readonly Guid ASPECT_ID = new Guid("C5C21762-FA8A-4C51-8C5B-6B0BF7FB162A");
 
     /// <summary>
     /// Contains the localized name of the movie.
     /// </summary>
     public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_MOVIE_NAME =
-        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("MovieName", 100, Cardinality.Inline, false);
+        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("MovieName", 100, Cardinality.Inline, true);
 
     /// <summary>
     /// Contains the original name of the movie.
@@ -54,7 +54,7 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
     /// Contains the name of the movie collection.
     /// </summary>
     public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_COLLECTION_NAME =
-        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("CollectionName", 100, Cardinality.Inline, false);
+        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("CollectionName", 100, Cardinality.Inline, true);
 
     /// <summary>
     /// Contains the official runtime in minutes. This value must not necessary match the exact video runtime (i.e. tv recordings will be longer because
@@ -67,13 +67,25 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
     /// Contains the certification.
     /// </summary>
     public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_CERTIFICATION =
-        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("Certification", 20, Cardinality.Inline, false);
+        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("Certification", 20, Cardinality.Inline, true);
+
+    /// <summary>
+    /// Contains list of awards.
+    /// </summary>
+    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_AWARDS =
+        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("Awards", 20, Cardinality.ManyToMany, true);
 
     /// <summary>
     /// Contains a short comment for the movie.
     /// </summary>
     public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_TAGLINE =
         MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("Tagline", 255, Cardinality.Inline, false);
+
+    /// <summary>
+    /// List of production company's involved in making the movie.
+    /// </summary>
+    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_COMPANIES =
+        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("Companies", 100, Cardinality.ManyToMany, true);
 
     /// <summary>
     /// Contains a popularity of movies, based on user votings.
@@ -119,12 +131,16 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
             ATTR_RUNTIME_M,
             ATTR_CERTIFICATION,
             ATTR_TAGLINE,
+            ATTR_AWARDS,
+            ATTR_COMPANIES,
             ATTR_POPULARITY,
             ATTR_BUDGET,
             ATTR_REVENUE,
             ATTR_SCORE,
             ATTR_TOTAL_RATING,
-            ATTR_RATING_COUNT
+            ATTR_RATING_COUNT,
         });
+
+    public static readonly Guid ROLE_MOVIE = new Guid("B8B58098-6577-442E-BCB9-DEE3D114EAEF");
   }
 }

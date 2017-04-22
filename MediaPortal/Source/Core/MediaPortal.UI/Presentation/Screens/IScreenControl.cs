@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -23,6 +23,7 @@
 #endregion
 
 using System;
+using System.Windows.Forms;
 using MediaPortal.Common.Runtime;
 
 namespace MediaPortal.UI.Presentation.Screens
@@ -135,5 +136,13 @@ namespace MediaPortal.UI.Presentation.Screens
     /// </summary>
     /// <param name="mode">The requested mode.</param>
     void SwitchMode(ScreenMode mode);
+
+    /// <summary>
+    /// Usually MediaPortal runs as <see cref="Form.TopMost"/> window in <see cref="ScreenMode.FullScreen"/>.
+    /// By setting this property to <c>true</c>, a plugin can temporary disable this behavior to allow
+    /// other windows to be on top, while MediaPortal can remain the <see cref="Form.ActiveForm"/> to be able
+    /// to receive key inputs.
+    /// </summary>
+    bool DisableTopMost { get; set; }
   }
 }

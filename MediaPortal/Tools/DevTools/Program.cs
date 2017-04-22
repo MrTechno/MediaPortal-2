@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2007-2014 Team MediaPortal
+﻿#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2014 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -179,7 +179,7 @@ namespace MediaPortal.DevTools
                 }
 
                 ResourcePath resourcePath = new ResourcePath(new ProviderPathSegment[] { segment });
-                Share source = new Share(Guid.NewGuid(), client.GetSystemId(), resourcePath, name, categories);
+                Share source = new Share(Guid.NewGuid(), client.GetSystemId(), resourcePath, name, true, categories);
 
                 _logger.Info("Adding LOCAL media source name={0} path={1} categories=[{2}]", source.BaseResourcePath.BasePathSegment.Path, source.Name, string.Join(",", source.MediaCategories));
                 client.GetContentDirectory().RegisterShare(source);
@@ -232,7 +232,7 @@ namespace MediaPortal.DevTools
                   _logger.Info("Removing old source");
                   client.GetContentDirectory().RemoveShare(preSource.ShareId);
 
-                  Share postSource = new Share(Guid.NewGuid(), preSource.SystemId, preSource.BaseResourcePath, preSource.Name, preSource.MediaCategories);
+                  Share postSource = new Share(Guid.NewGuid(), preSource.SystemId, preSource.BaseResourcePath, preSource.Name, true, preSource.MediaCategories);
 
                   _logger.Info("Adding media source name={0} path={1} categories=[{2}]", postSource.Name, postSource.BaseResourcePath.BasePathSegment.Path, string.Join(",", postSource.MediaCategories));
                   client.GetContentDirectory().RegisterShare(postSource);
@@ -259,7 +259,7 @@ namespace MediaPortal.DevTools
                 string id = argList[2];
                 string role = argList[3];
                 string linkedRole = argList[4];
-                ShowMediaItems(client, new RelationshipFilter(new Guid(id), new Guid(role), new Guid(linkedRole)));
+                ShowMediaItems(client, new RelationshipFilter(new Guid(role), new Guid(linkedRole), new Guid(id)));
               }
 
               else
@@ -312,7 +312,7 @@ namespace MediaPortal.DevTools
     private static void ShowMediaItems(Client client, IFilter filter)
     {
       IMediaItemAspectTypeRegistration registration = ServiceRegistration.Get<IMediaItemAspectTypeRegistration>();
-      IList<MediaItem> items = client.GetContentDirectory().Search(new MediaItemQuery(null, registration.LocallyKnownMediaItemAspectTypes.Keys, filter), true);
+      IList<MediaItem> items = client.GetContentDirectory().Search(new MediaItemQuery(null, registration.LocallyKnownMediaItemAspectTypes.Keys, filter), true, null, true);
       foreach (MediaItem item in items)
       {
         Console.WriteLine("\nItem {0}:", item.MediaItemId);
@@ -383,7 +383,7 @@ namespace MediaPortal.DevTools
         categoriesReader.Close();
 
         string name = sourcesReader.GetString(sourcesReader.GetOrdinal("name"));
-        sources.Add(new Share(sourceId, null, resourcePath, name, categories));
+        sources.Add(new Share(sourceId, null, resourcePath, name, true, categories));
       }
       sourcesReader.Close();
 

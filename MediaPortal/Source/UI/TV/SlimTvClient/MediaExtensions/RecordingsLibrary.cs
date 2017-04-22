@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -64,7 +64,7 @@ namespace MediaPortal.Plugins.SlimTv.Client.MediaExtensions
 
       AbstractItemsScreenData.PlayableItemCreatorDelegate picd = mi => new RecordingItem(mi) { Command = new MethodDelegateCommand(() => PlayItemsModel.CheckQueryPlayAction(mi)) };
 
-      _defaultScreen = new VideosShowItemsScreenData(picd);
+      _defaultScreen = new RecordingsShowItemsScreenData(picd);
       _availableScreens = new List<AbstractScreenData>
         {
           _defaultScreen,
@@ -76,7 +76,7 @@ namespace MediaPortal.Plugins.SlimTv.Client.MediaExtensions
           //new VideosFilterByGenreScreenData(),
           //new VideosFilterByYearScreenData(),
           //new VideosFilterBySystemScreenData(),
-          new VideosSimpleSearchScreenData(picd),
+          new RecordingsSimpleSearchScreenData(picd),
         };
 
       _defaultSorting = new SortByRecordingDateDesc();
@@ -100,6 +100,8 @@ namespace MediaPortal.Plugins.SlimTv.Client.MediaExtensions
         EpisodeAspect.ASPECT_ID,
         AudioAspect.ASPECT_ID,
         VideoAspect.ASPECT_ID,
+        VideoStreamAspect.ASPECT_ID,
+        VideoAudioStreamAspect.ASPECT_ID,
         ImageAspect.ASPECT_ID
       }.Union(MediaNavigationModel.GetMediaSkinOptionalMIATypes(MediaNavigationMode));
 

@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -31,7 +31,7 @@ namespace MediaPortal.Common.ResourceAccess
   public interface IResourceServer
   {
     /// <summary>
-    /// Gets the port number on which the HttpServer with the given IP is listening.
+    /// Gets the port number on which the HttpServer with give IP is listening.
     /// </summary>
     /// <param name="ipAddress">Bound IP address</param>
     /// <returns>Port number</returns>

@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2014 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -712,26 +712,66 @@ namespace UPnP.Infrastructure.CP.SSDP
         if (!DateTime.TryParse(date, out d))
           d = DateTime.Now;
         DateTime expirationTime = d.AddSeconds(maxAge);
-        // The specification says the SERVER header should contain three entries, separated by space, like
-        // "SERVER: OS/version UPnP/1.1 product/version".
-        // Unfortunately, some clients send entries separated by ", ", like "Linux/2.x.x, UPnP/1.0, pvConnect UPnP SDK/1.0".
-        // We try to handle all situations correctly here, that's the reason for this ugly code.
 
-        // What we've seen until now:
-        // SERVER: Linux/2.x.x, UPnP/1.0, pvConnect UPnP SDK/1.0  => tokens separated by ','
-        // SERVER: Windows 2003, UPnP/1.0 DLNADOC/1.50, Serviio/0.5.2  => tokens separated by ',' and additional info in UPnP version token
+        // The specification says the SERVER header should contain three tokens separated by space.
+        // For example: "SERVER: OS/version UPnP/1.1 product/version".
+        // Unfortunately clients don't always follow the specification. We've seen a range of
+        // non-compliancies:
+        // SERVER: Linux/2.x.x, UPnP/1.0, pvConnect UPnP SDK/1.0  => comma separated tokens
+        // SERVER: Windows 2003, UPnP/1.0 DLNADOC/1.50, Serviio/0.5.2  => comma separated tokens, no forward slash separator in the OS token, and additional info in the UPnP token
         // SERVER: 3Com-ADSL-11g/1.0 UPnP/1.0  => only two tokens
-        string[] versionInfos = server.Contains(", ") ? server.Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries) :
-            server.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-        string upnpVersionInfo = versionInfos.FirstOrDefault(v => v.StartsWith(UPnPVersion.VERSION_PREFIX));
-        if (upnpVersionInfo == null)
-          // Invalid message
+        // SERVER: DOTS 2.0 UPnP/1.0 ATI TV Wonder OpenCable Receiver (37F0)/1.19.12.09050155, May  1 2009  => space separated tokens, no forward slash separator in the OS token, and incidental spaces and commas
+        // SERVER: Linux/i686 UPnP/1,0 DLNADOC/1.50 LGE WebOS TV/Version 0.9  => four tokens, comma separated UPnP version number, and incidental spaces
+        //
+        // We assume:
+        // 1. The DLNA token is optional. If present, it can be in any position.
+        // 2. The OS token is optional. If present, it must be before the UPnP token.
+        // 3. The product token is optional. If present, it must be after the UPnP token.
+        // 4. Tokens can be space or comma separated, but not a mixture. Incidental spaces and commas may be present.
+        int upnpVersionIndex = server.IndexOf(UPnPVersion.VERSION_PREFIX);
+        if (upnpVersionIndex == -1)
+          // Invalid message (UPnP version not in SERVER header)
           return false;
-        // upnpVersionInfo = 'UPnP/1.0', 'UPnP/1.1', 'UPnP/1.0 DLNADOC/1.50', ..., the UPnP version is always the first token
-        string[] upnpVersionInfoTokens = upnpVersionInfo.Split(' ');
-        string upnpVersionInfoToken = upnpVersionInfoTokens[0];
+
+        char separator = ' ';
+        if (upnpVersionIndex == 0)
+          separator = server.Contains(',') ? ',' : ' ';
+        else
+        {
+          for (int c = upnpVersionIndex - 1; c >= 0; c--)
+          {
+            if (server[c] != ' ')
+            {
+              if (server[c] == ',')
+                separator = ',';
+              break;
+            }
+          }
+        }
+
+        string[] serverTokens = server.Split(new char[] { separator }, StringSplitOptions.RemoveEmptyEntries);
+        List<string> osVersionTokens = new List<string>(serverTokens.Length);
+        string upnpVersionString = null;
+        List<string> productVersionTokens = new List<string>(serverTokens.Length);
+        string dlnaVersion = string.Empty;
+        for (int v = 0; v < serverTokens.Length; v++)
+        {
+          string versionInfo = serverTokens[v].Trim();
+          serverTokens[v] = versionInfo;
+          if (versionInfo.StartsWith(UPnPVersion.VERSION_PREFIX, StringComparison.InvariantCultureIgnoreCase))
+            upnpVersionString = versionInfo;
+          else if (versionInfo.StartsWith(UPnPVersion.DLNA_VERSION_PREFIX, StringComparison.InvariantCultureIgnoreCase))
+            dlnaVersion = versionInfo;
+          else if (upnpVersionString == null)
+            osVersionTokens.Add(versionInfo);
+          else
+            productVersionTokens.Add(versionInfo);
+        }
+
+        // upnpVersionString = 'UPnP/1.0', 'UPnP/1.1', 'UPnP/1.0 DLNADOC/1.50', ..., the UPnP version is always the first token
+        string[] upnpVersionTokens = upnpVersionString.Split(' ');
         UPnPVersion upnpVersion;
-        if (!UPnPVersion.TryParse(upnpVersionInfoToken, out upnpVersion))
+        if (!UPnPVersion.TryParse(upnpVersionTokens[0], out upnpVersion))
           // Invalid message
           return false;
         if (upnpVersion.VerMax != 1)
@@ -758,14 +798,17 @@ namespace UPnP.Infrastructure.CP.SSDP
         lock (_cpData.SyncObj)
         {
           bool rootEntryAdded;
-          // Use fail-safe code, see comment above about the different SERVER headers
-          string osVersion = versionInfos.Length < 1 ? string.Empty : versionInfos[0];
-          string productVersion = versionInfos.Length < 3 ? string.Empty : versionInfos[2];
+          string osVersion = string.Join(separator.ToString(), osVersionTokens);
+          string productVersion = string.Join(separator.ToString(), productVersionTokens);
+          if (string.IsNullOrEmpty(dlnaVersion))
+            dlnaVersion = upnpVersionTokens.FirstOrDefault(t => t.StartsWith(UPnPVersion.DLNA_VERSION_PREFIX, StringComparison.InvariantCultureIgnoreCase)) ?? string.Empty;
           rootEntry = GetOrCreateRootEntry(deviceUUID, location, upnpVersion, osVersion,
               productVersion, expirationTime, config, httpVersion, searchPort, out rootEntryAdded);
-          if (bi != null && rootEntry.BootID > bootID)
-            // Invalid message
-            return false;
+
+          // Morpheus_xx, 2017/01: this check seems to discard many messages and it's not clear if this is a valid way to handle this. It's temporary commented for testing.
+          //if (bi != null && rootEntry.BootID > bootID)
+          //  // Invalid message
+          //  return false;
           uint currentConfigId = rootEntry.GetConfigID(remoteEndPoint);
           if (currentConfigId != 0 && currentConfigId != configID)
             fireConfigurationChanged = true;

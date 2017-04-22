@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2007-2014 Team MediaPortal
+﻿#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2014 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -125,8 +125,8 @@ namespace Test.Backend
       //Console.WriteLine("Part 7 " + parts[7].GetType());
       //Console.WriteLine("Bind vars [{0}]", string.Join(",", bindVars));
 
-      Assert.AreEqual(new List<object> { "test", " IN(",
-            "SELECT ", "MEDIA_ITEM_ID", " FROM ", "M_META1", " WHERE ", "ATTR_STRING", " LIKE ", "@V0", ")"
+      Assert.AreEqual(new List<object> {"test"," IN(",
+        "SELECT ","MEDIA_ITEM_ID"," FROM ","M_META1"," WHERE ","ATTR_STRING"," LIKE ","@V0",")"
         }, parts, "Parts");
       Assert.AreEqual(new List<BindVar> { new BindVar("V0", "%", typeof(string)) }, bindVars, "Bind vars");
     }
@@ -140,7 +140,7 @@ namespace Test.Backend
       Guid movieId = new Guid("aaaaaaaa-1111-1111-1111-aaaaaaaaaaaa");
       Guid movieType = new Guid("bbbbbbbb-2222-2222-2222-bbbbbbbbbbbb");
       Guid actorType = new Guid("cccccccc-3333-3333-3333-cccccccccccc");
-      IFilter filter = new RelationshipFilter(movieId, movieType, actorType);
+      IFilter filter = new RelationshipFilter(actorType, movieType, movieId);
 
       ICollection<MediaItemAspectMetadata> requiredMIATypes = new List<MediaItemAspectMetadata>();
 
@@ -155,18 +155,18 @@ namespace Test.Backend
       //Console.WriteLine("Bind vars [{0}]", string.Join(",", bindVars));
       //Console.WriteLine("Table joins [{0}]", string.Join(",", tableJoins));
 
-      Assert.AreEqual(new List<object> { "test"," IN(",
-          "SELECT V1.", "LINKEDID", " FROM ", "M_RELATIONSHIP", " V1 WHERE V1.", "ROLE", "=@V11", " AND ", "LINKEDROLE", "=@V12", " AND ", "MEDIA_ITEM_ID", "=@V10",
-          " UNION ",
-          "SELECT V2.", "MEDIA_ITEM_ID", " FROM ", "M_RELATIONSHIP", " V2 WHERE V2.", "ROLE", "=@V25", " AND ", "LINKEDROLE", "=@V24", " AND ", "LINKEDID", "=@V13", ")" }, parts, "Parts");
+      Assert.AreEqual(new List<object> {
+        "test"," IN(",
+        "SELECT R1.","MEDIA_ITEM_ID"," FROM ","M_RELATIONSHIP"," R1"," WHERE R1.LINKEDID","=@V0"," AND R1.","ROLE","=@V1"," AND R1.","LINKEDROLE","=@V2",
+        " UNION ",
+        "SELECT R2.","LINKEDID"," FROM ","M_RELATIONSHIP"," R2"," WHERE R2.MEDIA_ITEM_ID","=@V0"," AND R2.","LINKEDROLE","=@V1"," AND R2.","ROLE","=@V2",")"
+        }, parts, "Parts");
+
       Assert.AreEqual(new List<BindVar>
       {
-        new BindVar("V11", movieType, typeof(Guid)), 
-        new BindVar("V12", actorType, typeof(Guid)),
-        new BindVar("V10", movieId, typeof(Guid)), 
-        new BindVar("V25", actorType, typeof(Guid)),
-        new BindVar("V24", movieType, typeof(Guid)),
-        new BindVar("V13", movieId, typeof(Guid))
+        new BindVar("V0", movieId, typeof(Guid)),
+        new BindVar("V1", actorType, typeof(Guid)),
+        new BindVar("V2", movieType, typeof(Guid))
       }, bindVars, "Bind vars");
       Assert.AreEqual(new List<TableJoin> { }, tableJoins, "Tables joins");
     }
@@ -183,7 +183,7 @@ namespace Test.Backend
       requiredMIATypes.Add(mia1.Metadata);
       requiredMIATypes.Add(mia2.Metadata);
 
-      SingleMIAQueryBuilder builder = new SingleMIAQueryBuilder(MockCore.Management, new List<QueryAttribute>(), null, requiredMIATypes, new List<MediaItemAspectMetadata>(), filter, null);
+      MIAQueryBuilder builder = new MIAQueryBuilder(MockCore.Management, new List<QueryAttribute>(), null, requiredMIATypes, new List<MediaItemAspectMetadata>(), filter, null);
 
       string mediaItemIdAlias = null;
       IDictionary<MediaItemAspectMetadata, string> miamAliases = null;
@@ -201,7 +201,8 @@ namespace Test.Backend
       Assert.AreEqual("A0", mediaItemIdAlias, "Media item ID alias");
       Assert.AreEqual(CreateMIAMAliases(mia1.Metadata, "A1", mia2.Metadata, "A2"), miamAliases, "MIAM aliases");
       Assert.AreEqual(new Dictionary<QueryAttribute, string>(), attributeAliases, "Attribute aliases");
-      Assert.AreEqual("SELECT T0.MEDIA_ITEM_ID A0, T0.MEDIA_ITEM_ID A1, T1.MEDIA_ITEM_ID A2 FROM M_META1 T0 INNER JOIN M_META2 T1 ON T1.MEDIA_ITEM_ID = T0.MEDIA_ITEM_ID  WHERE T0.ATTR_STRING LIKE @V0", statementStr, "Statement");
+      Assert.AreEqual("SELECT T0.MEDIA_ITEM_ID A0, T0.MEDIA_ITEM_ID A1, T1.MEDIA_ITEM_ID A2 FROM M_META1 T0 INNER JOIN M_META2 T1 ON T1.MEDIA_ITEM_ID = T0.MEDIA_ITEM_ID "+
+        " WHERE T0.ATTR_STRING LIKE @V0", statementStr, "Statement");
       Assert.AreEqual(new List<BindVar> { new BindVar("V0", "%", typeof(string)) }, bindVars, "Bind vars");
     }
 
@@ -217,7 +218,7 @@ namespace Test.Backend
       requiredMIATypes.Add(mia1.Metadata);
       requiredMIATypes.Add(mia2.Metadata);
 
-      SingleMIAQueryBuilder builder = new SingleMIAQueryBuilder(MockCore.Management, new List<QueryAttribute>(), null, requiredMIATypes, new List<MediaItemAspectMetadata>(), filter, null);
+      MIAQueryBuilder builder = new MIAQueryBuilder(MockCore.Management, new List<QueryAttribute>(), null, requiredMIATypes, new List<MediaItemAspectMetadata>(), filter, null);
 
       string mediaItemIdAlias = null;
       IDictionary<MediaItemAspectMetadata, string> miamAliases = null;
@@ -233,9 +234,10 @@ namespace Test.Backend
       //Console.WriteLine("bindVars: [{0}]", string.Join(",", bindVars));
 
       Assert.AreEqual("A0", mediaItemIdAlias, "Media item ID alias");
-      Assert.AreEqual(CreateMIAMAliases(), miamAliases, "MIAM aliases");
+      Assert.AreEqual(CreateMIAMAliases(mia1.Metadata, "A1", mia2.Metadata, "A2"), miamAliases, "MIAM aliases");
       Assert.AreEqual(new string[] { }, attributeAliases, "Attribute aliases");
-      Assert.AreEqual("SELECT T0.MEDIA_ITEM_ID A0 FROM MEDIA_ITEMS T0  WHERE T0.MEDIA_ITEM_ID IN(SELECT MEDIA_ITEM_ID FROM M_META1 WHERE ATTR_STRING LIKE @V0)", statementStr, "Statement");
+      Assert.AreEqual("SELECT T0.MEDIA_ITEM_ID A0, T0.MEDIA_ITEM_ID A1, T1.MEDIA_ITEM_ID A2 FROM M_META1 T0 INNER JOIN M_META2 T1 ON T1.MEDIA_ITEM_ID = T0.MEDIA_ITEM_ID "+
+        " WHERE T0.MEDIA_ITEM_ID IN(SELECT MEDIA_ITEM_ID FROM M_META1 WHERE ATTR_STRING LIKE @V0)", statementStr, "Statement");
       Assert.AreEqual(new List<BindVar> { new BindVar("V0", "%", typeof(string)) }, bindVars, "Bind vars");
     }
 
@@ -253,7 +255,7 @@ namespace Test.Backend
       requiredMIATypes.Add(mia1.Metadata);
       requiredMIATypes.Add(mia2.Metadata);
 
-      SingleMIAQueryBuilder builder = new SingleMIAQueryBuilder(MockCore.Management, new List<QueryAttribute>(), null, requiredMIATypes, new List<MediaItemAspectMetadata>(), filter, null);
+      MIAQueryBuilder builder = new MIAQueryBuilder(MockCore.Management, new List<QueryAttribute>(), null, requiredMIATypes, new List<MediaItemAspectMetadata>(), filter, null);
 
       string mediaItemIdAlias = null;
       IDictionary<MediaItemAspectMetadata, string> miamAliases = null;
@@ -269,10 +271,10 @@ namespace Test.Backend
       Console.WriteLine("bindVars: [{0}]", string.Join(",", bindVars));
 
       Assert.AreEqual("A0", mediaItemIdAlias, "Media item ID alias");
-      Assert.AreEqual(CreateMIAMAliases(mia1.Metadata, "A1"), miamAliases, "MIAM aliases");
+      Assert.AreEqual(CreateMIAMAliases(mia1.Metadata, "A1", mia2.Metadata, "A2"), miamAliases, "MIAM aliases");
       Assert.AreEqual(new Dictionary<QueryAttribute, string>(), attributeAliases, "Attribute aliases");
-      //Assert.AreEqual("SELECT T0.MEDIA_ITEM_ID A0, T0.MEDIA_ITEM_ID A1 FROM M_SINGLE1 T0  WHERE (T0.ATTR_STRING LIKE @V0 AND T0.MEDIA_ITEM_ID IN(SELECT MEDIA_ITEM_ID FROM M_MULTI1 WHERE ATTR_STRING_0 LIKE @V1))", statementStr, "Statement");
-      Assert.AreEqual("SELECT T0.MEDIA_ITEM_ID A0, T0.MEDIA_ITEM_ID A1 FROM M_SINGLE1 T0  WHERE T0.MEDIA_ITEM_ID IN(SELECT MEDIA_ITEM_ID FROM M_MULTI1 WHERE ATTR_STRING_0 LIKE @V0) AND T0.ATTR_STRING LIKE @V1", statementStr, "Statement");
+      Assert.AreEqual("SELECT T0.MEDIA_ITEM_ID A0, T0.MEDIA_ITEM_ID A1, T1.MEDIA_ITEM_ID A2 FROM M_SINGLE1 T0 INNER JOIN M_MULTI1 T1 ON T1.MEDIA_ITEM_ID = T0.MEDIA_ITEM_ID  " +
+        "WHERE T0.MEDIA_ITEM_ID IN(SELECT MEDIA_ITEM_ID FROM M_MULTI1 WHERE ATTR_STRING LIKE @V0) AND T0.ATTR_STRING LIKE @V1", statementStr, "Statement");
       Assert.AreEqual(new List<BindVar>
             {
                 new BindVar("V0", "%", typeof(string)),
@@ -296,9 +298,9 @@ namespace Test.Backend
       Guid movieId = new Guid("aaaaaaaa-1111-1111-1111-aaaaaaaaaaaa");
       Guid movieType = new Guid("bbbbbbbb-2222-2222-2222-bbbbbbbbbbbb");
       Guid actorType = new Guid("cccccccc-3333-3333-3333-cccccccccccc");
-      IFilter filter = new RelationshipFilter(movieId, movieType, actorType);
+      IFilter filter = new RelationshipFilter(actorType, movieType, movieId);
 
-      SingleMIAQueryBuilder builder = new SingleMIAQueryBuilder(MockCore.Management, new List<QueryAttribute>(), null, requiredMIATypes, new List<MediaItemAspectMetadata>(), filter, null);
+      MIAQueryBuilder builder = new MIAQueryBuilder(MockCore.Management, new List<QueryAttribute>(), null, requiredMIATypes, new List<MediaItemAspectMetadata>(), filter, null);
 
       string mediaItemIdAlias = null;
       IDictionary<MediaItemAspectMetadata, string> miamAliases = null;
@@ -316,15 +318,14 @@ namespace Test.Backend
       Assert.AreEqual("A0", mediaItemIdAlias, "Media item ID alias");
       Assert.AreEqual(CreateMIAMAliases(mia1.Metadata, "A1", mia2.Metadata, "A2"), miamAliases, "MIAM aliases");
       Assert.AreEqual(new Dictionary<QueryAttribute, string>(), attributeAliases, "Attribute aliases");
-      Assert.AreEqual("SELECT T0.MEDIA_ITEM_ID A0, T0.MEDIA_ITEM_ID A1, T1.MEDIA_ITEM_ID A2 FROM M_META1 T0 INNER JOIN M_META2 T1 ON T1.MEDIA_ITEM_ID = T0.MEDIA_ITEM_ID  WHERE T0.MEDIA_ITEM_ID IN(SELECT V1.LINKEDID FROM M_RELATIONSHIP V1 WHERE V1.ROLE=@V11 AND LINKEDROLE=@V12 AND MEDIA_ITEM_ID=@V10 UNION SELECT V2.MEDIA_ITEM_ID FROM M_RELATIONSHIP V2 WHERE V2.ROLE=@V25 AND LINKEDROLE=@V24 AND LINKEDID=@V13)", statementStr, "Statement");
+      Assert.AreEqual("SELECT T0.MEDIA_ITEM_ID A0, T0.MEDIA_ITEM_ID A1, T1.MEDIA_ITEM_ID A2 FROM M_META1 T0 INNER JOIN M_META2 T1 ON T1.MEDIA_ITEM_ID = T0.MEDIA_ITEM_ID "+
+        " WHERE T0.MEDIA_ITEM_ID IN(SELECT R1.MEDIA_ITEM_ID FROM M_RELATIONSHIP R1 WHERE R1.LINKEDID=@V0 AND R1.ROLE=@V1 AND R1.LINKEDROLE=@V2 UNION SELECT R2.LINKEDID "+
+        "FROM M_RELATIONSHIP R2 WHERE R2.MEDIA_ITEM_ID=@V0 AND R2.LINKEDROLE=@V1 AND R2.ROLE=@V2)", statementStr, "Statement");
       Assert.AreEqual(new List<BindVar>
             {
-                new BindVar("V11", movieType, typeof(Guid)),
-                new BindVar("V12", actorType, typeof(Guid)),
-                new BindVar("V10", movieId, typeof(Guid)),
-                new BindVar("V25", actorType, typeof(Guid)),
-                new BindVar("V24", movieType, typeof(Guid)),
-                new BindVar("V13", movieId, typeof(Guid)),
+                new BindVar("V0", movieId, typeof(Guid)),
+                new BindVar("V1", actorType, typeof(Guid)),
+                new BindVar("V2", movieType, typeof(Guid))
             }, bindVars, "Bind vars");
     }
 
@@ -343,7 +344,7 @@ namespace Test.Backend
       requiredMIATypes.Add(mia1.Metadata);
       requiredMIATypes.Add(mia2.Metadata);
 
-      SingleMIAQueryBuilder builder = new SingleMIAQueryBuilder(MockCore.Management, new List<QueryAttribute>(), null, requiredMIATypes, new List<MediaItemAspectMetadata>(), filter, null);
+      MIAQueryBuilder builder = new MIAQueryBuilder(MockCore.Management, new List<QueryAttribute>(), null, requiredMIATypes, new List<MediaItemAspectMetadata>(), filter, null);
 
       string mediaItemIdAlias = null;
       IDictionary<MediaItemAspectMetadata, string> miamAliases = null;
@@ -361,7 +362,8 @@ namespace Test.Backend
       Assert.AreEqual("A0", mediaItemIdAlias, "Media item ID alias");
       Assert.AreEqual(CreateMIAMAliases(mia1.Metadata, "A1", mia2.Metadata, "A2"), miamAliases, "MIAM aliases");
       Assert.AreEqual(new string[] { }, attributeAliases, "Attribute aliases");
-      Assert.AreEqual("SELECT T0.MEDIA_ITEM_ID A0, T0.MEDIA_ITEM_ID A1, T1.MEDIA_ITEM_ID A2 FROM M_META1 T0 INNER JOIN M_META2 T1 ON T1.MEDIA_ITEM_ID = T0.MEDIA_ITEM_ID  WHERE (T0.ATTR_STRING LIKE @V0 AND T1.ATTR_STRING_0 LIKE @V1)", statementStr, "Statement");
+      Assert.AreEqual("SELECT T0.MEDIA_ITEM_ID A0, T0.MEDIA_ITEM_ID A1, T1.MEDIA_ITEM_ID A2 FROM M_META1 T0 INNER JOIN M_META2 T1 ON T1.MEDIA_ITEM_ID = T0.MEDIA_ITEM_ID  " +
+        "WHERE (T0.ATTR_STRING LIKE @V0 AND T1.ATTR_STRING LIKE @V1)", statementStr, "Statement");
       Assert.AreEqual(new List<BindVar>
       {
           new BindVar("V0", "%", typeof(string)),
@@ -392,7 +394,7 @@ namespace Test.Backend
       requiredMIATypes.Add(mia1.Metadata);
       requiredMIATypes.Add(mia2.Metadata);
 
-      SingleMIAQueryBuilder builder = new SingleMIAQueryBuilder(MockCore.Management, new List<QueryAttribute>(), null, requiredMIATypes, new List<MediaItemAspectMetadata>(), filter, null);
+      MIAQueryBuilder builder = new MIAQueryBuilder(MockCore.Management, new List<QueryAttribute>(), null, requiredMIATypes, new List<MediaItemAspectMetadata>(), filter, null);
 
       string mediaItemIdAlias = null;
       IDictionary<MediaItemAspectMetadata, string> miamAliases = null;

@@ -25,16 +25,17 @@
   <string name="Media.SavePlaylistSuccessfulWorkflowStateNavigationContextDisplayLabel">Успішно</string>
   <string name="Media.SavePlaylistFailedWorkflowStateNavigationContextDisplayLabel">Не вдалося</string>
   <!--Screen headers-->
-  <string name="Media.VideoItemsHeader">Відео</string>
-  <string name="Media.SeriesItemsHeader">Епізоди</string>
-  <string name="Media.ImageItemsHeader">Зображення</string>
-  <string name="Media.ChooseVideoLanguageHeader">Виберіть мову</string>
+  <string name="Media.ChooseImageHeader">Зображення</string>
+  <string name="Media.ChooseEpisodeHeader">Епізоди</string>
+  <string name="Media.ChooseVideoHeader">Відео</string>
   <string name="Media.SavePlaylistEditNameHeader">Зберегти плейлист</string>
   <string name="Media.SavePlaylistFailedHeader">Зберегти плейлист</string>
   <string name="Media.SavePlaylistSuccessfulHeader">Зберегти плейлист</string>
+  <!--View occupation names-->
   <!--View names (names for the view instances)-->
   <string name="Media.AudioRootViewName">Аудіо</string>
   <string name="Media.VideosRootViewName">Відео</string>
+  <string name="Media.EpisodeRootViewName">Епізод</string>
   <string name="Media.ImagesRootViewName">Зображення</string>
   <!--General strings used in views-->
   <!--Shown in the header of an items list-->
@@ -78,4 +79,7 @@
   <string name="Media.LargeGrid">Сітка</string>
   <string name="Media.SwitchSortingMenuItem">Сортування</string>
   <string name="Media.SwitchSortingDialogTitle">Сортування</string>
+  <!--Secondary filters-->
+  <string name="Filter.RemoteNumericAlphabet0"></string>
+  <string name="Filter.RemoteNumericAlphabet1"></string>
 </resources>

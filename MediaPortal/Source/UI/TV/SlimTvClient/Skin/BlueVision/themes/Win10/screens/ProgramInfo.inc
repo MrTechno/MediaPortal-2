@@ -1,48 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Grid xmlns="www.team-mediaportal.com/2008/mpf/directx"
+<DockPanel xmlns="www.team-mediaportal.com/2008/mpf/directx"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-    x:Name="ProgramInfoPanel" Margin="10">
-  <Grid.RowDefinitions>
-    <RowDefinition Height="Auto"/>
-    <RowDefinition Height="Auto"/>
-    <RowDefinition Height="Auto"/>
-    <RowDefinition Height="Auto"/>
-    <RowDefinition Height="Auto"/>
-    <RowDefinition Height="Auto"/>
-    <RowDefinition Height="Auto"/>
-    <RowDefinition Height="*"/>
-  </Grid.RowDefinitions>
-  <Grid.ColumnDefinitions>
-    <ColumnDefinition Width="{ThemeResource ProgramInfoHeaderWidth}"/>
-    <ColumnDefinition Width="Auto"/>
-    <ColumnDefinition Width="{ThemeResource ProgramInfoHeaderWidth}"/>
-    <ColumnDefinition Width="*"/>
-  </Grid.ColumnDefinitions>
-  <Label x:Name="ChannelLabel" Grid.Row="0" Grid.Column="0" Content="[SlimTvClient.ChannelLabel]" Color="{ThemeResource EmphasisTextColor}"/>
-  <Label x:Name="Channel" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Scroll="Auto" Content="{Binding ChannelName}" Color="{ThemeResource TextColor}"/>
+    xmlns:fanart="clr-namespace:MediaPortal.Extensions.UserServices.FanArtService.Client;assembly=FanArtService.Client"
+    x:Name="ProgramInfoPanel" LastChildFill="true" Height="170">
 
-  <Label x:Name="ProgramLabel" Grid.Row="1" Grid.Column="0" Content="[SlimTvClient.ProgramLabel]" Color="{ThemeResource EmphasisTextColor}"/>
-  <Label x:Name="Program" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Scroll="Auto" Content="{Binding CurrentProgram.Title}" Color="{ThemeResource TextColor}"/>
+  <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="8,10,0,-30">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="320"/>
+      <ColumnDefinition Width="1500"/>
+    </Grid.ColumnDefinitions>
 
-  <Label x:Name="ProgramStartLabel" Grid.Row="2" Grid.Column="0" Content="[SlimTvClient.ProgramStartLabel]" Color="{ThemeResource EmphasisTextColor}"/>
-  <Label x:Name="ProgramStart" Grid.Row="2" Grid.Column="1" Scroll="Auto"
-      Content="{Binding Path=CurrentProgram.StartTime, Converter={StaticResource SlimTvDateFormatConverter}}"
-      Color="{ThemeResource TextColor}"/>
+    <StackPanel Orientation="Vertical" Grid.RowSpan="2">
+      <StackPanel Orientation="Horizontal">
+        <Label x:Name="ProgramStart" Margin="0,0,0,0" Color="{ThemeResource TextColor}"
+               Content="{Binding Path=CurrentProgram.StartTime, Converter={StaticResource SlimTvDateFormatConverter}}"/>
+        <!--Label Margin="5,0,5,0" Content="—" Color="{ThemeResource TextColor}"/>
+        <Label x:Name="ProgramEnd" Content="{Binding Path=CurrentProgram.EndTime, Converter={StaticResource SlimTvDateFormatConverter}}"
+            Color="{ThemeResource TextColor}"/-->
+      </StackPanel>
+      <Label x:Name="Channel" Scroll="Auto" Content="{Binding ChannelName}" Color="{ThemeResource TextColor}"/>
+      <Image x:Name="ChannelLogo" Width="{ThemeResource ChannelLogoLarge}" Margin="0,10,0,0"
+             Stretch="Uniform" VerticalAlignment="Top" HorizontalAlignment="Left" >
+        <Image.Source>
+          <fanart:FanArtImageSource fanart:FanArtMediaType="ChannelTv" fanart:FanArtType="Banner"
+                                    fanart:FanArtName="{Binding ChannelName}" fanart:MaxWidth="0" fanart:MaxHeight="0"/>
+        </Image.Source>
+      </Image>
+    </StackPanel>
 
-  <Label x:Name="ProgramEndLabel" Grid.Row="2" Grid.Column="2" Content="[SlimTvClient.ProgramEndLabel]" Color="{ThemeResource EmphasisTextColor}" Margin="10,0,0,0"/>
-  <Label x:Name="ProgramEnd" Grid.Row="2" Grid.Column="3" Scroll="Auto"
-      Content="{Binding Path=CurrentProgram.EndTime, Converter={StaticResource SlimTvDateFormatConverter}}"
-      Color="{ThemeResource TextColor}"/>
+    <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1">
+      <Label x:Name="Program" Scroll="Auto" FontFamily="DefaultBold" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+             Content="{Binding CurrentProgram.Title}" Margin="0,0,0,0"
+             Color="{ThemeResource TextColor}"/>
+      <Label x:Name="SeriesLabel" Color="{ThemeResource TextColor}" Margin="5,0,0,0"
+             IsVisible="{Binding Path=CurrentProgram.Series, Converter={StaticResource EmptyStringToFalseConverter}}">
+        <Label.Content>
+          <Binding Path="CurrentProgram.Series" Converter="{StaticResource StringFormatConverter}" ConverterParameter="{} ({0})"/>
+        </Label.Content>
+      </Label>
+    </StackPanel>
 
-  <Label x:Name="GenreLabel" Grid.Row="3" Grid.Column="0" Content="[SlimTvClient.GenreLabel]" Color="{ThemeResource EmphasisTextColor}"/>
-  <Label x:Name="Genre" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" Content="{Binding Path=CurrentProgram.Genre}" Color="{ThemeResource TextColor}" Scroll="Auto"/>
-
-  <!-- TODO: add all related episode information -->
-  <Label x:Name="EpisodeLabel" Grid.Row="4" Grid.Column="0" Content="[SlimTvClient.EpisodeLabel]" Color="{ThemeResource EmphasisTextColor}"/>
-  <Label x:Name="Episode" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" Content="{Binding Path=CurrentProgram.EpisodeName}" Color="{ThemeResource TextColor}" Scroll="Auto"/>
-
-  <Label x:Name="DescriptionLabel" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" Content="[SlimTvClient.DescriptionLabel]" Color="{ThemeResource EmphasisTextColor}"/>
-  <Label x:Name="Description" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-      Wrap="True" Scroll="Auto" Content="{Binding Path=CurrentProgram.Description}" Color="{ThemeResource TextColor}"/>
-</Grid>
+    <Label Grid.Row="1" Grid.Column="1" x:Name="Description" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+           Wrap="True" TextTrimming="WordEllipsis" Opacity="0.6"
+           Content="{Binding Path=CurrentProgram.Description}"
+           Color="{ThemeResource TextColor}" Margin="0,0,10,25"/>
+  </Grid>
+</DockPanel>

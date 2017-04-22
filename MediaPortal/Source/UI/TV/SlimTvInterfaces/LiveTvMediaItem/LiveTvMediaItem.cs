@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -99,14 +99,7 @@ namespace MediaPortal.Plugins.SlimTv.Interfaces.LiveTvMediaItem
       while (reader.NodeType != XmlNodeType.EndElement)
       {
         MediaItemAspect mia = MediaItemAspect.Deserialize(reader);
-        if(mia is SingleMediaItemAspect)
-        {
-          MediaItemAspect.SetAspect(_aspects, (SingleMediaItemAspect)mia);
-        }
-        else if(mia is MultipleMediaItemAspect)
-        {
-          MediaItemAspect.AddOrUpdateAspect(_aspects, (MultipleMediaItemAspect)mia);
-        }
+        _aspects[mia.Metadata.AspectId] = new []{ mia };
       }
       reader.ReadEndElement(); // MI
     }

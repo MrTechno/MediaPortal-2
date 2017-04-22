@@ -2,7 +2,6 @@
 [Bb]in/
 [Oo]bj/
 *.log
-project.lock.json
 
 # User-specific files
 *.suo

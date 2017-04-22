@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2014 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2014 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -35,19 +35,19 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
     /// <summary>
     /// Media item aspect id of the relationship aspect.
     /// </summary>
-    public static readonly Guid ASPECT_ID = new Guid("3914AEAE-455A-458A-A747-EAF34FD704BB");
+    public static readonly Guid ASPECT_ID = new Guid("68F60451-9E01-4EA2-AA87-A104E940F2DA");
 
     /// <summary>
     /// The role played by this media item
     /// </summary>
     public static readonly MediaItemAspectMetadata.MultipleAttributeSpecification ATTR_ROLE =
-        MediaItemAspectMetadata.CreateMultipleAttributeSpecification("Role", typeof(Guid), Cardinality.Inline, false);
+        MediaItemAspectMetadata.CreateMultipleAttributeSpecification("Role", typeof(Guid), Cardinality.Inline, true);
 
     /// <summary>
     /// The role played by the media item being linked to
     /// </summary>
     public static readonly MediaItemAspectMetadata.MultipleAttributeSpecification ATTR_LINKED_ROLE =
-        MediaItemAspectMetadata.CreateMultipleAttributeSpecification("LinkedRole", typeof(Guid), Cardinality.Inline, false);
+        MediaItemAspectMetadata.CreateMultipleAttributeSpecification("LinkedRole", typeof(Guid), Cardinality.Inline, true);
 
     /// <summary>
     /// The media item being linked to

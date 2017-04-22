@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -347,7 +347,10 @@ namespace MediaPortal.Common.MediaManagement
 
     protected string _aspectName;
     protected Guid _aspectId;
+    protected IList<String> _refAttributeNames = new List<String>();
+    protected Guid _refAspectId = Guid.Empty;
     protected bool _isSystemAspect;
+    protected bool _isTransientAspect;
     protected IDictionary<string, AttributeSpecification> _attributeSpecifications =
         new Dictionary<string, AttributeSpecification>();
 
@@ -368,10 +371,11 @@ namespace MediaPortal.Common.MediaManagement
     /// <param name="attributeSpecifications">Enumeration of specifications for the attribute of the new
     /// aspect type</param>
     protected MediaItemAspectMetadata(Guid aspectId, string aspectName,
-        IEnumerable<AttributeSpecification> attributeSpecifications)
+        IEnumerable<AttributeSpecification> attributeSpecifications, bool isTransient)
     {
       _aspectId = aspectId;
       _aspectName = aspectName;
+      _isTransientAspect = isTransient;
       foreach (AttributeSpecification spec in attributeSpecifications)
         _attributeSpecifications[spec.AttributeName] = spec;
       CorrectParentsInAttributeTypes();
@@ -414,6 +418,16 @@ namespace MediaPortal.Common.MediaManagement
     }
 
     /// <summary>
+    /// Gets the information if this aspect is a transient aspect. Transient aspects are not persisted to 
+    /// the database and are only used for passing data in a consistent manner.
+    /// </summary>
+    [XmlIgnore]
+    public bool IsTransientAspect
+    {
+      get { return _isTransientAspect; }
+    }
+
+    /// <summary>
     /// Returns a read-only mapping of names to attribute specifications for all
     /// available attributes of this media item aspect.
     /// </summary>
@@ -421,6 +435,29 @@ namespace MediaPortal.Common.MediaManagement
     public IDictionary<string, AttributeSpecification> AttributeSpecifications
     {
       get { return _attributeSpecifications; }
+    }
+
+    /// <summary>
+    /// Returns a read-only mapping of names to attribute specifications for all
+    /// referenced attributes of this media item aspect. Must be in the same order as 
+    /// the unique attributes in the referencing aspect (if any).
+    /// </summary>
+    [XmlIgnore]
+    public IDictionary<string, AttributeSpecification> ReferencedAttributeSpecifications
+    {
+      get
+      {
+        return _attributeSpecifications.Where(x => _refAttributeNames.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value);
+      }
+    }
+
+    /// <summary>
+    /// Returns the globally unique ID of the referencing aspect (if any).
+    /// </summary>
+    [XmlIgnore]
+    public Guid? ReferencingAspectId
+    {
+      get { return _refAspectId == Guid.Empty ? (Guid?)null : _refAspectId; }
     }
 
     /// <summary>
@@ -596,6 +633,16 @@ namespace MediaPortal.Common.MediaManagement
     /// <summary>
     /// For internal use of the XML serialization system only.
     /// </summary>
+    [XmlAttribute("IsTransientAspect")]
+    public bool XML_IsTransientAspect
+    {
+      get { return _isTransientAspect; }
+      set { _isTransientAspect = value; }
+    }
+
+    /// <summary>
+    /// For internal use of the XML serialization system only.
+    /// </summary>
     [XmlElement("Name")]
     public string XML_Name
     {
@@ -627,17 +674,82 @@ namespace MediaPortal.Common.MediaManagement
       }
     }
 
+    /// <summary>
+    /// For internal use of the XML serialization system only.
+    /// </summary>
+    [XmlAttribute("RefId")]
+    public string XML_RefAspectId
+    {
+      get { return _refAspectId.ToString(); }
+      set { _refAspectId = new Guid(value); }
+    }
+
+    /// <summary>
+    /// For internal use of the XML serialization system only.
+    /// </summary>
+    [XmlArray("RefAttributes")]
+    [XmlArrayItem("RefAttribute")]
+    // We use an array here because when using a List, stupid XML serializer only uses the property getter and fills the
+    // List with its deserialized entries. When using an array, the property setter is invoked.
+    public String[] XML_RefAttributes
+    {
+      get
+      {
+        return _refAttributeNames.ToArray();
+      }
+      set
+      {
+        _refAttributeNames.Clear();
+        foreach (String refAttributeName in value)
+        {
+          _refAttributeNames.Add(refAttributeName);
+        }
+      }
+    }
+
     #endregion
   }
 
   public class SingleMediaItemAspectMetadata : MediaItemAspectMetadata
   {
     public SingleMediaItemAspectMetadata(Guid aspectId, string aspectName,
-        IEnumerable<SingleAttributeSpecification> attributeSpecifications) : base(aspectId, aspectName, attributeSpecifications)
+        IEnumerable<SingleAttributeSpecification> attributeSpecifications) 
+      : this(aspectId, aspectName, attributeSpecifications, false)
     {
     }
 
+    public SingleMediaItemAspectMetadata(Guid aspectId, string aspectName,
+        IEnumerable<SingleAttributeSpecification> attributeSpecifications, bool isTransient) 
+      : this(aspectId, aspectName, attributeSpecifications, Guid.Empty, null, isTransient)
+    {
+    }
+
+    public SingleMediaItemAspectMetadata(Guid aspectId, string aspectName,
+        IEnumerable<SingleAttributeSpecification> attributeSpecifications,
+        Guid referencedAspectId,
+        IEnumerable<MultipleAttributeSpecification> referencedAttributeSpecifications) 
+      : this(aspectId, aspectName, attributeSpecifications, referencedAspectId, referencedAttributeSpecifications, false)
+    {
+    }
+
+    public SingleMediaItemAspectMetadata(Guid aspectId, string aspectName,
+        IEnumerable<SingleAttributeSpecification> attributeSpecifications,
+        Guid referencedAspectId,
+        IEnumerable<MultipleAttributeSpecification> referencedAttributeSpecifications, bool isTransient) 
+      : base(aspectId, aspectName, attributeSpecifications, isTransient)
+    {
+      _refAspectId = referencedAspectId;
+      if (referencedAttributeSpecifications != null)
+      {
+        foreach (MultipleAttributeSpecification refAttributeSpecification in referencedAttributeSpecifications)
+        {
+          _refAttributeNames.Add(refAttributeSpecification.AttributeName);
+        }
+      }
+    }
+
     #region Additional members for the XML serialization
+
     internal SingleMediaItemAspectMetadata() { }
 
     new protected static XmlSerializer GetOrCreateXMLSerializer()
@@ -653,14 +765,45 @@ namespace MediaPortal.Common.MediaManagement
 
     public MultipleMediaItemAspectMetadata(Guid aspectId, string aspectName,
       IEnumerable<MultipleAttributeSpecification> attributeSpecifications)
-      : this(aspectId, aspectName, attributeSpecifications, null)
+      : this(aspectId, aspectName, attributeSpecifications, null, false)
+    {
+    }
+
+    public MultipleMediaItemAspectMetadata(Guid aspectId, string aspectName,
+      IEnumerable<MultipleAttributeSpecification> attributeSpecifications, bool isTransient)
+      : this(aspectId, aspectName, attributeSpecifications, null, isTransient)
     {
     }
 
     public MultipleMediaItemAspectMetadata(Guid aspectId, string aspectName,
         IEnumerable<MultipleAttributeSpecification> attributeSpecifications,
         IEnumerable<MultipleAttributeSpecification> uniqueAttributeSpecifications)
-      : base(aspectId, aspectName, attributeSpecifications)
+      : this(aspectId, aspectName, attributeSpecifications, uniqueAttributeSpecifications, false)
+    {
+    }
+
+    public MultipleMediaItemAspectMetadata(Guid aspectId, string aspectName,
+        IEnumerable<MultipleAttributeSpecification> attributeSpecifications,
+        IEnumerable<MultipleAttributeSpecification> uniqueAttributeSpecifications, bool isTransient)
+      : this(aspectId, aspectName, attributeSpecifications, uniqueAttributeSpecifications, Guid.Empty, null, isTransient)
+    {
+    }
+
+    public MultipleMediaItemAspectMetadata(Guid aspectId, string aspectName,
+    IEnumerable<MultipleAttributeSpecification> attributeSpecifications,
+    IEnumerable<MultipleAttributeSpecification> uniqueAttributeSpecifications,
+    Guid referencedAspectId,
+    IEnumerable<MultipleAttributeSpecification> referencedAttributeSpecifications)
+      : this(aspectId, aspectName, attributeSpecifications, uniqueAttributeSpecifications, referencedAspectId, referencedAttributeSpecifications, false)
+    {
+    }
+
+    public MultipleMediaItemAspectMetadata(Guid aspectId, string aspectName,
+        IEnumerable<MultipleAttributeSpecification> attributeSpecifications,
+        IEnumerable<MultipleAttributeSpecification> uniqueAttributeSpecifications,
+        Guid referencedAspectId,
+        IEnumerable<MultipleAttributeSpecification> referencedAttributeSpecifications, bool isTransient)
+      : base(aspectId, aspectName, attributeSpecifications, isTransient)
     {
       if (uniqueAttributeSpecifications != null)
       {
@@ -669,9 +812,29 @@ namespace MediaPortal.Common.MediaManagement
           _uniqueAttributeNames.Add(uniqueAttributeSpecification.AttributeName);
         }
       }
+      _refAspectId = referencedAspectId;
+      if (referencedAttributeSpecifications != null)
+      {
+        foreach (MultipleAttributeSpecification refAttributeSpecification in referencedAttributeSpecifications)
+        {
+          _refAttributeNames.Add(refAttributeSpecification.AttributeName);
+        }
+      }
     }
 
-    public IList<AttributeSpecification> UniqueAttributeSpecifications { get { return _attributeSpecifications.Values.Where(x => _uniqueAttributeNames.Contains(x.AttributeName)).ToList(); } }
+    /// <summary>
+    /// Returns a read-only mapping of names to attribute specifications for all
+    /// unique attributes of this media item aspect. Note that all attributes in the
+    /// aspect cannot be unique as this will cause errors in update operations.
+    /// </summary>
+    [XmlIgnore]
+    public IDictionary<string, AttributeSpecification> UniqueAttributeSpecifications
+    {
+      get
+      {
+        return _attributeSpecifications.Where(x => _uniqueAttributeNames.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value);
+      }
+    }
 
     #region Additional members for the XML serialization
 

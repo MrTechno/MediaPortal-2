@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -51,6 +51,8 @@ protected AbstractProperty _collectionNameProperty;
 protected AbstractProperty _runtimeProperty;
 protected AbstractProperty _certificationProperty;
 protected AbstractProperty _taglineProperty;
+protected AbstractProperty _awardsProperty;
+protected AbstractProperty _companiesProperty;
 protected AbstractProperty _popularityProperty;
 protected AbstractProperty _budgetProperty;
 protected AbstractProperty _revenueProperty;
@@ -127,6 +129,28 @@ public string Tagline
 {
   get { return (string) _taglineProperty.GetValue(); }
   set { _taglineProperty.SetValue(value); }
+}
+
+public AbstractProperty AwardsProperty
+{
+  get{ return _awardsProperty; }
+}
+
+public IEnumerable<string> Awards
+{
+  get { return (IEnumerable<string>) _awardsProperty.GetValue(); }
+  set { _awardsProperty.SetValue(value); }
+}
+
+public AbstractProperty CompaniesProperty
+{
+  get{ return _companiesProperty; }
+}
+
+public IEnumerable<string> Companies
+{
+  get { return (IEnumerable<string>) _companiesProperty.GetValue(); }
+  set { _companiesProperty.SetValue(value); }
 }
 
 public AbstractProperty PopularityProperty
@@ -218,6 +242,8 @@ public MovieAspectWrapper()
   _runtimeProperty = new SProperty(typeof(int?));
   _certificationProperty = new SProperty(typeof(string));
   _taglineProperty = new SProperty(typeof(string));
+  _awardsProperty = new SProperty(typeof(IEnumerable<string>));
+  _companiesProperty = new SProperty(typeof(IEnumerable<string>));
   _popularityProperty = new SProperty(typeof(float?));
   _budgetProperty = new SProperty(typeof(long?));
   _revenueProperty = new SProperty(typeof(long?));
@@ -251,7 +277,9 @@ public void Init(MediaItem mediaItem)
   CollectionName = (string) aspect[MovieAspect.ATTR_COLLECTION_NAME];
   Runtime = (int?) aspect[MovieAspect.ATTR_RUNTIME_M];
   Certification = (string) aspect[MovieAspect.ATTR_CERTIFICATION];
+  Awards = (IEnumerable<string>) aspect[MovieAspect.ATTR_AWARDS] ?? EMPTY_STRING_COLLECTION;
   Tagline = (string) aspect[MovieAspect.ATTR_TAGLINE];
+  Companies = (IEnumerable<string>) aspect[MovieAspect.ATTR_COMPANIES] ?? EMPTY_STRING_COLLECTION;
   Popularity = (float?) aspect[MovieAspect.ATTR_POPULARITY];
   Budget = (long?) aspect[MovieAspect.ATTR_BUDGET];
   Revenue = (long?) aspect[MovieAspect.ATTR_REVENUE];
@@ -267,7 +295,9 @@ public void SetEmpty()
   CollectionName = null;
   Runtime = null;
   Certification = null;
+  Awards = EMPTY_STRING_COLLECTION;
   Tagline = null;
+  Companies = EMPTY_STRING_COLLECTION;
   Popularity = null;
   Budget = null;
   Revenue = null;
@@ -275,7 +305,6 @@ public void SetEmpty()
   TotalRating = null;
   RatingCount = null;
 }
-
 
 #endregion
 

@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -23,7 +23,6 @@
 #endregion
 
 using System;
-using System.Globalization;
 
 namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
 {
@@ -35,80 +34,7 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
     /// <summary>
     /// Media item aspect id of the video aspect.
     /// </summary>
-    public static readonly Guid ASPECT_ID = new Guid("FEA2DA04-1FDC-4836-B669-F3CA73ADF120");
-
-    /// <summary>
-    /// Genre string.
-    /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_GENRES =
-        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("Genres", 100, Cardinality.ManyToMany, true);
-
-    /// <summary>
-    /// Duration in seconds.
-    /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_DURATION =
-        MediaItemAspectMetadata.CreateSingleAttributeSpecification("Duration", typeof(long), Cardinality.Inline, false);
-
-    /// <summary>
-    /// Number of audio streams for this video.
-    /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_AUDIOSTREAMCOUNT =
-        MediaItemAspectMetadata.CreateSingleAttributeSpecification("AudioStreamCount", typeof(int), Cardinality.Inline, false);
-
-    /// <summary>
-    /// Encoding. TODO: Describe format.
-    /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_AUDIOENCODING =
-        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("AudioEncoding", 50, Cardinality.Inline, false);
-
-    /// <summary>
-    /// Bitrate of the first audio stream in kbits/second.
-    /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_AUDIOBITRATE =
-        MediaItemAspectMetadata.CreateSingleAttributeSpecification("AudioBitRate", typeof(long), Cardinality.Inline, false);
-    
-    /// <summary>
-    /// List of available audio languages. Values are stored as <see cref="CultureInfo.TwoLetterISOLanguageName"/>.
-    /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_AUDIOLANGUAGES =
-        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("AudioLanguages", 2, Cardinality.ManyToMany, true);
-
-    /// <summary>
-    /// Encoding of the video. TODO: Describe format.
-    /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_VIDEOENCODING =
-        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("VideoEncoding", 50, Cardinality.Inline, false);
-
-    /// <summary>
-    /// Bitrate of the video in kbits/second.
-    /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_VIDEOBITRATE =
-        MediaItemAspectMetadata.CreateSingleAttributeSpecification("VideoBitRate", typeof(long), Cardinality.Inline, false);
-
-    /// <summary>
-    /// Width of the video in pixels.
-    /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_WIDTH =
-        MediaItemAspectMetadata.CreateSingleAttributeSpecification("Width", typeof(int), Cardinality.Inline, false);
-
-    /// <summary>
-    /// Height of the video in pixels.
-    /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_HEIGHT =
-        MediaItemAspectMetadata.CreateSingleAttributeSpecification("Height", typeof(int), Cardinality.Inline, false);
-
-    /// <summary>
-    /// Aspect ratio of the resulting video in width/height. Might differ from the quotient width/height of the properties
-    /// <see cref="ATTR_WIDTH"/> and <see cref="ATTR_HEIGHT"/> if the resulting video must be stretched.
-    /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_ASPECTRATIO =
-        MediaItemAspectMetadata.CreateSingleAttributeSpecification("AspectRatio", typeof(float), Cardinality.Inline, false);
-
-    /// <summary>
-    /// Frames/second of the video.
-    /// </summary>
-    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_FPS =
-        MediaItemAspectMetadata.CreateSingleAttributeSpecification("FPS", typeof(int), Cardinality.Inline, false);
+    public static readonly Guid ASPECT_ID = new Guid("55D6A91B-8867-4A8D-BED3-9CB7F3AECD24");
 
     /// <summary>
     /// Enumeration of actor name strings.
@@ -129,7 +55,13 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
         MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("Writers", 100, Cardinality.ManyToMany, true);
 
     /// <summary>
-    /// Set to <c>true</c> if this video item represents a DVD.
+    /// Enumeration of fictional character name strings.
+    /// </summary>
+    public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_CHARACTERS =
+        MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("Characters", 100, Cardinality.ManyToMany, true);
+
+    /// <summary>
+    /// Set to <c>true</c> if this video item represents a disc image, like DVD or BluRay.
     /// </summary>
     public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_ISDVD =
         MediaItemAspectMetadata.CreateSingleAttributeSpecification("IsDVD", typeof(bool), Cardinality.Inline, false);
@@ -143,23 +75,14 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
     public static readonly SingleMediaItemAspectMetadata Metadata = new SingleMediaItemAspectMetadata(
         // TODO: Localize name
         ASPECT_ID, "VideoItem", new[] {
-            ATTR_GENRES,
-            ATTR_DURATION,
-            ATTR_AUDIOSTREAMCOUNT,
-            ATTR_AUDIOENCODING,
-            ATTR_AUDIOBITRATE,
-            ATTR_AUDIOLANGUAGES,
-            ATTR_VIDEOENCODING,
-            ATTR_VIDEOBITRATE,
-            ATTR_WIDTH,
-            ATTR_HEIGHT,
-            ATTR_ASPECTRATIO,
-            ATTR_FPS,
             ATTR_ACTORS,
             ATTR_DIRECTORS,
             ATTR_WRITERS,
+            ATTR_CHARACTERS,
             ATTR_ISDVD,
             ATTR_STORYPLOT,
         });
+
+    public static readonly Guid ROLE_VIDEO = new Guid("96DB4C0E-13CC-4B5B-B66D-F2CC7D205414");
   }
 }

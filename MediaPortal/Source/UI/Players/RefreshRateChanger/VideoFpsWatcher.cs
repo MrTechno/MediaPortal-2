@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -23,7 +23,6 @@
 #endregion
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Timers;
 using MediaPortal.Common;
@@ -68,28 +67,27 @@ namespace MediaPortal.Plugins.RefreshRateChanger
       if (mediaItem == null)
         return;
 
-      int intFps;
-      if (MediaItemAspect.TryGetAttribute(mediaItem.Aspects, VideoAspect.ATTR_FPS, out intFps))
+      IList<MultipleMediaItemAspect> videoAspects;
+      if (!MediaItemAspect.TryGetAspects(mediaItem.Aspects, VideoStreamAspect.Metadata, out videoAspects))
+        return;
+
+      int intFps = Convert.ToInt32(videoAspects[0].GetAttributeValue<float>(VideoStreamAspect.ATTR_FPS));
+      if (intFps > 0)
       {
-        ICollection<int> excludeRates = TryParseIntList(_settings.Settings.NoChangeForRate);
-        if (excludeRates.Contains(intFps))
+        int mappedIntFps;
+        if (!_settings.Settings.RateMappings.TryGetValue(intFps, out mappedIntFps) || mappedIntFps <= 0)
         {
-          ServiceRegistration.Get<ILogger>().Debug("RefreshRateChanger: Video fps: {0}; No change due to settings.", intFps);
+          ServiceRegistration.Get<ILogger>().Debug("RefreshRateChanger: Video fps: {0}; No mapping for this rate found.", intFps);
           return;
         }
+
         _refreshRateChanger = new TemporaryRefreshRateChanger(GetScreenNum(), true);
-        double fps = intFps;
-        if (intFps == 23)
-          fps = 23.976;
-        if (intFps == 29)
-          fps = 29.970;
-        if (intFps == 59)
-          fps = 59.940;
+        var fps = TranslateFps(mappedIntFps);
 
         var currentRefreshRate = _refreshRateChanger.GetRefreshRate();
-        if (!IsMultipleOf(currentRefreshRate, fps))
+        if (currentRefreshRate != fps)
         {
-          ServiceRegistration.Get<ILogger>().Debug("RefreshRateChanger: Video fps: {0}; Screen refresh rate {1}, trying to change it.", fps, currentRefreshRate);
+          ServiceRegistration.Get<ILogger>().Info("RefreshRateChanger: Video fps: {0}; Screen refresh rate {1}, trying to change it.", fps, currentRefreshRate);
           _refreshRateChanger.SetRefreshRate(fps);
         }
         else
@@ -97,6 +95,23 @@ namespace MediaPortal.Plugins.RefreshRateChanger
           ServiceRegistration.Get<ILogger>().Debug("RefreshRateChanger: Video fps: {0}; Screen refresh rate {1}, no change required.", fps, currentRefreshRate);
         }
       }
+    }
+
+    /// <summary>
+    /// Returns to correct double value for given <see cref="intFps"/>.
+    /// </summary>
+    /// <param name="intFps">Integer FPS</param>
+    /// <returns>Exact FPS.</returns>
+    private static double TranslateFps(int intFps)
+    {
+      double fps = intFps;
+      if (intFps == 23)
+        fps = 23.976;
+      if (intFps == 29)
+        fps = 29.970;
+      if (intFps == 59)
+        fps = 59.940;
+      return fps;
     }
 
     private ICollection<int> TryParseIntList(string noChangeForRate)
@@ -119,6 +134,8 @@ namespace MediaPortal.Plugins.RefreshRateChanger
 
     private MediaItem GetCurrentMediaItem(IVideoPlayer player)
     {
+      if (player == null)
+        return null;
       IPlayerContextManager playerContextManager = ServiceRegistration.Get<IPlayerContextManager>();
       for (int index = 0; index < playerContextManager.NumActivePlayerContexts; index++)
       {
@@ -159,7 +176,8 @@ namespace MediaPortal.Plugins.RefreshRateChanger
       if (screenControl == null || screenControl.VideoPlayerSynchronizationStrategy == null)
         return;
 
-      _timer.Close();
+      if(_timer != null)
+        _timer.Close();
       _timer = null;
 
       screenControl.VideoPlayerSynchronizationStrategy.SynchronizeToVideoPlayerFramerate += SyncToPlayer;

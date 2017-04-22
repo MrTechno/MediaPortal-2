@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>44373f7d</NuGetPackageImportStamp>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -49,8 +50,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bass.Net">
-      <HintPath>..\..\..\..\Packages\BASS.NET.2.4.10.3\lib\net40\Bass.Net.dll</HintPath>
+    <Reference Include="Bass.Net, Version=2.4.12.5, Culture=neutral, PublicKeyToken=b7566c273e6ef480, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\Packages\BASS.NET.2.4.12.5\lib\net45\Bass.Net.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -94,6 +96,10 @@
     <ProjectReference Include="..\AudioMetadataExtractor\AudioMetadataExtractor.csproj">
       <Project>{11fd64f0-97c0-40b5-8aaa-1e56255d3ef7}</Project>
       <Name>AudioMetadataExtractor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OnlineLibraries\OnlineLibraries.csproj">
+      <Project>{dca4d19e-75f4-4a8a-b70a-f3f4291dc62b}</Project>
+      <Name>OnlineLibraries</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

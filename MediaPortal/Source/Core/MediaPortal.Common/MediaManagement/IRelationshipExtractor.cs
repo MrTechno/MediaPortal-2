@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -22,6 +22,7 @@
 
 #endregion
 
+using MediaPortal.Common.MediaManagement.MLQueries;
 using System;
 using System.Collections.Generic;
 
@@ -53,14 +54,41 @@ namespace MediaPortal.Common.MediaManagement
     Guid[] LinkedRoleAspects { get; }
 
     /// <summary>
+    /// Aspects that must be present in order to accurately match items in <see cref="TryMatch"/>  
+    /// </summary>
+    Guid[] MatchAspects { get; }
+
+    /// <summary>
+    /// Specifies whether or not this relation should be built. A relationship should not be 
+    /// built if it creates the inverse of an already existing relationship.
+    /// E.g. If Series -> Episode exists don't create Episode -> Series.
+    /// </summary>
+    bool BuildRelationship { get; }
+
+    /// <summary>
+    /// Get optimized filter that can be used to find a direct match to any existing media item.
+    /// </summary>
+    /// <param name="extractedAspects"></param>
+    /// <returns></returns>
+    IFilter GetSearchFilter(IDictionary<Guid, IList<MediaItemAspect>> extractedAspects);
+
+    /// <summary>
+    /// Add extracted media item to cache so querying the database can be avoided
+    /// </summary>
+    /// <param name="extractedItemId"></param>
+    /// <param name="extractedAspects"></param>
+    /// <returns></returns>
+    void CacheExtractedItem(Guid extractedItemId, IDictionary<Guid, IList<MediaItemAspect>> extractedAspects);
+
+    /// <summary>
     /// Part 1 of the relationship building - try to build a relationship
     /// from a group of aspects with Role to another group of aspects Linked Role
     /// </summary>
     /// <param name="aspects"></param>
+    /// <param name="importOnly"></param>
     /// <param name="extractedLinkedAspects"></param>
-    /// <param name="forceQuickMode"></param>
     /// <returns></returns>
-    bool TryExtractRelationships(IDictionary<Guid, IList<MediaItemAspect>> aspects, out ICollection<IDictionary<Guid, IList<MediaItemAspect>>> extractedLinkedAspects, bool forceQuickMode);
+    bool TryExtractRelationships(IDictionary<Guid, IList<MediaItemAspect>> aspects, bool importOnly, out IList<RelationshipItem> extractedLinkedAspects);
 
     /// <summary>
     /// Part 2 of the relationship building - if the extract was successful
@@ -72,10 +100,10 @@ namespace MediaPortal.Common.MediaManagement
     /// and episodes of that series) and since MediaLibrary doesn't know how to choose
     /// between them it delegates to the extractor
     /// </summary>
-    /// <param name="linkedAspects"></param>
+    /// <param name="extractedAspects"></param>
     /// <param name="existingAspects"></param>
     /// <returns></returns>
-    bool TryMatch(IDictionary<Guid, IList<MediaItemAspect>> linkedAspects, IDictionary<Guid, IList<MediaItemAspect>> existingAspects);
+    bool TryMatch(IDictionary<Guid, IList<MediaItemAspect>> extractedAspects, IDictionary<Guid, IList<MediaItemAspect>> existingAspects);
 
     /// <summary>
     /// Part 3 of the relationship building - if the linked items are new
@@ -85,7 +113,7 @@ namespace MediaPortal.Common.MediaManagement
     /// <param name="aspects"></param>
     /// <param name="index"></param>
     /// <returns></returns>
-    bool TryGetRelationshipIndex(IDictionary<Guid, IList<MediaItemAspect>> aspects, out int index);
+    bool TryGetRelationshipIndex(IDictionary<Guid, IList<MediaItemAspect>> aspects, IDictionary<Guid, IList<MediaItemAspect>> linkedAspects, out int index);
   }
 
   /// <summary>
@@ -100,6 +128,27 @@ namespace MediaPortal.Common.MediaManagement
     /// </summary>
     RelationshipExtractorMetadata Metadata { get; }
 
+    /// <summary>
+    /// Returns a list of relationship role extractors.
+    /// </summary>
     IList<IRelationshipRoleExtractor> RoleExtractors { get; }
+
+    /// <summary>
+    /// Returns a list of relationship role hierarchies.
+    /// </summary>
+    IList<RelationshipHierarchy> Hierarchies { get; }
+
+    /// <summary>
+    /// Returns a list filters to use to find media items which can be updated 
+    /// because new metadata is available. Each filter also has a limit to the 
+    /// number of items to find.
+    /// </summary>
+    IDictionary<IFilter, uint> GetLastChangedItemsFilters();
+
+    /// <summary>
+    /// Resets the current list of changed items so they are not included in 
+    /// the nest query for changed items.
+    /// </summary>
+    void ResetLastChangedItems();
   }
 }

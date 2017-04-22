@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -494,14 +494,21 @@ namespace MediaPortal.Common.MediaManagement
 
     private static int GetMatchingAspect(IList<MediaItemAspect> aspects, MultipleMediaItemAspect value)
     {
-      for(int index = 0; index < aspects.Count; index++)
+      for (int index = 0; index < aspects.Count; index++)
       {
         MediaItemAspect aspect = aspects[index];
-        if (value.Metadata.UniqueAttributeSpecifications.All(spec => aspect[spec].Equals(value[spec])))
+        if (value.Metadata.UniqueAttributeSpecifications.All(spec => SpecificationsAreEqual(aspect, value, spec.Value)))
           return index;
       }
 
       return -1;
+    }
+
+    private static bool SpecificationsAreEqual(MediaItemAspect aspect, MultipleMediaItemAspect value, MediaItemAspectMetadata.AttributeSpecification spec)
+    {
+      if (aspect[spec] == null)
+        return value[spec] == null;
+      return aspect[spec].Equals(value[spec]);
     }
 
     /// <summary>
@@ -510,7 +517,6 @@ namespace MediaPortal.Common.MediaManagement
     /// </summary>
     /// <param name="aspects">Dictionary of MediaItemAspects.</param>
     /// <param name="mediaItemAspectMetadata">Definiton of metadata that is used for creation.</param>
-    /// <param name="value">Metadata values used for creation.</param>
     public static MultipleMediaItemAspect CreateAspect(IDictionary<Guid, IList<MediaItemAspect>> aspects, MultipleMediaItemAspectMetadata mediaItemAspectMetadata)
     {
       MultipleMediaItemAspect mediaAspect = new MultipleMediaItemAspect(mediaItemAspectMetadata);
@@ -641,6 +647,30 @@ namespace MediaPortal.Common.MediaManagement
     }
 
     /// <summary>
+    /// Convenience method to get a list of same attribute specification of a multi attribute.
+    /// </summary>
+    /// <typeparam name="TE">Type of aspect specification</typeparam>
+    /// <param name="aspectData">Aspects</param>
+    /// <param name="attributeSpecification">Requested aspect attribute</param>
+    /// <param name="values">List of values of all aspects</param>
+    /// <returns><c>true</c> if at least one aspect value was found.</returns>
+    public static bool TryGetAttribute<TE>(IDictionary<Guid, IList<MediaItemAspect>> aspectData,
+      MediaItemAspectMetadata.MultipleAttributeSpecification attributeSpecification, out List<TE> values)
+    {
+      IList<MultipleMediaItemAspect> aspects;
+      values  = new List<TE>();
+      if (TryGetAspects(aspectData, attributeSpecification.ParentMIAM, out aspects))
+      {
+        foreach (MultipleMediaItemAspect aspect in aspects)
+        {
+          TE value = aspect.GetAttributeValue<TE>(attributeSpecification);
+          values.Add(value);
+        }
+      }
+      return values.Count > 0;
+    }
+
+    /// <summary>
     /// Convenience method to set a collection attribute in a dictionary of media item aspectData. If the given <paramref name="aspectData"/>
     /// dictionary contains the media item aspect of the requested aspect type, that aspect instance is used to store the
     /// attribute corresponding to the given <paramref name="attributeSpecification"/>. If the corresponding aspect instance is not
@@ -649,8 +679,8 @@ namespace MediaPortal.Common.MediaManagement
     /// <param name="aspectData">Dictionary of aspect data to be written to.</param>
     /// <param name="attributeSpecification">Type of the attribute to write.</param>
     /// <param name="value">Value to be set.</param>
-    public static void SetCollectionAttribute(IDictionary<Guid, IList<MediaItemAspect>> aspectData,
-        MediaItemAspectMetadata.SingleAttributeSpecification attributeSpecification, IEnumerable value)
+    public static void SetCollectionAttribute<T>(IDictionary<Guid, IList<MediaItemAspect>> aspectData,
+        MediaItemAspectMetadata.SingleAttributeSpecification attributeSpecification, IEnumerable<T> value)
     {
       SingleMediaItemAspect aspect = GetOrCreateAspect(aspectData, attributeSpecification.ParentMIAM);
       aspect.SetCollectionAttribute(attributeSpecification, value);
@@ -674,14 +704,6 @@ namespace MediaPortal.Common.MediaManagement
       return false;
     }
 
-    public static string GetExternalAttribute(IDictionary<Guid, IList<MediaItemAspect>> aspectData,
-      string source, string type)
-    {
-      string id;
-      TryGetExternalAttribute(aspectData, source, type, out id);
-      return id;
-    }
-
     public static void AddOrUpdateExternalIdentifier(IDictionary<Guid, IList<MediaItemAspect>> aspectData,
       string source, string type, string id)
     {
@@ -690,17 +712,6 @@ namespace MediaPortal.Common.MediaManagement
       aspect.SetAttribute(ExternalIdentifierAspect.ATTR_TYPE, type);
       aspect.SetAttribute(ExternalIdentifierAspect.ATTR_ID, id);
       AddOrUpdateAspect(aspectData, aspect);
-    }
-
-    public static IList<Guid> GetRelationships(IDictionary<Guid, IList<MediaItemAspect>> aspectData, Guid role, Guid linkedRole)
-    {
-      IList<MultipleMediaItemAspect> relationships;
-      if (!TryGetAspects(aspectData, RelationshipAspect.Metadata, out relationships))
-      {
-        return new List<Guid>();
-      }
-
-      return relationships.Where(x => x.GetAttributeValue<Guid>(RelationshipAspect.ATTR_ROLE) == role && x.GetAttributeValue<Guid>(RelationshipAspect.ATTR_LINKED_ROLE) == linkedRole).Select(x => x.GetAttributeValue<Guid>(RelationshipAspect.ATTR_LINKED_ID)).ToList();
     }
 
     public static void AddOrUpdateRelationship(IDictionary<Guid, IList<MediaItemAspect>> aspectData,
@@ -750,7 +761,8 @@ namespace MediaPortal.Common.MediaManagement
             {
               IList<string> list = new List<string>();
               foreach (object value in values)
-                list.Add(value.ToString());
+                if (value != null)
+                  list.Add(value.ToString());
               valueStr = string.Format("[{0}]", string.Join(",", list));
             }
           }

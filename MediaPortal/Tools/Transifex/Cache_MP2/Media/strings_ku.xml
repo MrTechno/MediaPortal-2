@@ -32,13 +32,15 @@
   <string name="Media.BrowseMediaNavigationRootWorkflowNavigationContextDisplayLabel">کردنەوەی فایل</string>
   <string name="Media.LocalMediaNavigationRootWorkflowNavigationContextDisplayLabel">فایلی ناوەکی</string>
   <!--Screen headers-->
-  <string name="Media.VideoItemsHeader">ڤیدیۆ</string>
-  <string name="Media.ImageItemsHeader">وێنە</string>
+  <string name="Media.ChooseImageHeader">وێنە</string>
+  <string name="Media.ChooseVideoHeader">ڤیدیۆ</string>
+  <!--View occupation names-->
   <!--View names (names for the view instances)-->
   <string name="Media.BrowseMediaRootViewName">کردنەوەی فایل</string>
   <string name="Media.LocalMediaRootViewName">فایلی ناوەکی</string>
   <string name="Media.AudioRootViewName">دەنگ</string>
   <string name="Media.VideosRootViewName">ڤیدیۆ</string>
+  <string name="Media.EpisodeRootViewName">زنجیرە</string>
   <string name="Media.ImagesRootViewName">وێنە</string>
   <!--General strings used in views-->
   <!--Shown in the header of an items list-->
@@ -60,4 +62,7 @@
   <!--Audio currently playing-->
   <!--VideoPlayerUIContributor-->
   <!--Video Player time units-->
+  <!--Secondary filters-->
+  <string name="Filter.RemoteNumericAlphabet0"></string>
+  <string name="Filter.RemoteNumericAlphabet1"></string>
 </resources>

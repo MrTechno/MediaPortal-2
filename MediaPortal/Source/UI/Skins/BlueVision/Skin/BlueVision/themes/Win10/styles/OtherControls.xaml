@@ -9,6 +9,7 @@
     xmlns:bgm="clr-namespace:MediaPortal.UiComponents.BackgroundManager.Converter;assembly=BackgroundManager"
     xmlns:animation="clr-namespace:MediaPortal.UI.SkinEngine.Controls.Brushes.Animation;assembly=SkinEngine" 
     xmlns:bvc="clr-namespace:MediaPortal.UiComponents.BlueVision.Converters;assembly=BlueVision"
+    xmlns:aspect="clr-namespace:MediaPortal.Common.MediaManagement.DefaultItemAspects;assembly=MediaPortal.Common"
     DependsOnStyleResources="Colors,Buttons,Consts,Widgets"
     >
 
@@ -27,12 +28,250 @@
   <DurationConverter x:Key="DurationConverter"/>
   <PriorityBindingConverter x:Key="PriorityBindingConverter"/>
   <StringFormatConverter x:Key="StringFormatConverter"/>
+  <fanart:MediaItemAspectToBoolConverter x:Key="MediaItemAspectToBoolConverter"/>
+  <fanart:InvertedMediaItemAspectToBoolConverter x:Key="InvertedMediaItemAspectToBoolConverter"/>
 
   <!-- If a control is defined without a style, the engine will choose a default style for that control.
        To avoid that default behavior, simply set this empty style. -->
   <Style x:Key="EmptyStyle"/>
 
   <!-- ***************************** ScrollViewer styles ********************************* -->
+
+  <Style x:Key="VerticalBottomScrollViewerStyle" TargetType="{x:Type ScrollViewer}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type ScrollViewer}">
+          <Grid x:Name="ScrollViewerGrid" Margin="0">
+            <Grid.OpacityMask>
+              <VisualBrush>
+                <VisualBrush.Visual>
+                  <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0">
+                    <Rectangle.Fill>
+                      <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FF000000" Offset="0"/>
+                        <GradientStop Color="#FF000000" Offset="0.2"/>
+                        <GradientStop Color="#FF000000" Offset="0.75"/>
+                        <GradientStop Color="#00000000" Offset="0.95"/>
+                      </LinearGradientBrush>
+                    </Rectangle.Fill>
+                  </Rectangle>
+                </VisualBrush.Visual>
+              </VisualBrush>
+            </Grid.OpacityMask>
+            <ScrollContentPresenter Grid.ZIndex="100" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style x:Key="GradientScrollViewerStyle" TargetType="{x:Type ScrollViewer}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type ScrollViewer}">
+          <Grid x:Name="ScrollViewerGrid" Margin="0">
+            <Grid.OpacityMask>
+              <VisualBrush>
+                <VisualBrush.Visual>
+                  <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0">
+                    <Rectangle.Fill>
+                      <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#00000000" Offset="0"/>
+                        <GradientStop Color="#FF000000" Offset="0.2"/>
+                        <GradientStop Color="#FF000000" Offset="0.8"/>
+                        <GradientStop Color="#00000000" Offset="0.95"/>
+                      </LinearGradientBrush>
+                    </Rectangle.Fill>
+                  </Rectangle>
+                </VisualBrush.Visual>
+              </VisualBrush>
+            </Grid.OpacityMask>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="*"/>
+              <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <!-- Content -->
+            <ScrollContentPresenter Grid.Row="0" Grid.Column="1" Grid.ZIndex="100" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+
+            <Grid x:Name="HorizontalScrollBar" IsVisible="{TemplateBinding ScrollBarXVisible}" Grid.Row="1" Grid.Column="1"
+                Grid.ZIndex="0" Margin="2,6,2,6"
+                RenderTransform="{DynamicResource ResourceKey=HorizontalScrollBarRenderTransform}">
+              <!-- RenderTransform can be applied by any ListView by defining a transform inside ResourceWrapper x:Key="HorizontalScrollBarRenderTransform" -->
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+              </Grid.RowDefinitions>
+              <!-- Background -->
+              <Rectangle x:Name="ScrollBarXBackground" Grid.Row="0" Grid.Column="0"
+                  Stroke="{ThemeResource ScrollBarStrokeColor}" RadiusX="4" RadiusY="4"
+                  Height="{ThemeResource ScrollBarWidth}"
+                  ActualWidth="{TemplateBinding Path=ScrollBarXSize,Mode=OneWayToSource}"
+                  Fill="{ThemeResource ScrollBarBackgroundXColor}">
+              </Rectangle>
+              <!-- Knob -->
+              <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                <StackPanel>
+                  <StackPanel.Width>
+                    <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0}+({1}/2)">
+                      <TemplateBinding Path="ScrollBarXKnobPos" />
+                      <TemplateBinding Path="ScrollBarXKnobWidth" />
+                    </MultiBinding>
+                  </StackPanel.Width>
+                </StackPanel>
+                <Rectangle x:Name="ScrollBarXKnob" Width="{ThemeResource ScrollBarKnobWidth}" Height="{ThemeResource ScrollBarKnobHeight}"
+                    Stroke="{ThemeResource ScrollBarKnobStrokeColor}" RadiusX="{ThemeResource ScrollBarKnobRadius}" RadiusY="{ThemeResource ScrollBarKnobRadius}"
+                    Fill="{ThemeResource ScrollBarKnobBackgroundColor}">
+                </Rectangle>
+              </StackPanel>
+            </Grid>
+            <Grid x:Name="VerticalScrollBar" IsVisible="{TemplateBinding ScrollBarYVisible}" Grid.Row="0" Grid.Column="0"
+                Grid.ZIndex="0" Margin="-30,2,0,2"
+                RenderTransform="{DynamicResource ResourceKey=VerticalScrollbarRenderTransform}">
+              <!-- RenderTransform can be applied by any ListView by defining a transform inside ResourceWrapper x:Key="VerticalScrollbarRenderTransform" -->
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+              </Grid.RowDefinitions>
+              <!-- Background -->
+              <Rectangle x:Name="ScrollBarYBackground" Grid.Row="0" Grid.Column="0"
+                  Stroke="{ThemeResource ScrollBarStrokeColor}"
+                  Width="{ThemeResource ScrollBarWidth}"
+                  ActualHeight="{TemplateBinding Path=ScrollBarYSize,Mode=OneWayToSource}"
+                  Fill="{ThemeResource ScrollBarBackgroundColor}">
+              </Rectangle>
+              <!-- Knob -->
+              <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical">
+                <StackPanel>
+                  <StackPanel.Height>
+                    <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0}+({1}/2)">
+                      <TemplateBinding Path="ScrollBarYKnobPos" />
+                      <TemplateBinding Path="ScrollBarYKnobHeight" />
+                    </MultiBinding>
+                  </StackPanel.Height>
+                </StackPanel>
+                <Rectangle x:Name="ScrollBarYKnob" Width="{ThemeResource ScrollBarKnobWidth}" Height="{ThemeResource ScrollBarKnobHeight}"
+                    Stroke="{ThemeResource ScrollBarKnobStrokeColor}" RadiusX="{ThemeResource ScrollBarKnobRadius}" RadiusY="{ThemeResource ScrollBarKnobRadius}"
+                    Fill="{ThemeResource ScrollBarKnobBackgroundColor}">
+                </Rectangle>
+              </StackPanel>
+            </Grid>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style x:Key="HorizontalGradientScrollViewerStyle" TargetType="{x:Type ScrollViewer}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type ScrollViewer}">
+          <Grid x:Name="ScrollViewerGrid" Margin="0">
+            <Grid.OpacityMask>
+              <VisualBrush>
+                <VisualBrush.Visual>
+                  <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0">
+                    <Rectangle.Fill>
+                      <LinearGradientBrush EndPoint="1,0.5" StartPoint="0,0.5">
+                        <GradientStop Color="#00000000" Offset="0"/>
+                        <GradientStop Color="#FF000000" Offset="0.1"/>
+                        <GradientStop Color="#FF000000" Offset="0.9"/>
+                        <GradientStop Color="#00000000" Offset="1"/>
+                      </LinearGradientBrush>
+                    </Rectangle.Fill>
+                  </Rectangle>
+                </VisualBrush.Visual>
+              </VisualBrush>
+            </Grid.OpacityMask>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="*"/>
+              <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <!-- Content -->
+            <ScrollContentPresenter Grid.Row="0" Grid.Column="1" Grid.ZIndex="100" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+
+            <Grid x:Name="HorizontalScrollBar" IsVisible="{TemplateBinding ScrollBarXVisible}" Grid.Row="1" Grid.Column="1"
+                Grid.ZIndex="0" Margin="2,6,2,6"
+                RenderTransform="{DynamicResource ResourceKey=HorizontalScrollBarRenderTransform}">
+              <!-- RenderTransform can be applied by any ListView by defining a transform inside ResourceWrapper x:Key="HorizontalScrollBarRenderTransform" -->
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+              </Grid.RowDefinitions>
+              <!-- Background -->
+              <Rectangle x:Name="ScrollBarXBackground" Grid.Row="0" Grid.Column="0"
+                  Stroke="{ThemeResource ScrollBarStrokeColor}" RadiusX="4" RadiusY="4"
+                  Height="{ThemeResource ScrollBarWidth}"
+                  ActualWidth="{TemplateBinding Path=ScrollBarXSize,Mode=OneWayToSource}"
+                  Fill="{ThemeResource ScrollBarBackgroundXColor}">
+              </Rectangle>
+              <!-- Knob -->
+              <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                <StackPanel>
+                  <StackPanel.Width>
+                    <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0}+({1}/2)">
+                      <TemplateBinding Path="ScrollBarXKnobPos" />
+                      <TemplateBinding Path="ScrollBarXKnobWidth" />
+                    </MultiBinding>
+                  </StackPanel.Width>
+                </StackPanel>
+                <Rectangle x:Name="ScrollBarXKnob" Width="{ThemeResource ScrollBarKnobWidth}" Height="{ThemeResource ScrollBarKnobHeight}"
+                    Stroke="{ThemeResource ScrollBarKnobStrokeColor}" RadiusX="{ThemeResource ScrollBarKnobRadius}" RadiusY="{ThemeResource ScrollBarKnobRadius}"
+                    Fill="{ThemeResource ScrollBarKnobBackgroundColor}">
+                </Rectangle>
+              </StackPanel>
+            </Grid>
+            <Grid x:Name="VerticalScrollBar" IsVisible="{TemplateBinding ScrollBarYVisible}" Grid.Row="0" Grid.Column="0"
+                Grid.ZIndex="0" Margin="-30,2,0,2"
+                RenderTransform="{DynamicResource ResourceKey=VerticalScrollbarRenderTransform}">
+              <!-- RenderTransform can be applied by any ListView by defining a transform inside ResourceWrapper x:Key="VerticalScrollbarRenderTransform" -->
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+              </Grid.RowDefinitions>
+              <!-- Background -->
+              <Rectangle x:Name="ScrollBarYBackground" Grid.Row="0" Grid.Column="0"
+                  Stroke="{ThemeResource ScrollBarStrokeColor}"
+                  Width="{ThemeResource ScrollBarWidth}"
+                  ActualHeight="{TemplateBinding Path=ScrollBarYSize,Mode=OneWayToSource}"
+                  Fill="{ThemeResource ScrollBarBackgroundColor}">
+              </Rectangle>
+              <!-- Knob -->
+              <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical">
+                <StackPanel>
+                  <StackPanel.Height>
+                    <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0}+({1}/2)">
+                      <TemplateBinding Path="ScrollBarYKnobPos" />
+                      <TemplateBinding Path="ScrollBarYKnobHeight" />
+                    </MultiBinding>
+                  </StackPanel.Height>
+                </StackPanel>
+                <Rectangle x:Name="ScrollBarYKnob" Width="{ThemeResource ScrollBarKnobWidth}" Height="{ThemeResource ScrollBarKnobHeight}"
+                    Stroke="{ThemeResource ScrollBarKnobStrokeColor}" RadiusX="{ThemeResource ScrollBarKnobRadius}" RadiusY="{ThemeResource ScrollBarKnobRadius}"
+                    Fill="{ThemeResource ScrollBarKnobBackgroundColor}">
+                </Rectangle>
+              </StackPanel>
+            </Grid>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
 
   <Style x:Key="LeftSideScrollViewerStyle" TargetType="{x:Type ScrollViewer}">
     <Setter Property="Template">
@@ -179,7 +418,7 @@
               </StackPanel>
             </Grid>
             <Grid x:Name="VerticalScrollBar" IsVisible="{TemplateBinding ScrollBarYVisible}" Grid.Row="0" Grid.Column="1"
-                Grid.ZIndex="0" Margin="2,2,10,2"
+                Grid.ZIndex="0" Margin="-15,5,0,5"
                 RenderTransform="{DynamicResource ResourceKey=VerticalScrollbarRenderTransform}">
               <!-- RenderTransform can be applied by any ListView by defining a transform inside ResourceWrapper x:Key="VerticalScrollbarRenderTransform" -->
               <Grid.ColumnDefinitions>
@@ -226,7 +465,7 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type ProgressBar}">
-          <Grid x:Name="ProgressBarGrid">
+          <Grid x:Name="ProgressBarGrid" UIElement.MouseClick="{CommandStencil RelativeSource={RelativeSource TemplatedParent}, Path=OnMouseClick}">
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -258,25 +497,23 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type ProgressBar}">
-          <Grid x:Name="ProgressBarGrid" Margin="0,0,35,0">
+          <Grid x:Name="ProgressBarGrid" Margin="0,0,0,0" UIElement.MouseClick="{CommandStencil RelativeSource={RelativeSource TemplatedParent}, Path=OnMouseClick}">
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-              <RowDefinition Height="*"/>
+              <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Rectangle x:Name="ProgressBarTrack" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                       Height="3"
-                       Fill="{ThemeResource ScrollBarBackgroundXColor}"/>
+            <Rectangle x:Name="ProgressBarTrack" HorizontalAlignment="Stretch"
+                       Height="10" Fill="{ThemeResource ScrollBarBackgroundXColor}"/>
             <Rectangle x:Name="ProgressBarIndicator" Width="{TemplateBinding PartIndicatorWidth}" HorizontalAlignment="Left"
-                       Height="3"
-                       Fill="{ThemeResource OSDProgressBarFillColor}"/>
-            <StackPanel Orientation="Horizontal">
+                       Height="10" Fill="{ThemeResource OSDProgressBarFillColor}"/>
+            <!--StackPanel Orientation="Horizontal">
               <StackPanel Width="{TemplateBinding PartIndicatorWidth}"/>
               <Rectangle x:Name="ScrollBarYKnob" Width="18" Height="18"
                     Stroke="{ThemeResource ScrollBarKnobStrokeColor}" RadiusX="9" RadiusY="9"
                     Fill="{ThemeResource ScrollBarKnobBackgroundColor}"/>
-            </StackPanel>
+            </-->
           </Grid>
         </ControlTemplate>
       </Setter.Value>
@@ -287,7 +524,7 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type ProgressBar}">
-          <Grid x:Name="ProgressBarGrid">
+          <Grid x:Name="ProgressBarGrid" UIElement.MouseClick="{CommandStencil RelativeSource={RelativeSource TemplatedParent}, Path=OnMouseClick}">
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -303,8 +540,7 @@
             <StackPanel Orientation="Horizontal">
               <StackPanel Width="{TemplateBinding PartIndicatorWidth}"/>
               <Rectangle x:Name="ScrollBarYKnob" Width="18" Height="18"
-                    Stroke="#A0626262" RadiusX="9" RadiusY="9"
-                    Fill="#D3D4D6"/>
+                         Stroke="#A0626262" RadiusX="9" RadiusY="9" Fill="#D3D4D6"/>
             </StackPanel>
           </Grid>
         </ControlTemplate>
@@ -338,12 +574,13 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type ListViewItem}">
-          <Button Style="{ThemeResource MenuButtonWideStyle}" Margin="50,0,20,0" 
+          <Button Style="{ThemeResource MenuButtonWideStyle}" Margin="35,0,20,0" 
                   Command="{DynamicResource ResourceKey=Menu_Command}"
                   IsEnabled="{Binding Enabled}" SetFocus="{Binding Path=Selected,Mode=OneTime}">
             <Button.Triggers>
               <Trigger Property="HasFocus" Value="True">
-                <Setter TargetName="ItemLabel" Property="Opacity" Value="1"/> 
+                <Setter TargetName="ItemLabel" Property="Opacity" Value="1"/>
+                <Setter TargetName="ItemLabel" Property="Color" Value="{ThemeResource TextColor}"/>
                 <Setter TargetName="ItemLabel" Property="Scroll" Value="Auto"/>
                 <Setter Property="StackPanel.ZIndex" Value="100.0"/>
               </Trigger>
@@ -358,7 +595,7 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type ListViewItem}">
-          <Button Style="{ThemeResource PopupMenuButtonWideStyle}"
+          <Button Style="{ThemeResource PopupMenuButtonWideStyle}" 
               Command="{DynamicResource ResourceKey=Menu_Command}"
               IsEnabled="{Binding Enabled}" SetFocus="{Binding Path=Selected,Mode=OneTime}">
             <Button.Triggers>
@@ -378,7 +615,7 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type ListViewItem}">
-          <Button Style="{ThemeResource HomeButtonStyle}" Margin="5"
+          <Button Style="{ThemeResource HomeButtonStyle}" Margin="4"
               Command="{DynamicResource ResourceKey=Menu_Command}"
               IsEnabled="{Binding Enabled}" SetFocus="{Binding Path=Selected,Mode=OneTime}">
             <Button.Triggers>             
@@ -406,7 +643,7 @@
     <DockPanel x:Name="ItemControl" LastChildFill="False">
       <Label x:Name="ItemLabel" DockPanel.Dock="Center" Content="{Binding [Name]}"
           HorizontalAlignment="Left" VerticalAlignment="Center" Margin="-45,0,0,0"
-          FontSize="{ThemeResource SmallFontSize}" Color="{ThemeResource TextColor}"
+          FontSize="{ThemeResource SmallFontSize}" Color="{ThemeResource DialogHeaderColor}"
           Opacity="1"/> 
     </DockPanel>
   </DataTemplate>
@@ -522,9 +759,15 @@
         </Rectangle>
                    
         <!-- Item label -->
-        <Label Grid.Row="1" Grid.Column="0" x:Name="ItemLabel" HorizontalAlignment="Center" VerticalAlignment="Center"  Content="{Binding [Name]}"
-               FontSize="{ThemeResource BigFontSize}" Color="{ThemeResource HomeNonFocusedColor}" Margin="0,0,0,0"/>
-      </Grid>
+      <Label Grid.Row="1" Grid.Column="0" x:Name="ItemLabel" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding [Name]}"
+               FontSize="{ThemeResource BigFontSize}" Color="{ThemeResource HomeNonFocusedColor}" Margin="5,0,5,0">
+        <Label.Triggers>
+          <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}, Path=HasFocus}" Value="True">
+            <Setter TargetName="ItemLabel" Property="FontFamily" Value="DefaultBold"/> 
+          </DataTrigger>
+        </Label.Triggers>
+      </Label>
+    </Grid>
   </DataTemplate>
 
   <!-- ***************************** ListView styles ********************************* -->
@@ -603,6 +846,48 @@
         </ItemsPanelTemplate>
       </Setter.Value>
     </Setter>
+  </Style>
+
+  <Style x:Key="SlideMenuItemContainerStyle" BasedOn="{ThemeResource DefaultItemContainerStyle}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type ListViewItem}">
+          <Button Style="{ThemeResource PopupMenuButtonWideStyle}"
+                    Command="{DynamicResource ResourceKey=Menu_Command}"
+                    SetFocus="{Binding Path=Selected,Mode=OneTime}">
+            <Button.IsEnabled>
+              <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} &amp;&amp; {1}">
+                <!-- Consider the item's enabled state -->
+                <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="IsEnabled"/>
+                <!-- In combination with the parent ListView's enabled state -->
+                <Binding RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type ListView}}" Path="IsEnabled"/>
+              </MultiBinding>
+            </Button.IsEnabled>
+            <Button.Triggers>
+              <Trigger Property="HasFocus" Value="True">
+                <Setter TargetName="ItemLabel" Property="Scroll" Value="Auto"/>
+                <Setter Property="StackPanel.ZIndex" Value="100.0"/>
+              </Trigger>
+            </Button.Triggers>
+          </Button>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style x:Key="SlideMenuListViewStyle" BasedOn="{ThemeResource DefaultListViewStyle}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type ListView}">
+          <ScrollViewer CanContentScroll="True" HorizontalAlignment="Stretch">
+            <ItemsPresenter VerticalAlignment="Stretch" HorizontalAlignment="Stretch" MinWidth="{ThemeResource FixedDialogWidth}" Margin="0,0,61,0"/>
+          </ScrollViewer>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+    <Setter Property="ItemTemplate" Value="{ThemeResource DefaultItemDataTemplate}"/>
+    <Setter Property="DataStringProvider" Value="{ThemeResource DefaultItemDataStringProvider}"/>
+    <Setter Property="ItemContainerStyle" Value="{ThemeResource SlideMenuItemContainerStyle}"/>
   </Style>
 
   <Style x:Key="PopupMenuListViewStyle" BasedOn="{ThemeResource DefaultListViewStyle}">
@@ -684,7 +969,6 @@
 
   <!-- Displayed texts in main menu -->
   <DataTemplate x:Key="HomeGroupDataTemplate" DataType="{x:Type collections:ListItem}">
-
     <Border DockPanel.Dock="Center" Width="72" Height="71.5" BorderThickness="0" Margin="0">
       <Border.Background>
         <SolidColorBrush Color="#0066CC"/>
@@ -698,7 +982,6 @@
       </Image.Source>
     </Image>
     </Border>
-
   </DataTemplate>
 
   <!-- ListView style to be used for main groups menu -->
@@ -766,19 +1049,128 @@
   </Style>
 
   <!-- Player control styles -->
+  
+  <ControlTemplate x:Key="PlayerControlPosterPrimary">
+    <mp_special_controls:PlayerControl PlayerContext="PrimaryPlayer"
+          HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+      <mp_special_controls:PlayerControl.TemplateControl>
+        <Grid x:Name="CoverGridContainer" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
+          <Grid x:Name="AudioPosterGrid" Width="{StaticResource MEDIA_POSTER_HEIGHT}" Height="{StaticResource MEDIA_POSTER_HEIGHT}"
+                Background="{ThemeResource MediaItemFallbackBackgroundColor}">
+            <Image x:Name="AudioPoster" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                   Stretch="Fill" Source="{Binding MediaItem}"/>
+            <Image Stretch="Uniform" Source="1190A648-90F3-413D-88AC-DA89684E9766.png" IsVisible="{Binding ElementName=AudioPoster, Path=!HasImage}"
+                   Margin="30" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.6"/>
+            <Grid.IsVisible>
+              <MultiBinding Converter="{StaticResource MediaItemAspectToBoolConverter}">
+                <Binding Path="MediaItem"/>
+                <Binding Source="{x:Static aspect:AudioAspect.ASPECT_ID}" />
+              </MultiBinding>
+            </Grid.IsVisible>
+          </Grid>
 
-  <ControlTemplate x:Key="PlayerControlPoster">
-    <Grid x:Name="CoverGridContainer" IsVisible="{Binding ElementName=ItemTypeImage,Path=HasImage}" Margin="10,10,10,10"
-          Width="{StaticResource MEDIA_POSTER_WIDTH}" Height="{StaticResource MEDIA_POSTER_HEIGHT}">
-        <Image  x:Name="ItemTypeImage" HorizontalAlignment="Center" VerticalAlignment="Center" Width="{StaticResource MEDIA_POSTER_WIDTH}" 
-                Height="{StaticResource MEDIA_POSTER_HEIGHT}" Stretch="UniformToFill" FallbackSource="VideoLarge.png" Source="{Binding MediaItem}">
-        </Image>
-    </Grid>
+          <Grid x:Name="MoviePosterGrid" Width="{StaticResource MEDIA_POSTER_WIDTH}" Height="{StaticResource MEDIA_POSTER_HEIGHT}" Background="{ThemeResource MediaItemFallbackBackgroundColor}">
+            <Image x:Name="MoviePoster" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill">
+              <Image.Source>
+                <fanart:FanArtImageSource fanart:FanArtMediaType="Movie" fanart:FanArtType="Poster" fanart:FanArtName="{Binding MediaItem.MediaItemId}"
+               fanart:MaxWidth="{StaticResource MEDIA_POSTER_WIDTH}" fanart:MaxHeight="{StaticResource MEDIA_POSTER_HEIGHT}"/>
+              </Image.Source>
+            </Image>
+            <Image Stretch="Uniform" Source="D887C930-3CFB-4FC5-A559-FFF6C8E30B25.png" IsVisible="{Binding ElementName=MoviePoster, Path=!HasImage}"
+                   Margin="30" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.6"/>
+            <Grid.IsVisible>
+              <MultiBinding Converter="{StaticResource MediaItemAspectToBoolConverter}">
+                <Binding Path="MediaItem"/>
+                <Binding Source="{x:Static aspect:MovieAspect.ASPECT_ID}" />
+              </MultiBinding>
+            </Grid.IsVisible>
+          </Grid>
+
+          <Grid Height="{StaticResource MEDIA_POSTER_HEIGHT}" Width="300" Background="{ThemeResource MediaItemFallbackBackgroundColor}">
+            <Grid.IsVisible>
+              <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}"
+                            ConverterParameter="{}!(({0}=={VisibilityEnum}.{Visible})||({1}=={VisibilityEnum}.{Visible}))">
+                <Binding ElementName="AudioPosterGrid" Path="Visibility" />
+                <Binding ElementName="MoviePosterGrid" Path="Visibility" />
+              </MultiBinding>
+            </Grid.IsVisible>
+            <Image x:Name="OtherPoster" Stretch="UniformToFill">
+              <Image.Source>
+                <fanart:FanArtImageSource fanart:FanArtMediaType="Undefined" fanart:FanArtType="Thumbnail" fanart:FanArtName="{Binding MediaItem.MediaItemId}"
+                fanart:MaxWidth="300" fanart:MaxHeight="{StaticResource MEDIA_POSTER_HEIGHT}"/>
+              </Image.Source>
+            </Image>
+            <Image Stretch="Uniform" Source="D887C930-3CFB-4FC5-A559-FFF6C8E30B25.png" IsVisible="{Binding ElementName=OtherPoster, Path=!HasImage}"
+                   Width="300" Height="{StaticResource MEDIA_POSTER_HEIGHT}" Opacity="0.6"
+                   Margin="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Grid>
+        </Grid>
+      </mp_special_controls:PlayerControl.TemplateControl>
+    </mp_special_controls:PlayerControl>
+  </ControlTemplate>
+ 
+  <ControlTemplate x:Key="PlayerControlPosterSecondary">
+    <mp_special_controls:PlayerControl PlayerContext="SecondaryPlayer"
+          HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+      <mp_special_controls:PlayerControl.TemplateControl>
+        <Grid x:Name="CoverGridContainer" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
+          <Grid x:Name="AudioPosterGrid" Width="{StaticResource MEDIA_POSTER_HEIGHT}" Height="{StaticResource MEDIA_POSTER_HEIGHT}"
+                Background="{ThemeResource MediaItemFallbackBackgroundColor}">
+            <Image x:Name="AudioPoster" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" Source="{Binding MediaItem}"/>
+            <Image Stretch="Uniform" Source="1190A648-90F3-413D-88AC-DA89684E9766.png" IsVisible="{Binding ElementName=AudioPoster, Path=!HasImage}"
+                   Margin="30" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.6"/>
+            <Grid.IsVisible>
+              <MultiBinding Converter="{StaticResource MediaItemAspectToBoolConverter}">
+                <Binding Path="MediaItem"/>
+                <Binding Source="{x:Static aspect:AudioAspect.ASPECT_ID}" />
+              </MultiBinding>
+            </Grid.IsVisible>
+          </Grid>
+
+          <Grid x:Name="MoviePosterGrid" Width="{StaticResource MEDIA_POSTER_WIDTH}" Height="{StaticResource MEDIA_POSTER_HEIGHT}"
+                Background="{ThemeResource MediaItemFallbackBackgroundColor}">
+            <Image x:Name="MoviePoster" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill">
+              <Image.Source>
+                <fanart:FanArtImageSource fanart:FanArtMediaType="Movie" fanart:FanArtType="Poster" fanart:FanArtName="{Binding MediaItem.MediaItemId}"
+               fanart:MaxWidth="{StaticResource MEDIA_POSTER_WIDTH}" fanart:MaxHeight="{StaticResource MEDIA_POSTER_HEIGHT}"/>
+              </Image.Source>
+            </Image>
+            <Image Stretch="Uniform" Source="D887C930-3CFB-4FC5-A559-FFF6C8E30B25.png" IsVisible="{Binding ElementName=MoviePoster, Path=!HasImage}"
+                   Margin="30" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.6"/>
+            <Grid.IsVisible>
+              <MultiBinding Converter="{StaticResource MediaItemAspectToBoolConverter}">
+                <Binding Path="MediaItem"/>
+                <Binding Source="{x:Static aspect:MovieAspect.ASPECT_ID}"/>
+              </MultiBinding>
+            </Grid.IsVisible>
+          </Grid>
+
+          <Grid Width="300" Height="{StaticResource MEDIA_POSTER_HEIGHT}" Background="{ThemeResource MediaItemFallbackBackgroundColor}">
+            <Grid.IsVisible>
+              <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}"
+                            ConverterParameter="{}!(({0}=={VisibilityEnum}.{Visible})||({1}=={VisibilityEnum}.{Visible}))">
+                <Binding ElementName="AudioPosterGrid" Path="Visibility" />
+                <Binding ElementName="MoviePosterGrid" Path="Visibility" />
+              </MultiBinding>
+            </Grid.IsVisible>
+            <Image x:Name="OtherPoster" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill">
+              <Image.Source>
+                <fanart:FanArtImageSource fanart:FanArtMediaType="Undefined" fanart:FanArtType="Thumbnail" fanart:FanArtName="{Binding MediaItem.MediaItemId}"
+                fanart:MaxWidth="300" fanart:MaxHeight="{StaticResource MEDIA_POSTER_HEIGHT}"/>
+              </Image.Source>
+            </Image>
+            <Image Stretch="Uniform" Source="D887C930-3CFB-4FC5-A559-FFF6C8E30B25.png" IsVisible="{Binding ElementName=OtherPoster, Path=!HasImage}"
+                   Width="300" Height="{StaticResource MEDIA_POSTER_HEIGHT}" Opacity="0.6"
+                   Margin="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Grid>
+
+        </Grid>
+      </mp_special_controls:PlayerControl.TemplateControl>
+    </mp_special_controls:PlayerControl>
   </ControlTemplate>
 
   <ControlTemplate x:Key="PlayerControlButtons">
     <Grid HorizontalAlignment="Center" Margin="0">
-
       <StackPanel x:Name="MouseControlsPanel" Orientation="Horizontal" IsVisible="True" Margin="10,0,10,0" Height="30">
         <Button x:Name="SkipBackButton" Style="{ThemeResource SkipBackDarkButtonStyle}" Margin="{ThemeResource PlayerControlHomeButtonMargins}" IsVisible="{Binding CanSkipBack}"
               Command="{Command Previous}"/>
@@ -795,12 +1187,11 @@
         <Button x:Name="SkipForwardButton" Style="{ThemeResource SkipForwardDarkButtonStyle}" Margin="{ThemeResource PlayerControlHomeButtonMargins}" IsVisible="{Binding CanSkipForward}"
               Command="{Command Next}"/>
       </StackPanel>
-
     </Grid>
 
   </ControlTemplate>
 
-  <ControlTemplate x:Key="PlayerControlVideoPrimary" >
+  <!--ControlTemplate x:Key="PlayerControlVideoPrimary" >
     <Rectangle x:Name="Video"  Width="300" Height="170" Margin="0,10,0,10">
       <Rectangle.Triggers>
         <EventTrigger RoutedEvent="UIElement.MouseDown">
@@ -811,7 +1202,7 @@
         <VideoBrush Stream="0"/>
       </Rectangle.Fill>
     </Rectangle>
-  </ControlTemplate>
+  </>
 
   <ControlTemplate x:Key="PlayerControlVideoSecondary">
     <Rectangle x:Name="Video"  Width="300" Height="170" Margin="0,10,0,10">
@@ -824,7 +1215,7 @@
         <VideoBrush Stream="1"/>
       </Rectangle.Fill>
     </Rectangle>
-  </ControlTemplate>
+  </ControlTemplate-->
 
   <ControlTemplate x:Key="PlayerControlMediaInfo">
     <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical" VerticalAlignment="Stretch">
@@ -840,7 +1231,6 @@
           <ColumnDefinition Width="*"/>
           <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-
         <Label x:Name="MediaItemTitle" Grid.Row="0" Grid.ColumnSpan="3" Color="{ThemeResource PlayerControlMediaItemColor}" FontSize="{ThemeResource SmallFontSize}"
             Content="{Binding MediaItemTitle}" HorizontalAlignment="Stretch" VerticalAlignment="Center" Scroll="Auto"
             Margin="0,0,0,0">
@@ -850,7 +1240,6 @@
             </DataTrigger>
           </Label.Triggers>
         </Label>
-
         <Label x:Name="CurrentPositionLabel" Grid.Row="1" Grid.Column="0" Color="{ThemeResource PlayerControlMediaItemColor}"
             FontSize="{ThemeResource SmallFontSize}" IsVisible="{Binding IsPlayerPresent}" HorizontalAlignment="Left"
             Content="{Binding CurrentTime}"
@@ -861,7 +1250,6 @@
             </DataTrigger>
           </Label.Triggers>
         </Label>
-
         <Label x:Name="DurationLabel" Grid.Row="1" Grid.Column="3" Color="{ThemeResource PlayerControlMediaItemColor}"
             FontSize="{ThemeResource SmallFontSize}" IsVisible="{Binding IsPlayerPresent}" HorizontalAlignment="Right"
             Content="{Binding Duration}">
@@ -871,13 +1259,11 @@
             </DataTrigger>
           </Label.Triggers>
         </Label>
-
         <ProgressBar x:Name="ProgressBar" Grid.ColumnSpan="3" Grid.Row="2" Height="22" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="0,5,0,0"
                 Style="{ThemeResource PlayerControlsProgressBarStyle}"
-                Value="{Binding Path=PercentPlayed}" IsVisible="{Binding IsPlayerPresent}" />
+                Value="{Binding Path=PercentPlayed, Mode=TwoWay}" IsVisible="{Binding IsPlayerPresent}" />
 
         <Control Template="{ThemeResource PlayerControlButtons}" Grid.Row="3" Grid.ColumnSpan="3" HorizontalAlignment="Center"/>
-
       </Grid>
     </StackPanel>
   </ControlTemplate>
@@ -888,16 +1274,12 @@
         <ControlTemplate TargetType="{x:Type mp_special_controls:PlayerControl}">
           <Grid x:Name="PCGroupBox" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
             <Grid.RowDefinitions>
-              <!-- Background -->
               <RowDefinition Height="Auto"/>
-              <!-- Playback controls -->
               <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-              <!-- Optional fanart -->
               <ColumnDefinition Width="Auto"/>
-              <!-- Media thumbnail -->
-              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="30"/>
               <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
@@ -905,15 +1287,27 @@
             <Rectangle x:Name="PCBackground" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                        Fill="{ThemeResource PlayerControlBackgroundColor}">
             </Rectangle>
-
-            <Control Template="{ThemeResource PlayerControlPoster}" Grid.Row="0" Grid.Column="0" />
-
-            <Control Template="{ThemeResource PlayerControlVideoSecondary}" Grid.Column="1" Grid.ColumnSpan="1" />
-
+            <Border Grid.Row="0" Grid.Column="1" BorderThickness="0" Margin="-15,0,15,0">
+              <Border.Background>
+                <LinearGradientBrush StartPoint="1,0.5" EndPoint="0,0.5">
+                  <LinearGradientBrush.GradientStops>
+                    <GradientStop Color="#00000000" Offset="0"  />
+                    <GradientStop Color="#E6000000" Offset="1"  />
+                  </LinearGradientBrush.GradientStops>
+                </LinearGradientBrush>
+              </Border.Background>
+            </Border>
+            <Control Template="{ThemeResource PlayerControlPosterSecondary}" Grid.Row="0" Grid.Column="0">
+              <Control.Triggers>
+                <EventTrigger RoutedEvent="UIElement.MouseDown">
+                  <TriggerCommand Command="{Command Source={Service WorkflowManager},Path=NavigatePush,Parameters=882C1142-8028-4112-A67D-370E6E483A33}"/>
+                </EventTrigger>
+              </Control.Triggers>
+            </Control>
+            <Control Template="{ThemeResource PlayerControlPosterSecondary}" Grid.Row="0" Grid.Column="0" />
+            <!--Control Template="{ThemeResource PlayerControlVideoSecondary}" Grid.Column="1" Grid.ColumnSpan="1" /-->
             <Control Template="{ThemeResource PlayerControlMediaInfo}"  Grid.Row="0" Grid.Column="2" />
-
           </Grid>
-
           <ControlTemplate.Triggers>
             <Trigger Property="IsCurrentPlayer" Value="True">
               <Setter TargetName="PCBackground" Property="Fill" Value="{ThemeResource CurrentPlayerControlBackgroundColor1}"/>
@@ -931,16 +1325,12 @@
         <ControlTemplate TargetType="{x:Type mp_special_controls:PlayerControl}">
           <Grid x:Name="PCGroupBox" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
             <Grid.RowDefinitions>
-              <!-- Background -->
               <RowDefinition Height="Auto"/>
-              <!-- Playback controls -->
               <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="*"/>
-              <!-- Media thumbnail -->
-              <ColumnDefinition Width="Auto"/>
-              <!-- Optional fanart -->
+              <ColumnDefinition Width="30"/>
               <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
@@ -948,9 +1338,25 @@
             <Rectangle x:Name="PCBackground" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                        Fill="{ThemeResource PlayerControlBackgroundColor}">
             </Rectangle>
+            <Border Grid.Row="0" Grid.Column="1" BorderThickness="0" Margin="15,0,-15,0">
+              <Border.Background>
+                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                  <LinearGradientBrush.GradientStops>
+                    <GradientStop Color="#00000000" Offset="0"  />
+                    <GradientStop Color="#E6000000" Offset="1"  />
+                  </LinearGradientBrush.GradientStops>
+                </LinearGradientBrush>
+              </Border.Background>
+            </Border>
+            <Control Template="{ThemeResource PlayerControlPosterPrimary}" Grid.Row="0" Grid.Column="2">
+              <Control.Triggers>
+                <EventTrigger RoutedEvent="UIElement.MouseDown">
+                  <TriggerCommand Command="{Command Source={Service WorkflowManager},Path=NavigatePush,Parameters=882C1142-8028-4112-A67D-370E6E483A33}"/>
+                </EventTrigger>
+              </Control.Triggers>
+            </Control>
             <Control Template="{ThemeResource PlayerControlMediaInfo}"  Grid.Row="0" Grid.Column="0" />
-            <Control Template="{ThemeResource PlayerControlVideoPrimary}" Grid.Row="0" Grid.Column="1" />            
-            <Control Template="{ThemeResource PlayerControlPoster}" Grid.Row="0" Grid.Column="2" />
+            <!--Control Template="{ThemeResource PlayerControlVideoPrimary}" Grid.Row="0" Grid.Column="1" /-->            
           </Grid>
 
           <ControlTemplate.Triggers>

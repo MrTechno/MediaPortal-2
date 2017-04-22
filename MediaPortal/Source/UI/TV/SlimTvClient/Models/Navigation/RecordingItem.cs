@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -43,6 +43,7 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models.Navigation
       SingleMediaItemAspect recordingAspect;
       if (MediaItemAspect.TryGetAspect(mediaItem.Aspects, RecordingAspect.Metadata, out recordingAspect))
       {
+        SimpleTitle = Title;
         Channel = (string)recordingAspect[RecordingAspect.ATTR_CHANNEL];
         StartTime = (DateTime?)recordingAspect[RecordingAspect.ATTR_STARTTIME];
         EndTime = (DateTime?)recordingAspect[RecordingAspect.ATTR_ENDTIME];

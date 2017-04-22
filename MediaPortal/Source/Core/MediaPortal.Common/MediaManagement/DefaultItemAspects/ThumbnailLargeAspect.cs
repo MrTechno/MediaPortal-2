@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -34,7 +34,7 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
     /// <summary>
     /// Media item aspect id of the large thumbnail aspect.
     /// </summary>
-    public static readonly Guid ASPECT_ID = new Guid("1FDA5774-9AC5-4873-926C-E84E3C36A966");
+    public static readonly Guid ASPECT_ID = new Guid("2E492453-269A-49EF-B3F1-FD71FE13FAB9");
 
     /// <summary>
     /// Contains a large sized (max. 256x256) thumbnail.

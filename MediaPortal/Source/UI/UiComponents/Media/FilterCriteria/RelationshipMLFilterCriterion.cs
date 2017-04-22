@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -31,6 +31,9 @@ using MediaPortal.Common.MediaManagement.DefaultItemAspects;
 using MediaPortal.Common.MediaManagement.MLQueries;
 using MediaPortal.Common.SystemCommunication;
 using MediaPortal.UI.ServerCommunication;
+using MediaPortal.UI.Services.UserManagement;
+using System.Linq;
+using MediaPortal.UiComponents.Media.Settings;
 
 namespace MediaPortal.UiComponents.Media.FilterCriteria
 {
@@ -41,11 +44,17 @@ namespace MediaPortal.UiComponents.Media.FilterCriteria
   {
     protected Guid _role;
     protected Guid _linkedRole;
+    protected IEnumerable<Guid> _necessaryMIATypeIds;
+    protected IEnumerable<Guid> _optionalMIATypeIds;
+    protected SortInformation _sortInformation;
 
-    public RelationshipMLFilterCriterion(Guid role, Guid linkedRole)
+    public RelationshipMLFilterCriterion(Guid role, Guid linkedRole, IEnumerable<Guid> necessaryMIATypeIds, IEnumerable<Guid> optionalMIATypeIds, SortInformation sortInformation)
     {
       _role = role;
       _linkedRole = linkedRole;
+      _necessaryMIATypeIds = necessaryMIATypeIds;
+      _optionalMIATypeIds = optionalMIATypeIds;
+      _sortInformation = sortInformation;
     }
 
     #region Base overrides
@@ -55,23 +64,38 @@ namespace MediaPortal.UiComponents.Media.FilterCriteria
       IContentDirectory cd = ServiceRegistration.Get<IServerConnectionManager>().ContentDirectory;
       if (cd == null)
         throw new NotConnectedException("The MediaLibrary is not connected");
-      MediaItemQuery query = new MediaItemQuery(necessaryMIATypeIds, filter);
-      IList<MediaItem> items = cd.Search(query, true);
+
+      Guid? userProfile = null;
+      IUserManagement userProfileDataManagement = ServiceRegistration.Get<IUserManagement>();
+      if (userProfileDataManagement != null && userProfileDataManagement.IsValidUser)
+        userProfile = userProfileDataManagement.CurrentUser.ProfileId;
+
+      IEnumerable<Guid> mias = _necessaryMIATypeIds ?? necessaryMIATypeIds;
+      IEnumerable<Guid> optMias = _optionalMIATypeIds != null ? _optionalMIATypeIds.Except(mias) : null;
+      IFilter queryFilter;
+      if (filter != null)
+        queryFilter = new FilteredRelationshipFilter(_role, filter);
+      else
+        queryFilter = new RelationshipFilter(_role, _linkedRole, Guid.Empty);
+      MediaItemQuery query = new MediaItemQuery(mias, optMias, queryFilter);
+      if (_sortInformation != null)
+        query.SortInformation = new List<SortInformation> { _sortInformation };
+      IList<MediaItem> items = cd.Search(query, true, userProfile, ShowVirtualSetting.ShowVirtualMedia(necessaryMIATypeIds));
       IList<FilterValue> result = new List<FilterValue>(items.Count);
-      int numEmptyEntries = 0;
       foreach (MediaItem item in items)
       {
         string name;
         MediaItemAspect.TryGetAttribute(item.Aspects, MediaAspect.ATTR_TITLE, out name);
-        if (name == string.Empty)
-          numEmptyEntries ++;
-        else
-          result.Add(new FilterValue(name, new RelationshipFilter(item.MediaItemId, _role, _linkedRole), null, item, this));
+        result.Add(new FilterValue(name,
+          new RelationshipFilter(_linkedRole, _role, item.MediaItemId),
+          null,
+          item,
+          this));
       }
       return result;
     }
 
-    protected virtual string GetDisplayName (object groupKey)
+    protected virtual string GetDisplayName(object groupKey)
     {
       return string.Format("{0}", groupKey).Trim();
     }

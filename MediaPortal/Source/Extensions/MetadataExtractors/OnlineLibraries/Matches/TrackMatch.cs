@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -24,21 +24,22 @@
 
 namespace MediaPortal.Extensions.OnlineLibraries.Matches
 {
+  /// <summary>
+  /// TrackMatch stores name matches for Tracks.
+  /// </summary>
+  public class TrackMatch : BaseFanArtMatch<string>
+  {
     /// <summary>
-    /// TrackMatch stores name matches for Tracks.
+    /// Contains the name found in online library.
     /// </summary>
-    public class TrackMatch : BaseMatch<string>
-    {
-        /// <summary>
-        /// Contains the name found in online library.
-        /// </summary>
-        public string TrackName;
-        public string RecordingName;
-        public string ReleaseName;
+    public string TrackName;
+    public string ArtistName;
+    public string AlbumName;
+    public int TrackNum;
 
-        public override string ToString()
-        {
-            return string.Format("{0}: {1} {2} {2} [{2}]", ItemName, TrackName, RecordingName, ReleaseName, Id);
-        }
+    public override string ToString()
+    {
+      return string.Format("{0}: {1} - {2} ({3}: {4}) [{5}]", ItemName, TrackNum, TrackName, ArtistName, AlbumName, Id);
     }
+  }
 }

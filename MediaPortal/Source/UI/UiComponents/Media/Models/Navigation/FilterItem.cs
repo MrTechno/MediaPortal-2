@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -23,7 +23,9 @@
 #endregion
 
 using MediaPortal.Common.MediaManagement;
+using MediaPortal.Common.MediaManagement.DefaultItemAspects;
 using MediaPortal.UiComponents.Media.General;
+using MediaPortal.UiComponents.Media.Settings;
 
 namespace MediaPortal.UiComponents.Media.Models.Navigation
 {
@@ -38,8 +40,16 @@ namespace MediaPortal.UiComponents.Media.Models.Navigation
       SimpleTitle = name;
     }
 
+    public FilterItem(string id, string name, int? numItems)
+      : base(numItems)
+    {
+      Id = id;
+      SimpleTitle = name;
+    }
+
     public FilterItem()
-    { }
+    {
+    }
 
     public MediaItem MediaItem
     {
@@ -49,7 +59,31 @@ namespace MediaPortal.UiComponents.Media.Models.Navigation
         AdditionalProperties.TryGetValue(Consts.KEY_MEDIA_ITEM, out mi);
         return mi as MediaItem;
       }
-      set { AdditionalProperties[Consts.KEY_MEDIA_ITEM] = value; }
+      set
+      {
+        AdditionalProperties[Consts.KEY_MEDIA_ITEM] = value;
+        Update(value);
+      }
+    }
+
+    public bool? Virtual
+    {
+      get { return (bool?)AdditionalProperties[Consts.KEY_VIRTUAL]; }
+      set { AdditionalProperties[Consts.KEY_VIRTUAL] = value; }
+    }
+
+    public virtual void Update(MediaItem mediaItem)
+    {
+      if (mediaItem != null)
+      {
+        SingleMediaItemAspect mediaAspect;
+        if (MediaItemAspect.TryGetAspect(mediaItem.Aspects, MediaAspect.Metadata, out mediaAspect))
+        {
+          SimpleTitle = (string)mediaAspect[MediaAspect.ATTR_TITLE];
+          SortString = (string)mediaAspect[MediaAspect.ATTR_SORT_TITLE];
+          Virtual = (bool?)mediaAspect[MediaAspect.ATTR_ISVIRTUAL];
+        }
+      }
     }
   }
 }

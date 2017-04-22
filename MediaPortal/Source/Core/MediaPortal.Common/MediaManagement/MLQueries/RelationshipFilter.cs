@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2014 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2014 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -23,41 +23,30 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Xml.Serialization;
-using MediaPortal.Utilities;
 
 namespace MediaPortal.Common.MediaManagement.MLQueries
 {
   /// <summary>
   /// Filter which filters based on the relationship
   /// </summary>
-  public class RelationshipFilter : IFilter
+  public class RelationshipFilter : AbstractRelationshipFilter
   {
-    protected Guid _itemId;
-    protected Guid _role;
     protected Guid _linkedRole;
+    protected Guid _linkedMediaItemId;
 
-    public RelationshipFilter(Guid itemId, Guid role, Guid linkedRole)
+    public RelationshipFilter(Guid role, Guid linkedRole, Guid linkedMediaItemId) :
+      base(role)
     {
-      _itemId = itemId;
-      _role = role;
       _linkedRole = linkedRole;
+      _linkedMediaItemId = linkedMediaItemId;
     }
 
     [XmlIgnore]
-    public Guid ItemId
+    public Guid LinkedMediaItemId
     {
-      get { return _itemId; }
-      set { _itemId = value; }
-    }
-
-    [XmlIgnore]
-    public Guid Role
-    {
-      get { return _role; }
-      set { _role = value; }
+      get { return _linkedMediaItemId; }
+      set { _linkedMediaItemId = value; }
     }
 
     [XmlIgnore]
@@ -69,7 +58,7 @@ namespace MediaPortal.Common.MediaManagement.MLQueries
 
     public override string ToString()
     {
-      return "(ITEM_ID='" + _itemId + "' AND ROLE='" + _role + "' AND LINKED_ROLE='" + _linkedRole + "')";
+      return "(LINKED_ID = '" + _linkedMediaItemId + "'" + (_role != Guid.Empty ? " AND ROLE='" + _role + "'" : "") + " AND LINKED_ROLE='" + _linkedRole + "')";
     }
 
     #region Additional members for the XML serialization
@@ -79,21 +68,10 @@ namespace MediaPortal.Common.MediaManagement.MLQueries
     /// <summary>
     /// For internal use of the XML serialization system only.
     /// </summary>
-    [XmlAttribute("ItemId")]
-    public Guid XML_ItemId
+    public Guid XML_LinkedId
     {
-      get { return _itemId; }
-      set { _itemId = value; }
-    }
-
-    /// <summary>
-    /// For internal use of the XML serialization system only.
-    /// </summary>
-    [XmlAttribute("Role")]
-    public Guid XML_Role
-    {
-      get { return _role; }
-      set { _role = value; }
+      get { return _linkedMediaItemId; }
+      set { _linkedMediaItemId = value; }
     }
 
     /// <summary>

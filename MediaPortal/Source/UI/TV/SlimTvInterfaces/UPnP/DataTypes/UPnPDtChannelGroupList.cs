@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -56,14 +56,14 @@ namespace MediaPortal.Plugins.SlimTv.Interfaces.UPnP.DataTypes
 
     public override bool IsAssignableFrom(Type type)
     {
-      return typeof (IEnumerable).IsAssignableFrom(type);
+      return typeof(IEnumerable).IsAssignableFrom(type);
     }
 
     protected override void DoSerializeValue(object value, bool forceSimpleValue, XmlWriter writer)
     {
-      IEnumerable groups = (IEnumerable) value;
+      IEnumerable groups = (IEnumerable)value;
       foreach (ChannelGroup group in groups)
-        group.Serialize(writer);
+        if (group != null) group.Serialize(writer);
     }
 
     protected override object DoDeserializeValue(XmlReader reader, bool isSimpleValue)
@@ -75,6 +75,6 @@ namespace MediaPortal.Plugins.SlimTv.Interfaces.UPnP.DataTypes
         result.Add(ChannelGroup.Deserialize(reader));
       reader.ReadEndElement(); // End of enclosing element
       return result;
-    }    
+    }
   }
 }

@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -362,18 +362,29 @@ namespace MediaPortal.Common.Services.MediaManagement
     /// <param name="mediaAccessor">Convenience reference to the media accessor.</param>
     /// <returns><c>true</c>, if metadata could be extracted from the given <paramref name="mediaItemAccessor"/>, else
     /// <c>false</c>.</returns>
-    protected bool ImportResource(IResourceAccessor mediaItemAccessor, Guid parentDirectoryId,
-        ICollection<IMetadataExtractor> metadataExtractors, IImportResultHandler resultHandler, IMediaAccessor mediaAccessor)
+    protected bool ImportResource(ImportJob importJob, IResourceAccessor mediaItemAccessor, Guid parentDirectoryId, ICollection<IMetadataExtractor> metadataExtractors, 
+      IImportResultHandler resultHandler, IMediaAccessor mediaAccessor)
     {
-      const bool forceQuickMode = false; // Allow extractions with probably longer runtime.
+      const bool importOnly = false; // Allow extractions with probably longer runtime.
       ResourcePath path = mediaItemAccessor.CanonicalLocalResourcePath;
       ImporterWorkerMessaging.SendImportMessage(ImporterWorkerMessaging.MessageType.ImportStatus, path);
-      IDictionary<Guid, IList<MediaItemAspect>> aspects = mediaAccessor.ExtractMetadata(mediaItemAccessor, metadataExtractors, forceQuickMode);
+      IDictionary<Guid, IList<MediaItemAspect>> aspects = mediaAccessor.ExtractMetadata(mediaItemAccessor, metadataExtractors, importOnly);
       if (aspects == null)
         // No metadata could be extracted
         return false;
-      resultHandler.UpdateMediaItem(parentDirectoryId, path, MediaItemAspect.GetAspects(aspects));
-      resultHandler.DeleteUnderPath(path);
+      using (CancellationTokenSource cancelToken = new CancellationTokenSource())
+      {
+        try
+        {
+          resultHandler.UpdateMediaItem(parentDirectoryId, path, MediaItemAspect.GetAspects(aspects), importJob.JobType == ImportJobType.Refresh, importJob.BasePath, cancelToken.Token);
+          resultHandler.DeleteUnderPath(path);
+        }
+        catch
+        {
+          cancelToken.Cancel();
+          throw;
+        }
+      }
       return true;
     }
 
@@ -393,7 +404,7 @@ namespace MediaPortal.Common.Services.MediaManagement
       ResourcePath currentFilePath = resourceAccessor.CanonicalLocalResourcePath;
       try
       {
-        ImportResource(resourceAccessor, Guid.Empty, metadataExtractors, resultHandler, mediaAccessor);
+        ImportResource(importJob, resourceAccessor, Guid.Empty, metadataExtractors, resultHandler, mediaAccessor);
       }
       catch (Exception e)
       {
@@ -403,7 +414,7 @@ namespace MediaPortal.Common.Services.MediaManagement
       }
     }
 
-    protected Guid GetOrAddDirectory(IFileSystemResourceAccessor directoryAccessor, Guid parentDirectoryId,
+    protected Guid GetOrAddDirectory(ImportJob importJob, IFileSystemResourceAccessor directoryAccessor, Guid parentDirectoryId,
         IMediaBrowsing mediaBrowsing, IImportResultHandler resultHandler)
     {
       ResourcePath directoryPath = directoryAccessor.CanonicalLocalResourcePath;
@@ -421,6 +432,8 @@ namespace MediaPortal.Common.Services.MediaManagement
       { // Add directory item to ML
         MediaItemAspect mia = new SingleMediaItemAspect(MediaAspect.Metadata);
         mia.SetAttribute(MediaAspect.ATTR_TITLE, directoryAccessor.ResourceName);
+        mia.SetAttribute(MediaAspect.ATTR_SORT_TITLE, directoryAccessor.ResourceName);
+        mia.SetAttribute(MediaAspect.ATTR_ISVIRTUAL, false);
         mia.SetAttribute(MediaAspect.ATTR_RECORDINGTIME, DateTime.MinValue);
         mia.SetAttribute(MediaAspect.ATTR_RATING, 0);
         mia.SetAttribute(MediaAspect.ATTR_COMMENT, null);
@@ -431,7 +444,7 @@ namespace MediaPortal.Common.Services.MediaManagement
               mia,
               da,
           });
-        return resultHandler.UpdateMediaItem(parentDirectoryId, directoryPath, aspects);
+        return resultHandler.UpdateMediaItem(parentDirectoryId, directoryPath, aspects, importJob.JobType == ImportJobType.Refresh, importJob.BasePath, CancellationToken.None);
       }
       return directoryItem.MediaItemId;
     }
@@ -458,21 +471,21 @@ namespace MediaPortal.Common.Services.MediaManagement
       try
       {
         ImporterWorkerMessaging.SendImportMessage(ImporterWorkerMessaging.MessageType.ImportStatus, currentDirectoryPath);
-        if (ImportResource(directoryAccessor, parentDirectoryId, metadataExtractors, resultHandler, mediaAccessor))
+        if (ImportResource(importJob, directoryAccessor, parentDirectoryId, metadataExtractors, resultHandler, mediaAccessor))
           // The directory could be imported as a media item.
           // If the directory itself was identified as a normal media item, don't import its children.
           // Necessary for DVD directories, for example.
           return null;
-        Guid directoryId = GetOrAddDirectory(directoryAccessor, parentDirectoryId, mediaBrowsing, resultHandler);
+        Guid directoryId = GetOrAddDirectory(importJob, directoryAccessor, parentDirectoryId, mediaBrowsing, resultHandler);
         IDictionary<string, MediaItem> path2Item = new Dictionary<string, MediaItem>();
         if (importJob.JobType == ImportJobType.Refresh)
         {
           foreach (MediaItem mediaItem in mediaBrowsing.Browse(directoryId,
-              IMPORTER_PROVIDER_MIA_ID_ENUMERATION, EMPTY_MIA_ID_ENUMERATION, null, null))
+              IMPORTER_PROVIDER_MIA_ID_ENUMERATION, EMPTY_MIA_ID_ENUMERATION, null, false))
           {
-            SingleMediaItemAspect providerResourceAspect;
-            if (MediaItemAspect.TryGetAspect(mediaItem.Aspects, ProviderResourceAspect.Metadata, out providerResourceAspect))
-              path2Item[providerResourceAspect.GetAttributeValue<string>(ProviderResourceAspect.ATTR_RESOURCE_ACCESSOR_PATH)] = mediaItem;
+            IList<MultipleMediaItemAspect> providerResourceAspects;
+            if (MediaItemAspect.TryGetAspects(mediaItem.Aspects, ProviderResourceAspect.Metadata, out providerResourceAspects))
+              path2Item[providerResourceAspects[0].GetAttributeValue<string>(ProviderResourceAspect.ATTR_RESOURCE_ACCESSOR_PATH)] = mediaItem;
           }
         }
         CheckImportStillRunning(importJob.State);
@@ -495,7 +508,7 @@ namespace MediaPortal.Common.Services.MediaManagement
                   path2Item.Remove(serializedFilePath);
                   continue;
                 }
-                if (ImportResource(fileAccessor, directoryId, metadataExtractors, resultHandler, mediaAccessor))
+                if (ImportResource(importJob, fileAccessor, directoryId, metadataExtractors, resultHandler, mediaAccessor))
                   path2Item.Remove(serializedFilePath);
               }
               catch (Exception e)
@@ -641,7 +654,7 @@ namespace MediaPortal.Common.Services.MediaManagement
               string moreResources = numPending > 1 ? string.Format(" ({0} more resources pending)", numPending) : string.Empty;
               ServiceRegistration.Get<ILogger>().Info("ImporterWorker: Importing '{0}'{1}", fsra.ResourcePathName, moreResources);
               if (fsra.IsFile && fsra.Exists)
-                ImportResource(fsra, pendingImportResource.ParentDirectory, metadataExtractors, resultHandler, mediaAccessor);
+                ImportResource(importJob, fsra, pendingImportResource.ParentDirectory, metadataExtractors, resultHandler, mediaAccessor);
               else if (!fsra.IsFile)
               {
                 CheckImportStillRunning(importJob.State);

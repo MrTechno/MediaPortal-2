@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2007-2014 Team MediaPortal
+﻿#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2014 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -35,35 +35,54 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
   public static class ExternalIdentifierAspect
   {
     // TODO: Put this somewhere else?
-    public static readonly string SOURCE_IMDB = "imdb";
-    public static readonly string SOURCE_MUSICBRAINZ = "musicbrainz";
-    public static readonly string SOURCE_TMDB = "tmdb";
-    public static readonly string SOURCE_TVDB = "tvdb";
+    public static readonly string SOURCE_IMDB = "IMDB";
+    public static readonly string SOURCE_ISRC = "ISRC";
+    public static readonly string SOURCE_UPCEAN = "UPCEAN";
+    public static readonly string SOURCE_MUSICBRAINZ = "MUSICBRAINZ";
+    public static readonly string SOURCE_MUSICBRAINZ_GROUP = "MUSICBRAINZ_GROUP";
+    public static readonly string SOURCE_TMDB = "TMDB";
+    public static readonly string SOURCE_TVDB = "TVDB";
+    public static readonly string SOURCE_CDDB = "CDDB";
+    public static readonly string SOURCE_AUDIODB = "AUDIODB";
+    public static readonly string SOURCE_TVMAZE = "TVMAZE";
+    public static readonly string SOURCE_TVRAGE = "TVRAGE";
+    public static readonly string SOURCE_ALLOCINE = "ALLOCINE";
+    public static readonly string SOURCE_CINEPASSION = "CINEPASSION";
+    public static readonly string SOURCE_AMAZON = "AMAZON";
+    public static readonly string SOURCE_MUSIC_IP = "MUSIC_IP";
+    public static readonly string SOURCE_MVDB = "MVDB";
+    public static readonly string SOURCE_LYRIC = "LYRIC";
+    public static readonly string SOURCE_ITUNES = "ITUNES";
+    public static readonly string SOURCE_NAME = "NAME";
 
-    public static readonly string TYPE_CHARACTER = "character"; // Someone in a movie / series
-    public static readonly string TYPE_COLLECTION = "collection";
-    public static readonly string TYPE_EPISODE = "episode";
-    public static readonly string TYPE_MOVIE = "movie";
-    public static readonly string TYPE_PERSON = "person"; // Someone in real life
-    public static readonly string TYPE_SERIES = "series";
-    public static readonly string TYPE_TRACK = "track";
+    public static readonly string TYPE_CHARACTER = "CHARACTER"; // Someone in a movie / series
+    public static readonly string TYPE_COLLECTION = "COLLECTION";
+    public static readonly string TYPE_EPISODE = "EPISODE";
+    public static readonly string TYPE_SEASON = "SEASON";
+    public static readonly string TYPE_MOVIE = "MOVIE";
+    public static readonly string TYPE_PERSON = "PERSON"; // Someone in real life
+    public static readonly string TYPE_SERIES = "SERIES";
+    public static readonly string TYPE_TRACK = "TRACK";
+    public static readonly string TYPE_ALBUM = "ALBUM";
+    public static readonly string TYPE_COMPANY = "COMPANY";
+    public static readonly string TYPE_NETWORK = "NETWORK";
 
     /// <summary>
     /// Media item aspect id of the relationship aspect.
     /// </summary>
-    public static readonly Guid ASPECT_ID = new Guid("4C43FFDC-8A43-42F0-A6EF-3A0ECA46F9AA");
+    public static readonly Guid ASPECT_ID = new Guid("242A6B8D-D75B-4C28-BDF8-4ED1BAD08038");
 
     /// <summary>
     /// Source of the identifier
     /// </summary>
     public static readonly MediaItemAspectMetadata.MultipleAttributeSpecification ATTR_SOURCE =
-        MediaItemAspectMetadata.CreateMultipleStringAttributeSpecification("Source", 100, Cardinality.Inline, false);
+        MediaItemAspectMetadata.CreateMultipleStringAttributeSpecification("Source", 100, Cardinality.Inline, true);
 
     /// <summary>
     /// The type of identifier
     /// </summary>
     public static readonly MediaItemAspectMetadata.MultipleAttributeSpecification ATTR_TYPE =
-        MediaItemAspectMetadata.CreateMultipleStringAttributeSpecification("Type", 100, Cardinality.Inline, false);
+        MediaItemAspectMetadata.CreateMultipleStringAttributeSpecification("Type", 100, Cardinality.Inline, true);
 
     /// <summary>
     /// Source type's unique id

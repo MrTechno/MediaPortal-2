@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -28,6 +28,8 @@ using System.Linq;
 using MediaPortal.Common;
 using MediaPortal.Common.Logging;
 using MediaPortal.Common.MediaManagement;
+using MediaPortal.Common.MediaManagement.MLQueries;
+using MediaPortal.Common.MediaManagement.DefaultItemAspects;
 
 namespace MediaPortal.Mock
 {
@@ -37,33 +39,37 @@ namespace MediaPortal.Mock
     public Guid[] RoleAspects { get; set; }
     public Guid LinkedRole { get; set; }
     public Guid[] LinkedRoleAspects { get; set; }
+    public Guid[] MatchAspects { get; set; }
 
-    public bool TryExtractRelationships(IDictionary<Guid, IList<MediaItemAspect>> aspects, out ICollection<IDictionary<Guid, IList<MediaItemAspect>>> extractedLinkedAspects, bool forceQuickMode)
+    public bool TryExtractRelationships(IDictionary<Guid, IList<MediaItemAspect>> aspects, bool importOnly, out IList<RelationshipItem> extractedLinkedAspects)
     {
       string id;
       MockCore.ShowMediaAspects(aspects, MockCore.Library.GetManagedMediaItemAspectMetadata());
       if (MediaItemAspect.TryGetExternalAttribute(aspects, ExternalSource, ExternalType, out id) && ExternalId == id)
       {
         ServiceRegistration.Get<ILogger>().Debug("Matched {0} / {1} / {2} / {3} / {4}", Role, LinkedRole, ExternalSource, ExternalType, ExternalId);
-        extractedLinkedAspects = Data;
+        extractedLinkedAspects = new List<RelationshipItem>();
+        foreach (IDictionary<Guid, IList<MediaItemAspect>> data in Data)
+        {
+          extractedLinkedAspects.Add(new RelationshipItem(data, Guid.Empty));
+        }
         return true;
       }
       ServiceRegistration.Get<ILogger>().Debug("No match for {0} / {1} / {2} / {3} / {4}", Role, LinkedRole, ExternalSource, ExternalType, ExternalId);
 
       extractedLinkedAspects = null;
-
       return false;
     }
 
-    public bool TryMatch(IDictionary<Guid, IList<MediaItemAspect>> linkedAspects, IDictionary<Guid, IList<MediaItemAspect>> existingAspects)
+    public bool TryMatch(IDictionary<Guid, IList<MediaItemAspect>> extractedAspects, IDictionary<Guid, IList<MediaItemAspect>> existingAspects)
     {
       if (Matcher == null)
         return true;
 
-      return Matcher(linkedAspects, existingAspects);
+      return Matcher(extractedAspects, existingAspects);
     }
 
-    public bool TryGetRelationshipIndex(IDictionary<Guid, IList<MediaItemAspect>> aspects, out int index)
+    public bool TryGetRelationshipIndex(IDictionary<Guid, IList<MediaItemAspect>> aspects, IDictionary<Guid, IList<MediaItemAspect>> linkedAspects, out int index)
     {
       index = Index;
       return true;
@@ -78,6 +84,53 @@ namespace MediaPortal.Mock
     public Func<IDictionary<Guid, IList<MediaItemAspect>>, IDictionary<Guid, IList<MediaItemAspect>>, bool> Matcher { get; set; }
 
     public int Index { get; set; }
+
+    public bool BuildRelationship
+    {
+      get
+      {
+        return true;
+      }
+    }
+
+    public IFilter GetSearchFilter(IDictionary<Guid, IList<MediaItemAspect>> extractedAspects)
+    {
+      List<IFilter> searchFilters = new List<IFilter>();
+      IList<MultipleMediaItemAspect> externalAspects;
+      if (MediaItemAspect.TryGetAspects(extractedAspects, ExternalIdentifierAspect.Metadata, out externalAspects))
+      {
+        foreach (MultipleMediaItemAspect externalAspect in externalAspects)
+        {
+          string source = externalAspect.GetAttributeValue<string>(ExternalIdentifierAspect.ATTR_SOURCE);
+          string type = externalAspect.GetAttributeValue<string>(ExternalIdentifierAspect.ATTR_TYPE);
+          string id = externalAspect.GetAttributeValue<string>(ExternalIdentifierAspect.ATTR_ID);
+          if (searchFilters.Count == 0)
+          {
+            searchFilters.Add(new BooleanCombinationFilter(BooleanOperator.And, new[]
+            {
+                new RelationalFilter(ExternalIdentifierAspect.ATTR_SOURCE, RelationalOperator.EQ, source),
+                new RelationalFilter(ExternalIdentifierAspect.ATTR_TYPE, RelationalOperator.EQ, type),
+                new RelationalFilter(ExternalIdentifierAspect.ATTR_ID, RelationalOperator.EQ, id),
+              }));
+          }
+          else
+          {
+            searchFilters[0] = BooleanCombinationFilter.CombineFilters(BooleanOperator.Or, searchFilters[0],
+            new BooleanCombinationFilter(BooleanOperator.And, new[]
+            {
+                new RelationalFilter(ExternalIdentifierAspect.ATTR_SOURCE, RelationalOperator.EQ, source),
+                new RelationalFilter(ExternalIdentifierAspect.ATTR_TYPE, RelationalOperator.EQ, type),
+                new RelationalFilter(ExternalIdentifierAspect.ATTR_ID, RelationalOperator.EQ, id),
+            }));
+          }
+        }
+      }
+      return BooleanCombinationFilter.CombineFilters(BooleanOperator.Or, searchFilters.ToArray());
+    }
+
+    public void CacheExtractedItem(Guid extractedItemId, IDictionary<Guid, IList<MediaItemAspect>> extractedAspects)
+    {
+    }
   }
 
   public class MockRelationshipExtractor : IRelationshipExtractor
@@ -96,8 +149,16 @@ namespace MediaPortal.Mock
       get { return _lookups.Cast<IRelationshipRoleExtractor>().ToList(); }
     }
 
+    public IList<RelationshipHierarchy> Hierarchies
+    {
+      get
+      {
+        return null;
+      }
+    }
+
     public void AddRelationship(
-      Guid role, Guid[] roleAspectIds, Guid linkedRole, Guid[] linkedRoleAspectIds, 
+      Guid role, Guid[] roleAspectIds, Guid linkedRole, Guid[] linkedRoleAspectIds, Guid[] matchAspectIds,
       string source, string type, string id, 
       ICollection<IDictionary<Guid, IList<MediaItemAspect>>> extractedAspectData, Func<IDictionary<Guid, IList<MediaItemAspect>>, IDictionary<Guid, IList<MediaItemAspect>>, bool> matcher,
       int index)
@@ -108,6 +169,7 @@ namespace MediaPortal.Mock
         RoleAspects = roleAspectIds,
         LinkedRole = linkedRole,
         LinkedRoleAspects = linkedRoleAspectIds,
+        MatchAspects = matchAspectIds,
         ExternalSource = source,
         ExternalType = type,
         ExternalId = id,
@@ -115,6 +177,15 @@ namespace MediaPortal.Mock
         Data = extractedAspectData,
         Index = index,
       });
+    }
+
+    public IDictionary<IFilter, uint> GetLastChangedItemsFilters()
+    {
+      return null;
+    }
+
+    public void ResetLastChangedItems()
+    {
     }
   }
 }

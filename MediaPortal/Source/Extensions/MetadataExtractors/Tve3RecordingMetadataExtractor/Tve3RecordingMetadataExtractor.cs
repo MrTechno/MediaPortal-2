@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -47,12 +47,12 @@ namespace MediaPortal.Extensions.MetadataExtractors
     /// <summary>
     /// GUID string for the Tve3 Recording metadata extractor.
     /// </summary>
-    private const string METADATAEXTRACTOR_ID_STR = "53033EC6-52BB-4032-A822-2573C66D0ACE";
+    private const string TVE_SERIES_METADATAEXTRACTOR_ID_STR = "53033EC6-52BB-4032-A822-2573C66D0ACE";
 
     /// <summary>
     /// Tve3 metadata extractor GUID.
     /// </summary>
-    public new static Guid METADATAEXTRACTOR_ID = new Guid(METADATAEXTRACTOR_ID_STR);
+    public new static Guid METADATAEXTRACTOR_ID = new Guid(TVE_SERIES_METADATAEXTRACTOR_ID_STR);
 
     protected static IList<MediaCategory> SERIES_MEDIA_CATEGORIES = new List<MediaCategory>();
 
@@ -68,15 +68,23 @@ namespace MediaPortal.Extensions.MetadataExtractors
     public Tve3RecordingSeriesMetadataExtractor()
     {
       _metadata = new MetadataExtractorMetadata(METADATAEXTRACTOR_ID, "TVEngine3 recordings series metadata extractor", MetadataExtractorPriority.Extended, false,
-        SERIES_MEDIA_CATEGORIES, new[] { SeriesAspect.Metadata });
+        SERIES_MEDIA_CATEGORIES, new[]
+        {
+          MediaAspect.Metadata,
+          VideoAspect.Metadata,
+          EpisodeAspect.Metadata,
+        });
     }
 
-    public override bool TryExtractMetadata(IResourceAccessor mediaItemAccessor, IDictionary<Guid, IList<MediaItemAspect>> extractedAspectData, bool forceQuickMode)
+    public override bool TryExtractMetadata(IResourceAccessor mediaItemAccessor, IDictionary<Guid, IList<MediaItemAspect>> extractedAspectData, bool importOnly)
     {
       try
       {
         IResourceAccessor metaFileAccessor;
-        if (!CanExtract(mediaItemAccessor, extractedAspectData, out metaFileAccessor)) return false;
+        if (!CanExtract(mediaItemAccessor, extractedAspectData, out metaFileAccessor))
+          return false;
+        if (extractedAspectData.ContainsKey(EpisodeAspect.ASPECT_ID))
+          return false;
 
         Tags tags;
         using (metaFileAccessor)
@@ -85,16 +93,15 @@ namespace MediaPortal.Extensions.MetadataExtractors
             tags = (Tags)GetTagsXmlSerializer().Deserialize(metaStream);
         }
 
-        // Handle episode information
-        EpisodeInfo episodeInfo = GetEpisodeFromTags(tags);
-        if (episodeInfo.IsCompleteMatch)
+        // Handle series information
+        EpisodeInfo episodeInfo = GetSeriesFromTags(tags);
+        if (episodeInfo.IsBaseInfoPresent)
         {
-          if (!forceQuickMode)
-            SeriesTvDbMatcher.Instance.FindAndUpdateSeries(episodeInfo);
-
-          episodeInfo.SetMetadata(extractedAspectData);
+          OnlineMatcherService.Instance.FindAndUpdateEpisode(episodeInfo, importOnly);
+          if (episodeInfo.IsBaseInfoPresent)
+            episodeInfo.SetMetadata(extractedAspectData);
         }
-        return true;
+        return episodeInfo.IsBaseInfoPresent;
       }
       catch (Exception e)
       {
@@ -140,7 +147,7 @@ namespace MediaPortal.Extensions.MetadataExtractors
     /// <summary>
     /// GUID string for the Tve3Recording metadata extractor.
     /// </summary>
-    private const string METADATAEXTRACTOR_ID_STR = "C7080745-8EAE-459E-8A9A-25D87DF8565F";
+    public const string METADATAEXTRACTOR_ID_STR = "C7080745-8EAE-459E-8A9A-25D87DF8565F";
 
     /// <summary>
     /// Tve3 metadata extractor GUID.
@@ -175,6 +182,7 @@ namespace MediaPortal.Extensions.MetadataExtractors
 
     static Tve3RecordingMetadataExtractor()
     {
+      MEDIA_CATEGORIES.Add(DefaultMediaCategories.Audio);
       MEDIA_CATEGORIES.Add(DefaultMediaCategories.Video);
 
       // All non-default media item aspects must be registered
@@ -185,12 +193,11 @@ namespace MediaPortal.Extensions.MetadataExtractors
     public Tve3RecordingMetadataExtractor()
     {
       _metadata = new MetadataExtractorMetadata(METADATAEXTRACTOR_ID, "TVEngine3 recordings metadata extractor", MetadataExtractorPriority.Extended, false,
-          MEDIA_CATEGORIES, new[]
+          MEDIA_CATEGORIES, new MediaItemAspectMetadata[]
               {
                 MediaAspect.Metadata,
                 VideoAspect.Metadata,
                 RecordingAspect.Metadata,
-                EpisodeAspect.Metadata
               });
     }
 
@@ -201,17 +208,17 @@ namespace MediaPortal.Extensions.MetadataExtractors
       return _xmlSerializer ?? (_xmlSerializer = new XmlSerializer(typeof(Tags)));
     }
 
-    public EpisodeInfo GetEpisodeFromTags(Tags extractedTags)
+    public EpisodeInfo GetSeriesFromTags(Tags extractedTags)
     {
       EpisodeInfo episodeInfo = new EpisodeInfo();
       string tmpString;
       int tmpInt;
 
       if (TryGet(extractedTags, TAG_TITLE, out tmpString))
-        episodeInfo.Series = tmpString;
+        episodeInfo.SeriesName = tmpString;
 
       if (TryGet(extractedTags, TAG_EPISODENAME, out tmpString))
-        episodeInfo.Episode = tmpString;
+        episodeInfo.EpisodeName = tmpString;
 
       if (TryGet(extractedTags, TAG_SERIESNUM, out tmpString) && int.TryParse(tmpString, out tmpInt))
         episodeInfo.SeasonNumber = tmpInt;
@@ -222,6 +229,14 @@ namespace MediaPortal.Extensions.MetadataExtractors
         if (int.TryParse(tmpString, out episodeNum))
           episodeInfo.EpisodeNumbers.Add(episodeNum);
       }
+
+      if (TryGet(extractedTags, TAG_GENRE, out tmpString))
+      {
+        episodeInfo.Genres = new List<GenreInfo>(new GenreInfo[] { new GenreInfo { Name = tmpString } });
+        OnlineMatcherService.Instance.AssignMissingSeriesGenreIds(episodeInfo.Genres);
+      }
+
+      episodeInfo.HasChanged = true;
       return episodeInfo;
     }
 
@@ -243,12 +258,15 @@ namespace MediaPortal.Extensions.MetadataExtractors
       get { return _metadata; }
     }
 
-    public virtual bool TryExtractMetadata(IResourceAccessor mediaItemAccessor, IDictionary<Guid, IList<MediaItemAspect>> extractedAspectData, bool forceQuickMode)
+    public virtual bool TryExtractMetadata(IResourceAccessor mediaItemAccessor, IDictionary<Guid, IList<MediaItemAspect>> extractedAspectData, bool importOnly)
     {
       try
       {
         IResourceAccessor metaFileAccessor;
-        if (!CanExtract(mediaItemAccessor, extractedAspectData, out metaFileAccessor)) return false;
+        if (!CanExtract(mediaItemAccessor, extractedAspectData, out metaFileAccessor))
+          return false;
+        if (extractedAspectData.ContainsKey(RecordingAspect.ASPECT_ID))
+          return false;
 
         Tags tags;
         using (metaFileAccessor)
@@ -257,12 +275,24 @@ namespace MediaPortal.Extensions.MetadataExtractors
             tags = (Tags)GetTagsXmlSerializer().Deserialize(metaStream);
         }
 
+        MediaItemAspect.SetAttribute(extractedAspectData, MediaAspect.ATTR_ISVIRTUAL, false);
+        MediaItemAspect.SetAttribute(extractedAspectData, VideoAspect.ATTR_ISDVD, false);
+
         string value;
         if (TryGet(tags, TAG_TITLE, out value) && !string.IsNullOrEmpty(value))
+        {
           MediaItemAspect.SetAttribute(extractedAspectData, MediaAspect.ATTR_TITLE, value);
+          MediaItemAspect.SetAttribute(extractedAspectData, MediaAspect.ATTR_SORT_TITLE, BaseInfo.GetSortTitle(value));
+        }
 
         if (TryGet(tags, TAG_GENRE, out value))
-          MediaItemAspect.SetCollectionAttribute(extractedAspectData, VideoAspect.ATTR_GENRES, new List<String> { value });
+        {
+          List<GenreInfo> genreList = new List<GenreInfo>(new GenreInfo[] { new GenreInfo { Name = value } });
+          OnlineMatcherService.Instance.AssignMissingMovieGenreIds(genreList);
+          MultipleMediaItemAspect genreAspect = MediaItemAspect.CreateAspect(extractedAspectData, GenreAspect.Metadata);
+          genreAspect.SetAttribute(GenreAspect.ATTR_ID, genreList[0].Id);
+          genreAspect.SetAttribute(GenreAspect.ATTR_GENRE, genreList[0].Name);
+        }
 
         if (TryGet(tags, TAG_PLOT, out value))
         {

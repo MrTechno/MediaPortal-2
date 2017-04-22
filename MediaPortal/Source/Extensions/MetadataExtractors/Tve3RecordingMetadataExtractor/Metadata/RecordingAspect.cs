@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -24,20 +24,19 @@
 
 using System;
 using MediaPortal.Common.MediaManagement;
-using MediaPortal.Common.MediaManagement.DefaultItemAspects;
 
 namespace MediaPortal.Extensions.MetadataExtractors.Aspects
 {
   /// <summary>
   /// Contains the metadata specification of the "Recording" media item aspect which is assigned to all recording media items.
-  /// Recordings here are meant as TV video recordings, so common video related metadata are available in <seealso cref="VideoAspect"/>.
+  /// Recordings here are meant as TV video recordings, so common video related metadata are available in <seealso cref="VideoStreamAspect"/>.
   /// </summary>
   public class RecordingAspect
   {
     /// <summary>
     /// Media item aspect id of the recording aspect.
     /// </summary>
-    public static readonly Guid ASPECT_ID = new Guid("C389F655-ED60-4271-91EA-EC589BD815C6");
+    public static readonly Guid ASPECT_ID = new Guid("8DB70262-0DCE-4C80-AD03-FB1CDF7E1913");
 
     /// <summary>
     /// Channel name where the program was recorded.

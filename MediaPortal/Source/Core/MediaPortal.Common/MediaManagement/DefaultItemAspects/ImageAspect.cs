@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -42,7 +42,7 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
     /// <summary>
     /// Media item aspect id of the image aspect.
     /// </summary>
-    public static readonly Guid ASPECT_ID = new Guid("2E6C3C20-0B0B-4EE3-8A0C-550C6791EAD0");
+    public static readonly Guid ASPECT_ID = new Guid("A3A42A4C-3365-4A85-AE3E-0438D67FF52F");
 
     /// <summary>
     /// Width of the image in pixels.
@@ -127,19 +127,19 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
     /// Contains the city.
     /// </summary>
     public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_CITY =
-      MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("City", 100, Cardinality.Inline, false);
+      MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("City", 100, Cardinality.Inline, true);
 
     /// <summary>
     /// Contains the state.
     /// </summary>
     public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_STATE =
-      MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("State", 100, Cardinality.Inline, false);
+      MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("State", 100, Cardinality.Inline, true);
 
     /// <summary>
     /// Contains the country.
     /// </summary>
     public static readonly MediaItemAspectMetadata.SingleAttributeSpecification ATTR_COUNTRY =
-      MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("Country", 100, Cardinality.Inline, false);
+      MediaItemAspectMetadata.CreateSingleStringAttributeSpecification("Country", 100, Cardinality.Inline, true);
 
     public static readonly SingleMediaItemAspectMetadata Metadata = new SingleMediaItemAspectMetadata(
       // TODO: Localize name
@@ -162,6 +162,8 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
         ATTR_STATE,
         ATTR_COUNTRY
       });
+
+    public static readonly Guid ROLE_IMAGE = new Guid("EEE7B780-EDB0-434F-9624-F07446D5B63E");
 
     /// <summary>
     /// Translates the EXIF orientation info to a rotation. The value should be used to apply a rotation

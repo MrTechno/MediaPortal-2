@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -38,9 +38,10 @@ using MediaPortal.Common.ResourceAccess;
 using MediaPortal.Common.Services.Logging;
 using MediaPortal.Common.Services.PathManager;
 using MediaPortal.Extensions.MetadataExtractors;
-using MediaPortal.Extensions.OnlineLibraries;
-using MediaPortal.Extensions.OnlineLibraries.Libraries.TvdbLib.Data;
+using MediaPortal.Mock;
 using MediaPortal.Utilities;
+using System.Threading;
+using MediaPortal.Extensions.OnlineLibraries.Matchers;
 
 namespace Test.OnlineLibraries
 {
@@ -77,7 +78,7 @@ namespace Test.OnlineLibraries
       }
     }
 
-    private static void TestMusicBrainz(string title, string artist, string album, string genre, int year, int trackNum, string language)
+    private static void TestMusicBrainz(string title, string artist, string album, int year, int trackNum)
     {
       ServiceRegistration.Set<IPathManager>(new PathManager());
       ServiceRegistration.Get<IPathManager>().SetPath("DATA", "_Test/data");
@@ -90,17 +91,82 @@ namespace Test.OnlineLibraries
       matcher.Init();
 
       TrackInfo track = new TrackInfo();
-      track.Title = title;
-      track.ArtistName = artist;
-      track.AlbumName = album;
-      track.Genre = genre;
-      track.Year = year;
+      track.TrackName = title;
+      track.Artists.Add(new PersonInfo() { Name = artist });
+      track.Album = album;
+      track.ReleaseDate = new DateTime(year, 1, 1);
       track.TrackNum = trackNum;
-      if (matcher.FindAndUpdateTrack(track))
-        Console.WriteLine("Found track title={0} artist={1} album={2} genre={3} year={4} trackNum={5} language={6}:\n{7}", title, artist, album, genre, year, trackNum, language, track);
+      if (matcher.FindAndUpdateTrack(track, false))
+      {
+        Console.WriteLine("Found track title={0} artist={1} album={2} year={3} trackNum={4}:\nTitle={5} Artists={6} Album={7} Year={8} Track={9}",
+          title, artist, album, year, trackNum, track.TrackName, string.Join(", ", track.Artists), track.Album, track.ReleaseDate, track.TrackNum);
+
+        Thread.Sleep(5000); //Let fanart download
+      }
       else
       {
-        Console.WriteLine("Cannot find track title={0} artist={1} album={2} genre={3} year={4} trackNum={5} language={6}", title, artist, album, genre, year, trackNum, language);
+        Console.WriteLine("Cannot find track title={0} artist={1} album={2} year={3} trackNum={4}",
+          title, artist, album, year, trackNum);
+      }
+    }
+
+    private static void TestFreeDB(string cdDbId, string title)
+    {
+      ServiceRegistration.Set<IPathManager>(new PathManager());
+      ServiceRegistration.Get<IPathManager>().SetPath("DATA", "_Test/data");
+      ServiceRegistration.Get<IPathManager>().SetPath("LOG", "_Test/log");
+      ServiceRegistration.Get<IPathManager>().SetPath("CONFIG", "_Test/config");
+      ServiceRegistration.Set<ILogger>(new ConsoleLogger(LogLevel.All, true));
+      ServiceRegistration.Set<ILocalization>(new NoLocalization());
+
+      CDFreeDbMatcher matcher = new CDFreeDbMatcher();
+      matcher.Init();
+
+      TrackInfo track = new TrackInfo();
+      track.AlbumCdDdId = cdDbId;
+      track.TrackName = title;
+      if (matcher.FindAndUpdateTrack(track, false))
+      {
+        Console.WriteLine("Found track CDDB ID={0} title={1}:\nTitle={2} Artists={3} Album={4} Year={5} Track={6}",
+          cdDbId, title, track.TrackName, string.Join(", ", track.Artists), track.Album, track.ReleaseDate, track.TrackNum);
+
+        Thread.Sleep(5000); //Let fanart download
+      }
+      else
+      {
+        Console.WriteLine("Cannot find track CDDB ID={0} title={1}", cdDbId, title);
+      }
+    }
+
+    private static void TestAudioDB(string title, string artist, string album, int year, int trackNum)
+    {
+      ServiceRegistration.Set<IPathManager>(new PathManager());
+      ServiceRegistration.Get<IPathManager>().SetPath("DATA", "_Test/data");
+      ServiceRegistration.Get<IPathManager>().SetPath("LOG", "_Test/log");
+      ServiceRegistration.Get<IPathManager>().SetPath("CONFIG", "_Test/config");
+      ServiceRegistration.Set<ILogger>(new ConsoleLogger(LogLevel.All, true));
+      ServiceRegistration.Set<ILocalization>(new NoLocalization());
+
+      MusicTheAudioDbMatcher matcher = new MusicTheAudioDbMatcher();
+      matcher.Init();
+
+      TrackInfo track = new TrackInfo();
+      track.TrackName = title;
+      track.Artists.Add(new PersonInfo() { Name = artist });
+      track.Album = album;
+      track.ReleaseDate = new DateTime(year, 1, 1);
+      track.TrackNum = trackNum;
+      if (matcher.FindAndUpdateTrack(track, false))
+      {
+        Console.WriteLine("Found track title={0} artist={1} album={2} year={3} trackNum={4}:\nTitle={5} Artists={6} Album={7} Year={8} Track={9}",
+          title, artist, album, year, trackNum, track.TrackName, string.Join(", ", track.Artists), track.Album, track.ReleaseDate, track.TrackNum);
+
+        Thread.Sleep(5000); //Let fanart download
+      }
+      else
+      {
+        Console.WriteLine("Cannot find track title={0} artist={1} album={2} year={3} trackNum={4}",
+          title, artist, album, year, trackNum);
       }
     }
 
@@ -116,7 +182,7 @@ namespace Test.OnlineLibraries
       ServiceRegistration.Set<ILogger>(new ConsoleLogger(LogLevel.All, true));
 
       ServiceRegistration.Set<IMediaAccessor>(new TestMediaAccessor());
-      ServiceRegistration.Set<IMediaItemAspectTypeRegistration>(new TestMediaItemAspectTypeRegistration());
+      ServiceRegistration.Set<IMediaItemAspectTypeRegistration>(new MockMediaItemAspectTypeRegistration());
 
       ApplicationCore.RegisterDefaultMediaItemAspectTypes();
 
@@ -144,7 +210,7 @@ namespace Test.OnlineLibraries
       ShowMIAs(aspects, registration);
 
       IMetadataExtractor extractor = new Tve3RecordingMetadataExtractor();
-      IResourceAccessor accessor = new TestLocalFsResourceAccessor(ProviderPathHelper.ChangeExtension(filename, ".ts"));
+      IResourceAccessor accessor = new MockLocalFsResourceAccessor(ProviderPathHelper.ChangeExtension(filename, ".ts"));
       extractor.TryExtractMetadata(accessor, aspects, false);
 
       Console.WriteLine("After extract:");
@@ -153,13 +219,12 @@ namespace Test.OnlineLibraries
       string value;
       if (MediaItemAspect.TryGetExternalAttribute(aspects, ExternalIdentifierAspect.SOURCE_TVDB, ExternalIdentifierAspect.TYPE_SERIES, out value))
       {
-        TvdbSeries seriesDetail;
-        SeriesTvDbMatcher.Instance.TryGetSeries(Int32.Parse(value), out seriesDetail);
-        Console.WriteLine("{0}: {1}", seriesDetail.SeriesName, seriesDetail.Overview);
-        foreach (TvdbEpisode episode in seriesDetail.Episodes)
+        SeriesInfo seriesInfo = new SeriesInfo()
         {
-          Console.WriteLine("S{0}E{1}({2}): {3}", episode.SeasonNumber, episode.EpisodeNumber, episode.SeasonId, episode.EpisodeName);
-        }
+          TvdbId = Int32.Parse(value)
+        };
+        SeriesTvDbMatcher.Instance.UpdateSeries(seriesInfo, false, false);
+        Console.WriteLine("{0}: {1}", seriesInfo.SeriesName, seriesInfo.Description);
       }
 
       SeriesTvDbMatcher.Instance.EndDownloads();
@@ -167,7 +232,9 @@ namespace Test.OnlineLibraries
 
     static void Usage()
     {
-      Console.WriteLine("Usage: Test.OnlineLibraries musicbrainz <title> <artist> <album> <genre> <year> <track #>");
+      Console.WriteLine("Usage: Test.OnlineLibraries musicbrainz <title> <artist> <album> <year> <track #>");
+      Console.WriteLine("Usage: Test.OnlineLibraries audiodb <title> <artist> <album> <year> <track #>");
+      Console.WriteLine("Usage: Test.OnlineLibraries freedb <CDDB ID> <title>");
       Console.WriteLine("Usage:                      recording <TVE XML file>");
       Environment.Exit(1);
     }
@@ -178,8 +245,14 @@ namespace Test.OnlineLibraries
       {
         if (args.Length >= 1)
         {
-          if (args[0] == "musicbrainz" && args.Length == 7)
-            TestMusicBrainz(args[1], args[2], args[3], args[4], Int32.Parse(args[5]), Int32.Parse(args[6]), "GB");
+          if (args[0] == "musicbrainz" && args.Length == 6)
+            TestMusicBrainz(args[1], args[2], args[3], Int32.Parse(args[4]), Int32.Parse(args[5]));
+
+          else if (args[0] == "audiodb" && args.Length == 6)
+            TestAudioDB(args[1], args[2], args[3], Int32.Parse(args[4]), Int32.Parse(args[5]));
+
+          else if (args[0] == "freedb" && args.Length == 3)
+            TestFreeDB(args[1], args[2]);
 
           else if (args[0] == "recording" && args.Length == 2)
             TestRecording(args[1]);

@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2007-2014 Team MediaPortal
+﻿#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2014 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -118,7 +118,7 @@ namespace Test.Common
 
       Assert.AreEqual(src.Metadata.UniqueAttributeSpecifications.Count, dest.UniqueAttributeSpecifications.Count, "Attribute unique spec count");
 
-      AssertMultipleMIAMSpec(src.Metadata.UniqueAttributeSpecifications, dest.UniqueAttributeSpecifications, src.ATTR_ID);
+      AssertMultipleMIAMSpec(src.Metadata.UniqueAttributeSpecifications.Values, dest.UniqueAttributeSpecifications.Values, src.ATTR_ID);
     }
   }
 }

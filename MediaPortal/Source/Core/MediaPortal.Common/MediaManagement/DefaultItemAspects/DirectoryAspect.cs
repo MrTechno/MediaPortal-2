@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -35,7 +35,7 @@ namespace MediaPortal.Common.MediaManagement.DefaultItemAspects
     /// <summary>
     /// Media item aspect id of the directory aspect.
     /// </summary>
-    public static readonly Guid ASPECT_ID = new Guid("1EEEF2D0-D52F-40f7-A12A-9908C2DAED1A");
+    public static readonly Guid ASPECT_ID = new Guid("1CECB026-2204-4432-8408-706414C44DBA");
 
     public static readonly SingleMediaItemAspectMetadata Metadata = new SingleMediaItemAspectMetadata(
         // TODO: Localize name

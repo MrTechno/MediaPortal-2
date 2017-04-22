@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -43,6 +43,18 @@ namespace MediaPortal.Mock
       if (_locallyKnownMediaItemAspectTypes.ContainsKey(miaType.AspectId))
         return;
       _locallyKnownMediaItemAspectTypes.Add(miaType.AspectId, miaType);
+    }
+
+    public void RegisterLocallyKnownMediaItemAspectType(MediaItemAspectMetadata miaType, MediaItemAspectMetadata.AttributeSpecification[] fkSpecs, MediaItemAspectMetadata refType, MediaItemAspectMetadata.AttributeSpecification[] refSpecs)
+    {
+    }
+
+    public void RegisterMediaItemAspectRoleHierarchy(Guid role, Guid parentRole)
+    {
+    }
+
+    public void RegisterMediaItemAspectRoleHierarchyChildCountAttribute(Guid childRole, Guid parentRole, MediaItemAspectMetadata parentMiaType, MediaItemAspectMetadata.AttributeSpecification childCountAttribute, bool includeVirtual)
+    {
     }
   }
 }

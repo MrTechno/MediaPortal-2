@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -24,6 +24,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using MediaPortal.Common.General;
 using MediaPortal.Common.MediaManagement;
 using MediaPortal.Common.MediaManagement.DefaultItemAspects;
@@ -47,11 +48,10 @@ public static readonly ICollection<string> EMPTY_STRING_COLLECTION = new List<st
 
 protected AbstractProperty _seriesNameProperty;
 protected AbstractProperty _seasonProperty;
-protected AbstractProperty _seriesSeasonNameProperty;
+protected AbstractProperty _seasonNameProperty;
 protected AbstractProperty _episodeProperty;
 protected AbstractProperty _dvdEpisodeProperty;
 protected AbstractProperty _episodeNameProperty;
-protected AbstractProperty _firstAiredProperty;
 protected AbstractProperty _totalRatingProperty;
 protected AbstractProperty _ratingCountProperty;
 protected AbstractProperty _mediaItemProperty;
@@ -82,15 +82,15 @@ public int? Season
   set { _seasonProperty.SetValue(value); }
 }
 
-public AbstractProperty SeriesSeasonNameProperty
+public AbstractProperty SeasonNameProperty
 {
-  get{ return _seriesSeasonNameProperty; }
+  get{ return _seasonNameProperty; }
 }
 
-public string SeriesSeasonName
+public string SeasonName
 {
-  get { return (string) _seriesSeasonNameProperty.GetValue(); }
-  set { _seriesSeasonNameProperty.SetValue(value); }
+  get { return (string) _seasonNameProperty.GetValue(); }
+  set { _seasonNameProperty.SetValue(value); }
 }
 
 public AbstractProperty EpisodeProperty
@@ -124,17 +124,6 @@ public string EpisodeName
 {
   get { return (string) _episodeNameProperty.GetValue(); }
   set { _episodeNameProperty.SetValue(value); }
-}
-
-public AbstractProperty FirstAiredProperty
-{
-  get{ return _firstAiredProperty; }
-}
-
-public DateTime? FirstAired
-{
-  get { return (DateTime?) _firstAiredProperty.GetValue(); }
-  set { _firstAiredProperty.SetValue(value); }
 }
 
 public AbstractProperty TotalRatingProperty
@@ -178,11 +167,10 @@ public EpisodeAspectWrapper()
 {
   _seriesNameProperty = new SProperty(typeof(string));
   _seasonProperty = new SProperty(typeof(int?));
-  _seriesSeasonNameProperty = new SProperty(typeof(string));
+  _seasonNameProperty = new SProperty(typeof(string));
   _episodeProperty = new SProperty(typeof(IEnumerable<int>));
   _dvdEpisodeProperty = new SProperty(typeof(IEnumerable<double>));
   _episodeNameProperty = new SProperty(typeof(string));
-  _firstAiredProperty = new SProperty(typeof(DateTime?));
   _totalRatingProperty = new SProperty(typeof(double?));
   _ratingCountProperty = new SProperty(typeof(int?));
   _mediaItemProperty = new SProperty(typeof(MediaItem));
@@ -207,30 +195,30 @@ public void Init(MediaItem mediaItem)
      return;
   }
 
-  SeriesName = (string) aspect[EpisodeAspect.ATTR_SERIESNAME];
+  SeriesName = (string) aspect[EpisodeAspect.ATTR_SERIES_NAME];
   Season = (int?) aspect[EpisodeAspect.ATTR_SEASON];
-  SeriesSeasonName = (string) aspect[EpisodeAspect.ATTR_SERIES_SEASON];
+  SeasonName = (string) aspect[EpisodeAspect.ATTR_SERIES_SEASON];
   Episode = (IEnumerable<int>) aspect[EpisodeAspect.ATTR_EPISODE];
   DvdEpisode = (IEnumerable<double>) aspect[EpisodeAspect.ATTR_DVDEPISODE];
-  EpisodeName = (string) aspect[EpisodeAspect.ATTR_EPISODENAME];
-  FirstAired = (DateTime?) aspect[EpisodeAspect.ATTR_FIRSTAIRED];
+  EpisodeName = (string) aspect[EpisodeAspect.ATTR_EPISODE_NAME];
   TotalRating = (double?) aspect[EpisodeAspect.ATTR_TOTAL_RATING];
   RatingCount = (int?) aspect[EpisodeAspect.ATTR_RATING_COUNT];
+  // Sorting
+  Episode = Episode?.OrderBy(e => e);
+  DvdEpisode = DvdEpisode?.OrderBy(e => e);
 }
 
 public void SetEmpty()
 {
   SeriesName = null;
   Season = null;
-  SeriesSeasonName = null;
+  SeasonName = null;
   Episode = new List<Int32>();
   DvdEpisode = new List<Double>();
   EpisodeName = null;
-  FirstAired = null;
   TotalRating = null;
   RatingCount = null;
 }
-
 
 #endregion
 

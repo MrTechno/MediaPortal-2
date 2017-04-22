@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -36,8 +36,7 @@ namespace MediaPortal.Plugins.SlimTv.Client.TvHandler
       {
           ProviderResourceAspect.ASPECT_ID,
           MediaAspect.ASPECT_ID,
-          VideoAspect.ASPECT_ID,
-          new Guid("C389F655-ED60-4271-91EA-EC589BD815C6") /* RecordingAspect.ASPECT_ID*/
+          new Guid("8DB70262-0DCE-4C80-AD03-FB1CDF7E1913") /* RecordingAspect.ASPECT_ID*/
       };
 
     public const string KEY_CHANNEL = "Channel";
@@ -46,12 +45,15 @@ namespace MediaPortal.Plugins.SlimTv.Client.TvHandler
 
     public const string SCREEN_RECORDINGS_FILTER_BY_CHANNEL = "RecordingsByChannel";
     public const string SCREEN_RECORDINGS_FILTER_BY_NAME = "RecordingsByName";
+    public const string SCREEN_RECORDINGS_SHOW_ITEMS = "RecordingsShowItems";
 
     public const string RES_FILTER_BY_CHANNEL_MENU_ITEM = "[SlimTvClient.ChannelMenuItemLabel]";
     public const string RES_FILTER_BY_NAME_MENU_ITEM = "[SlimTvClient.NameFilterMenuItemLabel]";
+    public const string RES_SHOW_ALL_RECORDINGS_ITEMS_MENU_ITEM = "[SlimTvClient.ShowAllRecordingsItemsMenuItem]";
 
     public const string RES_FILTER_CHANNEL_NAVBAR_DISPLAY_LABEL = "[SlimTvClient.ChannelNavBarItemLabel]";
     public const string RES_FILTER_NAME_NAVBAR_DISPLAY_LABEL = "[SlimTvClient.NameFilterNavBarItemLabel]";
+    public const string RES_FILTER_RECORDINGS_ITEMS_NAVBAR_DISPLAY_LABEL = "[SlimTvClient.FilterRecordingsItemsNavbarDisplayLabel]";
 
     public const string RES_RECORDINGS_VIEW_NAME = "[SlimTvClient.RecordingsRootViewName]";
   }

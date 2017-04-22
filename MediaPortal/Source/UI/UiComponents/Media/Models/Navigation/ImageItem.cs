@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -26,6 +26,7 @@ using MediaPortal.Common.MediaManagement;
 using MediaPortal.Common.MediaManagement.DefaultItemAspects;
 using MediaPortal.Common.ResourceAccess;
 using MediaPortal.UiComponents.Media.General;
+using System.Collections.Generic;
 
 namespace MediaPortal.UiComponents.Media.Models.Navigation
 {
@@ -52,16 +53,16 @@ namespace MediaPortal.UiComponents.Media.Models.Navigation
           Size = width + " x " + height;
         }
       }
-      SingleMediaItemAspect resourceAspect;
-      if (MediaItemAspect.TryGetAspect(mediaItem.Aspects, ProviderResourceAspect.Metadata, out resourceAspect))
+      IList<MultipleMediaItemAspect> resourceAspects;
+      if (MediaItemAspect.TryGetAspects(mediaItem.Aspects, ProviderResourceAspect.Metadata, out resourceAspects))
       {
-        ResourcePath rp = ResourcePath.Deserialize((string)resourceAspect[ProviderResourceAspect.ATTR_RESOURCE_ACCESSOR_PATH]);
+        ResourcePath rp = ResourcePath.Deserialize((string)resourceAspects[0][ProviderResourceAspect.ATTR_RESOURCE_ACCESSOR_PATH]);
         string ext = ProviderPathHelper.GetExtension(rp.FileName);
         if (ext.Length > 1)
           // remove leading '.'
           ext = ext.Substring(1);
         Extension = ext;
-        MimeType = (string)resourceAspect[ProviderResourceAspect.ATTR_MIME_TYPE];
+        MimeType = (string)resourceAspects[0][ProviderResourceAspect.ATTR_MIME_TYPE];
       }
       FireChange();
     }

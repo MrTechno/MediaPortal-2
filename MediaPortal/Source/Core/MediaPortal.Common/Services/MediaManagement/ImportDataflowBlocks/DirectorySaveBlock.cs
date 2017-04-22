@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -49,6 +49,7 @@ namespace MediaPortal.Common.Services.MediaManagement.ImportDataflowBlocks
     #region Variables
 
     private readonly ConcurrentDictionary<ResourcePath, Guid> _parentDirectoryIds = new ConcurrentDictionary<ResourcePath, Guid>();
+    private readonly CancellationToken _ct;
 
     #endregion
 
@@ -67,6 +68,7 @@ namespace MediaPortal.Common.Services.MediaManagement.ImportDataflowBlocks
       new ExecutionDataflowBlockOptions { CancellationToken = ct },
       BLOCK_NAME, true, parentImportJobController)
     {
+      _ct = ct;
     }
 
     #endregion
@@ -203,20 +205,27 @@ namespace MediaPortal.Common.Services.MediaManagement.ImportDataflowBlocks
     /// <returns></returns>
     private async Task<Guid> AddDirectory(IFileSystemResourceAccessor directoryAccessor, Guid parentDirectoryId)
     {
-      var directoryPath = directoryAccessor.CanonicalLocalResourcePath;
-      var mediaAspect = new SingleMediaItemAspect(MediaAspect.Metadata);
-      mediaAspect.SetAttribute(MediaAspect.ATTR_TITLE, directoryAccessor.ResourceName);
-      mediaAspect.SetAttribute(MediaAspect.ATTR_RECORDINGTIME, DateTime.MinValue);
-      mediaAspect.SetAttribute(MediaAspect.ATTR_RATING, 0);
-      mediaAspect.SetAttribute(MediaAspect.ATTR_COMMENT, null);
-      mediaAspect.SetAttribute(MediaAspect.ATTR_LASTPLAYED, DateTime.MinValue);
-      var directoryAspect = new SingleMediaItemAspect(DirectoryAspect.Metadata);
-      IList<MediaItemAspect> aspects = new List<MediaItemAspect>(new[]
-        {
+      var directoryMediaItem = await LoadLocalItem(directoryAccessor.CanonicalLocalResourcePath, PROVIDERRESOURCE_DIRECTORY_MIA_ID_ENUMERATION, EMPTY_MIA_ID_ENUMERATION);
+      if (directoryMediaItem == null)
+      {
+        var directoryPath = directoryAccessor.CanonicalLocalResourcePath;
+        var mediaAspect = new SingleMediaItemAspect(MediaAspect.Metadata);
+        mediaAspect.SetAttribute(MediaAspect.ATTR_TITLE, directoryAccessor.ResourceName);
+        mediaAspect.SetAttribute(MediaAspect.ATTR_SORT_TITLE, directoryAccessor.ResourceName);
+        mediaAspect.SetAttribute(MediaAspect.ATTR_ISVIRTUAL, false);
+        mediaAspect.SetAttribute(MediaAspect.ATTR_RECORDINGTIME, DateTime.MinValue);
+        mediaAspect.SetAttribute(MediaAspect.ATTR_RATING, 0);
+        mediaAspect.SetAttribute(MediaAspect.ATTR_COMMENT, null);
+        mediaAspect.SetAttribute(MediaAspect.ATTR_LASTPLAYED, DateTime.MinValue);
+        var directoryAspect = new SingleMediaItemAspect(DirectoryAspect.Metadata);
+        IList<MediaItemAspect> aspects = new List<MediaItemAspect>(new[]
+          {
             mediaAspect,
             directoryAspect
         });
-      return await UpdateMediaItem(parentDirectoryId, directoryPath, aspects);
+        return await UpdateMediaItem(parentDirectoryId, directoryPath, aspects, ImportJobInformation, false, _ct);
+      }
+      return directoryMediaItem.MediaItemId;
     }
 
     #endregion

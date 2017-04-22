@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -35,10 +35,6 @@ namespace MediaPortal.Plugins.SlimTv.Providers.Items
     public int ChannelGroupId { get; set; }
 
     public string Name { get; set; }
-
-    public MediaType MediaType { get; set; }
-
-    public int SortOrder { get; set; }
 
     #endregion
   }

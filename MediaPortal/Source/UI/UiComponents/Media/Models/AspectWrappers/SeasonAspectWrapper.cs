@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -47,11 +47,9 @@ public static readonly ICollection<string> EMPTY_STRING_COLLECTION = new List<st
 
 protected AbstractProperty _seriesNameProperty;
 protected AbstractProperty _seasonProperty;
-protected AbstractProperty _seriesSeasonNameProperty;
 protected AbstractProperty _descriptionProperty;
-protected AbstractProperty _firstAiredProperty;
-protected AbstractProperty _totalRatingProperty;
-protected AbstractProperty _ratingCountProperty;
+protected AbstractProperty _availEpisodesProperty;
+protected AbstractProperty _numEpisodesProperty;
 protected AbstractProperty _mediaItemProperty;
 
 #endregion
@@ -80,17 +78,6 @@ public int? Season
   set { _seasonProperty.SetValue(value); }
 }
 
-public AbstractProperty SeriesSeasonNameProperty
-{
-  get{ return _seriesSeasonNameProperty; }
-}
-
-public string SeriesSeasonName
-{
-  get { return (string) _seriesSeasonNameProperty.GetValue(); }
-  set { _seriesSeasonNameProperty.SetValue(value); }
-}
-
 public AbstractProperty DescriptionProperty
 {
   get{ return _descriptionProperty; }
@@ -102,37 +89,26 @@ public string Description
   set { _descriptionProperty.SetValue(value); }
 }
 
-public AbstractProperty FirstAiredProperty
+public AbstractProperty AvailEpisodesProperty
 {
-  get{ return _firstAiredProperty; }
+  get{ return _availEpisodesProperty; }
 }
 
-public DateTime? FirstAired
+public int? AvailEpisodes
 {
-  get { return (DateTime?) _firstAiredProperty.GetValue(); }
-  set { _firstAiredProperty.SetValue(value); }
+  get { return (int?) _availEpisodesProperty.GetValue(); }
+  set { _availEpisodesProperty.SetValue(value); }
 }
 
-public AbstractProperty TotalRatingProperty
+public AbstractProperty NumEpisodesProperty
 {
-  get{ return _totalRatingProperty; }
+  get{ return _numEpisodesProperty; }
 }
 
-public double? TotalRating
+public int? NumEpisodes
 {
-  get { return (double?) _totalRatingProperty.GetValue(); }
-  set { _totalRatingProperty.SetValue(value); }
-}
-
-public AbstractProperty RatingCountProperty
-{
-  get{ return _ratingCountProperty; }
-}
-
-public int? RatingCount
-{
-  get { return (int?) _ratingCountProperty.GetValue(); }
-  set { _ratingCountProperty.SetValue(value); }
+  get { return (int?) _numEpisodesProperty.GetValue(); }
+  set { _numEpisodesProperty.SetValue(value); }
 }
 
 public AbstractProperty MediaItemProperty
@@ -154,11 +130,9 @@ public SeasonAspectWrapper()
 {
   _seriesNameProperty = new SProperty(typeof(string));
   _seasonProperty = new SProperty(typeof(int?));
-  _seriesSeasonNameProperty = new SProperty(typeof(string));
   _descriptionProperty = new SProperty(typeof(string));
-  _firstAiredProperty = new SProperty(typeof(DateTime?));
-  _totalRatingProperty = new SProperty(typeof(double?));
-  _ratingCountProperty = new SProperty(typeof(int?));
+  _availEpisodesProperty = new SProperty(typeof(int?));
+  _numEpisodesProperty = new SProperty(typeof(int?));
   _mediaItemProperty = new SProperty(typeof(MediaItem));
   _mediaItemProperty.Attach(MediaItemChanged);
 }
@@ -181,26 +155,21 @@ public void Init(MediaItem mediaItem)
      return;
   }
 
-  SeriesName = (string) aspect[SeasonAspect.ATTR_SERIESNAME];
+  SeriesName = (string) aspect[SeasonAspect.ATTR_SERIES_NAME];
   Season = (int?) aspect[SeasonAspect.ATTR_SEASON];
-  SeriesSeasonName = (string) aspect[SeasonAspect.ATTR_SERIES_SEASON];
   Description = (string) aspect[SeasonAspect.ATTR_DESCRIPTION];
-  FirstAired = (DateTime?) aspect[SeasonAspect.ATTR_FIRSTAIRED];
-  TotalRating = (double?) aspect[SeasonAspect.ATTR_TOTAL_RATING];
-  RatingCount = (int?) aspect[SeasonAspect.ATTR_RATING_COUNT];
+  AvailEpisodes = (int?) aspect[SeasonAspect.ATTR_AVAILABLE_EPISODES];
+  NumEpisodes = (int?) aspect[SeasonAspect.ATTR_NUM_EPISODES];
 }
 
 public void SetEmpty()
 {
   SeriesName = null;
   Season = null;
-  SeriesSeasonName = null;
   Description = null;
-  FirstAired = null;
-  TotalRating = null;
-  RatingCount = null;
+  AvailEpisodes = null;
+  NumEpisodes = null;
 }
-
 
 #endregion
 

@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -22,6 +22,7 @@
 
 #endregion
 
+using System;
 using System.Collections.Generic;
 using MediaPortal.Common.MediaManagement;
 using MediaPortal.Common.MediaManagement.DefaultItemAspects;
@@ -35,9 +36,20 @@ namespace MediaPortal.UiComponents.Media.Models.Sorting
     protected IComparer<MediaItem> _videoComparer = new SortByTitle();
     protected IComparer<MediaItem> _imageComparer = new SortByTitle();
 
+    public BrowseDefaultSorting()
+    {
+      _includeMias = null;
+      _excludeMias = null;
+    }
+
     public override string DisplayName
     {
       get { return Consts.RES_SORTING_BROWSE_DEFAULT; }
+    }
+
+    public override string GroupByDisplayName
+    {
+      get { return String.Empty; }
     }
 
     public override int Compare(MediaItem x, MediaItem y)
@@ -91,6 +103,11 @@ namespace MediaPortal.UiComponents.Media.Models.Sorting
     protected int CompareDifferentTypes(MediaItemAspect aspectX, MediaItemAspect aspectY)
     {
       return aspectX != null ? 1 : -1;
+    }
+
+    public override object GetGroupByValue(MediaItem item)
+    {
+      return null;
     }
   }
 }

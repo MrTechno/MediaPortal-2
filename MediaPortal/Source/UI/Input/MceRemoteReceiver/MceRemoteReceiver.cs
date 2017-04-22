@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -52,6 +52,7 @@ namespace MediaPortal.Plugins.MceRemoteReceiver
 
     protected AsynchronousMessageQueue _messageQueue = null;
     protected IDictionary<int, Key> _mappedKeyCodes = null;
+    protected ICollection<int> _unmappedKeyCodes = new HashSet<int>();
 
     #endregion
 
@@ -248,7 +249,20 @@ namespace MediaPortal.Plugins.MceRemoteReceiver
         LogDebug("Mapped Key '{0}' to '{1}'", remoteButton, key);
       }
       else
-        LogWarn("No remote mapping found for remote button '{0}'", remoteButton);
+        LogUnmappedButtonOnce(remoteButton);
+    }
+
+    /// <summary>
+    /// Writes log message for every distinct <paramref name="remoteButton"/> which is not mapped.
+    /// This avoids writing many single lines for same button.
+    /// </summary>
+    /// <param name="remoteButton">remoteButton</param>
+    private void LogUnmappedButtonOnce(int remoteButton)
+    {
+      if (_unmappedKeyCodes.Contains(remoteButton))
+        return;
+      _unmappedKeyCodes.Add(remoteButton);
+      LogInfo("No remote mapping found for remote button '{0}'", remoteButton);
     }
 
     #endregion

@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2014 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2014 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -186,32 +186,32 @@ namespace MediaPortal.DevTools
 
     public int GetVideoCount()
     {
-      Guid[] types = new Guid[] { VideoAspect.ASPECT_ID };
+      Guid[] types = new Guid[] { VideoStreamAspect.ASPECT_ID };
       IFilter filter = new LikeFilter(MediaAspect.ATTR_TITLE, "%", null, false);
 
-      return GetContentDirectory().CountMediaItems(types, filter, true);
+      return GetContentDirectory().CountMediaItems(types, filter, true, true);
     }
 
     public int GetSeriesCount()
     {
       Guid[] types = new Guid[] { SeriesAspect.ASPECT_ID };
-      IFilter filter = new LikeFilter(SeriesAspect.ATTR_SERIESNAME, "%", null, false);
+      IFilter filter = new LikeFilter(SeriesAspect.ATTR_SERIES_NAME, "%", null, false);
 
-      return GetContentDirectory().CountMediaItems(types, filter, true);
+      return GetContentDirectory().CountMediaItems(types, filter, true, true);
     }
 
     public IList<MediaItem> SearchSeries(string text)
     {
-      Guid[] types = new Guid[] { MediaAspect.ASPECT_ID, VideoAspect.ASPECT_ID };
+      Guid[] types = new Guid[] { MediaAspect.ASPECT_ID, VideoStreamAspect.ASPECT_ID };
       IFilter titleFilter = new LikeFilter(MediaAspect.ATTR_TITLE, string.Format("%{0}%", text), null, false);
       IFilter actorsFilter = new LikeFilter(VideoAspect.ATTR_ACTORS, string.Format("%{0}%", text), null, false);
       IFilter directorsFilter = new LikeFilter(VideoAspect.ATTR_DIRECTORS, string.Format("%{0}%", text), null, false);
       IFilter writersFilter = new LikeFilter(VideoAspect.ATTR_WRITERS, string.Format("%{0}%", text), null, false);
-      IFilter episodeFilter = new LikeFilter(EpisodeAspect.ATTR_EPISODENAME, string.Format("%{0}%", text), null, false);
-      IFilter seriesFilter = new LikeFilter(EpisodeAspect.ATTR_SERIESNAME, string.Format("%{0}%", text), null, false);
+      IFilter episodeFilter = new LikeFilter(EpisodeAspect.ATTR_EPISODE_NAME, string.Format("%{0}%", text), null, false);
+      IFilter seriesFilter = new LikeFilter(EpisodeAspect.ATTR_SERIES_NAME, string.Format("%{0}%", text), null, false);
       IFilter filter = new BooleanCombinationFilter(BooleanOperator.Or, new IFilter[] { titleFilter, actorsFilter, directorsFilter, writersFilter, episodeFilter, seriesFilter });
 
-      return GetContentDirectory().Search(new MediaItemQuery(types, new Guid[] { SeriesAspect.ASPECT_ID }, filter), true);
+      return GetContentDirectory().Search(new MediaItemQuery(types, new Guid[] { SeriesAspect.ASPECT_ID }, filter), true, null, true);
     }
   }
 }

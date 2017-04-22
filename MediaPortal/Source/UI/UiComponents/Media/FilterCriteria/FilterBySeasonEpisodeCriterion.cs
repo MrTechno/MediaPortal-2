@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -32,6 +32,8 @@ using MediaPortal.Common.MediaManagement.DefaultItemAspects;
 using MediaPortal.Common.MediaManagement.MLQueries;
 using MediaPortal.Common.SystemCommunication;
 using MediaPortal.UI.ServerCommunication;
+using MediaPortal.UI.Services.UserManagement;
+using MediaPortal.UiComponents.Media.Settings;
 
 namespace MediaPortal.UiComponents.Media.FilterCriteria
 {
@@ -48,18 +50,23 @@ namespace MediaPortal.UiComponents.Media.FilterCriteria
       if (cd == null)
         throw new NotConnectedException("The MediaLibrary is not connected");
 
+      Guid? userProfile = null;
+      IUserManagement userProfileDataManagement = ServiceRegistration.Get<IUserManagement>();
+      if (userProfileDataManagement != null && userProfileDataManagement.IsValidUser)
+        userProfile = userProfileDataManagement.CurrentUser.ProfileId;
+
       IEnumerable<Guid> mias = new[] { MediaAspect.ASPECT_ID, ProviderResourceAspect.ASPECT_ID, EpisodeAspect.ASPECT_ID }.Concat(necessaryMIATypeIds);
       MediaItemQuery query = new MediaItemQuery(mias, filter)
       {
         SortInformation = new List<SortInformation> { new SortInformation(EpisodeAspect.ATTR_EPISODE, SortDirection.Ascending) }
       };
-      var items = cd.Search(query, true);
+      var items = cd.Search(query, true, userProfile, ShowVirtualSetting.ShowVirtualMedia(necessaryMIATypeIds));
       IList<FilterValue> result = new List<FilterValue>(items.Count);
       foreach (var item in items)
       {
         string title;
         MediaItemAspect.TryGetAttribute(item.Aspects, MediaAspect.ATTR_TITLE, out title);
-		// TODO: Now what? There's no values for an episode
+        // TODO: Now what? There's no values for an episode
         result.Add(new FilterValue(title,
           null,
           null,

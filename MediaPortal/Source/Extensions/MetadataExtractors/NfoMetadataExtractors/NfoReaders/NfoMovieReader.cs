@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2007-2015 Team MediaPortal
+﻿#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2014 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -24,6 +24,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -32,9 +33,13 @@ using System.Xml.Linq;
 using MediaPortal.Common.Logging;
 using MediaPortal.Common.MediaManagement;
 using MediaPortal.Common.MediaManagement.DefaultItemAspects;
+using MediaPortal.Common.MediaManagement.Helpers;
 using MediaPortal.Common.ResourceAccess;
 using MediaPortal.Extensions.MetadataExtractors.NfoMetadataExtractors.Settings;
 using MediaPortal.Extensions.MetadataExtractors.NfoMetadataExtractors.Stubs;
+using MediaPortal.Extensions.OnlineLibraries.Matchers;
+using System.Globalization;
+using MediaPortal.Extensions.OnlineLibraries;
 
 namespace MediaPortal.Extensions.MetadataExtractors.NfoMetadataExtractors.NfoReaders
 {
@@ -74,14 +79,73 @@ namespace MediaPortal.Extensions.MetadataExtractors.NfoMetadataExtractors.NfoRea
     /// </summary>
     /// <param name="debugLogger">Debug logger to log to</param>
     /// <param name="miNumber">Unique number of the MediaItem for which the nfo-file is parsed</param>
-    /// <param name="forceQuickMode">If true, no long lasting operations such as parsing images are performed</param>
+    /// <param name="importOnly">If true, no long lasting operations such as parsing images are performed</param>
     /// <param name="httpClient"><see cref="HttpClient"/> used to download from http URLs contained in nfo-files</param>
     /// <param name="settings">Settings of the <see cref="NfoMovieMetadataExtractor"/></param>
-    public NfoMovieReader(ILogger debugLogger, long miNumber, bool forceQuickMode, HttpClient httpClient, NfoMovieMetadataExtractorSettings settings)
-      : base(debugLogger, miNumber, forceQuickMode, httpClient, settings)
+    public NfoMovieReader(ILogger debugLogger, long miNumber, bool importOnly, HttpClient httpClient, NfoMovieMetadataExtractorSettings settings)
+      : base(debugLogger, miNumber, importOnly, httpClient, settings)
     {
       InitializeSupportedElements();
       InitializeSupportedAttributes();
+    }
+
+    #endregion
+
+    #region Public Methods
+
+    /// <summary>
+    /// Treats the nfo-file's content as a string and parses it for a valid IMDB-ID; 
+    /// if one is found and it represents a movie, it is stored in the stub object.
+    /// </summary>
+    /// <remarks>
+    /// Used as a fallback, if the nfo-file cannot be parsed with XmlNfoReader. After calling
+    /// this method, there is only one stub object with the IMDB-ID as only metadata. Any
+    /// additional metadata must be fetched by the MDEs applied after the NfoMovieMDE.
+    /// </remarks>
+    /// <param name="nfoFsra"><see cref="IFileSystemResourceAccessor"/> pointing to the nfo-file</param>
+    /// <returns><c>true</c> if a valid IMDB-ID for a movie was found; otherwise <c>false</c></returns>
+    public async Task<bool> TryParseForImdbId(IFileSystemResourceAccessor nfoFsra)
+    {
+      // Make sure the nfo-file was read into _nfoBytes as byte array
+      if (_nfoBytes == null && !await TryReadNfoFileAsync(nfoFsra).ConfigureAwait(false))
+        return false;
+
+      try
+      {
+        // ReSharper disable once AssignNullToNotNullAttribute
+        // TryReadNfoFileAsync makes sure that _nfoBytes is not null
+        using (var nfoMemoryStream = new MemoryStream(_nfoBytes))
+        using (var nfoReader = new StreamReader(nfoMemoryStream, true))
+        {
+          // Convert the byte array to a string
+          var nfoString = nfoReader.ReadToEnd();
+
+          Match match = ((NfoMovieMetadataExtractorSettings)_settings).ImdbIdRegex.Regex.Match(nfoString);
+          if (match.Success)
+          {
+            string imdbId = match.Groups[1].Value;
+            _debugLogger.Debug("[#{0}]: Imdb-ID: '{1}' found when parsing the nfo-file as plain text.", _miNumber, imdbId);
+
+            // Returns true, if the found IMDB-ID represents a movie (not a series)
+            if (MovieTheMovieDbMatcher.Instance.FindAndUpdateMovie(new MovieInfo { ImdbId = imdbId }, false))
+            {
+              _debugLogger.Debug("[#{0}]: Imdb-ID: '{1}' confirmed online to represent a movie. Storing only Imdb-ID.", _miNumber, imdbId);
+              var stub = new MovieStub { Id = imdbId };
+              _stubs.Clear();
+              _stubs.Add(stub);
+              return true;
+            }
+            _debugLogger.Warn("[#{0}]: Cannot extract metadata; Imdb-ID: '{1}' could not be found or does not represent a movie on TheMovieDb.com", _miNumber, imdbId);
+          }
+          else
+            _debugLogger.Warn("[#{0}]: Cannot extract metadata; no valid Imdb-ID was found in the nfo-file.", _miNumber);
+        }
+      }
+      catch (Exception e)
+      {
+        _debugLogger.Warn("[#{0}]: Cannot extract metadata; error when trying to parse the nfo-file for a valid Imdb-ID", e, _miNumber);
+      }
+      return false;
     }
 
     #endregion
@@ -192,10 +256,13 @@ namespace MediaPortal.Extensions.MetadataExtractors.NfoMetadataExtractors.NfoRea
       _supportedAttributes.Add(TryWriteVideoAspectWriters);
       _supportedAttributes.Add(TryWriteVideoAspectStoryPlot);
 
+      _supportedAttributes.Add(TryWriteMovieAspectCompanies);
       _supportedAttributes.Add(TryWriteMovieAspectMovieName);
       _supportedAttributes.Add(TryWriteMovieAspectOrigName);
       _supportedAttributes.Add(TryWriteMovieAspectTmdbId);
       _supportedAttributes.Add(TryWriteMovieAspectImdbId);
+      _supportedAttributes.Add(TryWriteMovieAspectAllocineId);
+      _supportedAttributes.Add(TryWriteMovieAspectCinePassionId);
       _supportedAttributes.Add(TryWriteMovieAspectCollectionName);
       _supportedAttributes.Add(TryWriteMovieAspectRuntime);
       _supportedAttributes.Add(TryWriteMovieAspectCertification);
@@ -512,8 +579,6 @@ namespace MediaPortal.Extensions.MetadataExtractors.NfoMetadataExtractors.NfoRea
       // Examples of valid elements:
       // <studio>Warner Bros. Pictures</studio>
       // <studio>Happy Madison Productions / Columbia Pictures</studio>
-      // <studios>Warner Bros. Pictures</studios>
-      // <studios>Happy Madison Productions / Columbia Pictures</studios>
       return ((_currentStub.Studios = ParseCharacterSeparatedStrings(element, _currentStub.Studios)) != null);
     }
 
@@ -1222,7 +1287,17 @@ namespace MediaPortal.Extensions.MetadataExtractors.NfoMetadataExtractors.NfoRea
     {
       if (_stubs[0].Title != null)
       {
-        MediaItemAspect.SetAttribute(extractedAspectData, MediaAspect.ATTR_TITLE, _stubs[0].Title);
+        string title = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(_stubs[0].Title);
+        MediaItemAspect.SetAttribute(extractedAspectData, MediaAspect.ATTR_TITLE, title);
+        if (_stubs[0].SortTitle != null)
+        {
+          title = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(_stubs[0].SortTitle);
+          MediaItemAspect.SetAttribute(extractedAspectData, MediaAspect.ATTR_SORT_TITLE, title);
+        }
+        else
+        {
+          MediaItemAspect.SetAttribute(extractedAspectData, MediaAspect.ATTR_SORT_TITLE, BaseInfo.GetSortTitle(title));
+        }
         return true;
       }
       return false;
@@ -1300,14 +1375,21 @@ namespace MediaPortal.Extensions.MetadataExtractors.NfoMetadataExtractors.NfoRea
     {
       if (_stubs[0].Genres != null && _stubs[0].Genres.Any())
       {
-        MediaItemAspect.SetCollectionAttribute(extractedAspectData, VideoAspect.ATTR_GENRES, _stubs[0].Genres.ToList());
+        List<GenreInfo> genres = _stubs[0].Genres.Select(s => new GenreInfo { Name = s }).ToList();
+        OnlineMatcherService.Instance.AssignMissingMovieGenreIds(genres);
+        foreach (GenreInfo genre in genres)
+        {
+          MultipleMediaItemAspect genreAspect = MediaItemAspect.CreateAspect(extractedAspectData, GenreAspect.Metadata);
+          genreAspect.SetAttribute(GenreAspect.ATTR_ID, genre.Id);
+          genreAspect.SetAttribute(GenreAspect.ATTR_GENRE, genre.Name);
+        }
         return true;
       }
       return false;
     }
 
     /// <summary>
-    /// Tries to write metadata into <see cref="VideoAspect.ATTR_ACTORS"/>
+    /// Tries to write metadata into <see cref="VideoAspect.ATTR_ACTORS"/> and <see cref="VideoAspect.ATTR_CHARACTERS"/>
     /// </summary>
     /// <param name="extractedAspectData">Dictionary of <see cref="MediaItemAspect"/>s to write into</param>
     /// <returns><c>true</c> if any information was written; otherwise <c>false</c></returns>
@@ -1315,7 +1397,18 @@ namespace MediaPortal.Extensions.MetadataExtractors.NfoMetadataExtractors.NfoRea
     {
       if (_stubs[0].Actors != null && _stubs[0].Actors.Any())
       {
-        MediaItemAspect.SetCollectionAttribute(extractedAspectData, VideoAspect.ATTR_ACTORS, _stubs[0].Actors.OrderBy(actor => actor.Order).Select(actor => actor.Name).ToList());
+        foreach(PersonStub person in _stubs[0].Actors)
+        {
+          if (!string.IsNullOrEmpty(person.Name))
+          {
+            INfoRelationshipExtractor.StorePersonAndCharacter(extractedAspectData, person, PersonAspect.OCCUPATION_ACTOR, false);
+          }
+        }
+
+        MediaItemAspect.SetCollectionAttribute(extractedAspectData, VideoAspect.ATTR_ACTORS, _stubs[0].Actors.OrderBy(actor => actor.Order).
+          Where(actor => !string.IsNullOrEmpty(actor.Name)).Select(actor => actor.Name).ToList());
+        MediaItemAspect.SetCollectionAttribute(extractedAspectData, VideoAspect.ATTR_CHARACTERS, _stubs[0].Actors.OrderBy(actor => actor.Order).
+          Where(actor => !string.IsNullOrEmpty(actor.Name) && !string.IsNullOrEmpty(actor.Role)).Select(actor => actor.Role).ToList());
         return true;
       }
       return false;
@@ -1330,6 +1423,14 @@ namespace MediaPortal.Extensions.MetadataExtractors.NfoMetadataExtractors.NfoRea
     {
       if (_stubs[0].Director != null)
       {
+        if (!string.IsNullOrEmpty(_stubs[0].Director))
+        {
+          PersonStub ps = new PersonStub();
+          ps.ImdbId = _stubs[0].DirectorImdb;
+          ps.Name = _stubs[0].Director;
+          INfoRelationshipExtractor.StorePersonAndCharacter(extractedAspectData, ps, PersonAspect.OCCUPATION_DIRECTOR, false);
+         }
+
         MediaItemAspect.SetCollectionAttribute(extractedAspectData, VideoAspect.ATTR_DIRECTORS, new List<string> { _stubs[0].Director });
         return true;
       }
@@ -1378,6 +1479,28 @@ namespace MediaPortal.Extensions.MetadataExtractors.NfoMetadataExtractors.NfoRea
     #region MovieAspect
 
     /// <summary>
+    /// Tries to write metadata into <see cref="MovieAspect.ATTR_COMPANIES"/>
+    /// </summary>
+    /// <param name="extractedAspectData">Dictionary of <see cref="MediaItemAspect"/>s to write into</param>
+    /// <returns><c>true</c> if any information was written; otherwise <c>false</c></returns>
+    private bool TryWriteMovieAspectCompanies(IDictionary<Guid, IList<MediaItemAspect>> extractedAspectData)
+    {
+      // priority 1:
+      if (_stubs[0].Companies != null && _stubs[0].Companies.Any())
+      {
+        MediaItemAspect.SetCollectionAttribute(extractedAspectData, MovieAspect.ATTR_COMPANIES, _stubs[0].Companies.ToList());
+        return true;
+      }
+      // priority 2:
+      if (_stubs[0].Studios != null && _stubs[0].Studios.Any())
+      {
+        MediaItemAspect.SetCollectionAttribute(extractedAspectData, MovieAspect.ATTR_COMPANIES, _stubs[0].Studios.ToList());
+        return true;
+      }
+      return false;
+    }
+
+    /// <summary>
     /// Tries to write metadata into <see cref="MovieAspect.ATTR_MOVIE_NAME"/>
     /// </summary>
     /// <param name="extractedAspectData">Dictionary of <see cref="MediaItemAspect"/>s to write into</param>
@@ -1386,7 +1509,8 @@ namespace MediaPortal.Extensions.MetadataExtractors.NfoMetadataExtractors.NfoRea
     {
       if (_stubs[0].Title != null)
       {
-        MediaItemAspect.SetAttribute(extractedAspectData, MovieAspect.ATTR_MOVIE_NAME, _stubs[0].Title);
+        string title = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(_stubs[0].Title);
+        MediaItemAspect.SetAttribute(extractedAspectData, MovieAspect.ATTR_MOVIE_NAME, title);
         return true;
       }
       return false;
@@ -1457,7 +1581,37 @@ namespace MediaPortal.Extensions.MetadataExtractors.NfoMetadataExtractors.NfoRea
       //priority 3:
       if (_stubs[0].IdsImdbId != null)
       {
-        MediaItemAspect.AddOrUpdateExternalIdentifier(extractedAspectData, ExternalIdentifierAspect.SOURCE_IMDB, ExternalIdentifierAspect.TYPE_MOVIE, _stubs[0].Imdb);
+        MediaItemAspect.AddOrUpdateExternalIdentifier(extractedAspectData, ExternalIdentifierAspect.SOURCE_IMDB, ExternalIdentifierAspect.TYPE_MOVIE, _stubs[0].IdsImdbId);
+        return true;
+      }
+      return false;
+    }
+
+    /// <summary>
+    /// Tries to write metadata into <see cref="ExternalIdentifierAspect"/>
+    /// </summary>
+    /// <param name="extractedAspectData">Dictionary of <see cref="MediaItemAspect"/>s to write into</param>
+    /// <returns><c>true</c> if any information was written; otherwise <c>false</c></returns>
+    private bool TryWriteMovieAspectAllocineId(IDictionary<Guid, IList<MediaItemAspect>> extractedAspectData)
+    {
+      if (_stubs[0].Allocine.HasValue)
+      {
+        MediaItemAspect.AddOrUpdateExternalIdentifier(extractedAspectData, ExternalIdentifierAspect.SOURCE_ALLOCINE, ExternalIdentifierAspect.TYPE_MOVIE, _stubs[0].Allocine.ToString());
+        return true;
+      }
+      return false;
+    }
+
+    /// <summary>
+    /// Tries to write metadata into <see cref="ExternalIdentifierAspect"/>
+    /// </summary>
+    /// <param name="extractedAspectData">Dictionary of <see cref="MediaItemAspect"/>s to write into</param>
+    /// <returns><c>true</c> if any information was written; otherwise <c>false</c></returns>
+    private bool TryWriteMovieAspectCinePassionId(IDictionary<Guid, IList<MediaItemAspect>> extractedAspectData)
+    {
+      if (_stubs[0].Cinepassion.HasValue)
+      {
+        MediaItemAspect.AddOrUpdateExternalIdentifier(extractedAspectData, ExternalIdentifierAspect.SOURCE_CINEPASSION, ExternalIdentifierAspect.TYPE_MOVIE, _stubs[0].Cinepassion.ToString());
         return true;
       }
       return false;
@@ -1472,7 +1626,8 @@ namespace MediaPortal.Extensions.MetadataExtractors.NfoMetadataExtractors.NfoRea
     {
       if (_stubs[0].Sets != null && _stubs[0].Sets.Any())
       {
-        MediaItemAspect.SetAttribute(extractedAspectData, MovieAspect.ATTR_COLLECTION_NAME, _stubs[0].Sets.OrderBy(set => set.Order).First().Name);
+        string setName = _stubs[0].Sets.OrderBy(set => set.Order).First().Name;
+        MediaItemAspect.SetAttribute(extractedAspectData, MovieAspect.ATTR_COLLECTION_NAME, setName);
         return true;
       }
       return false;

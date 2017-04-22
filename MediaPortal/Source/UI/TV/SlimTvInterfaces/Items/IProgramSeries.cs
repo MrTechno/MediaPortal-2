@@ -1,7 +1,7 @@
-#region Copyright (C) 2007-2015 Team MediaPortal
+#region Copyright (C) 2007-2017 Team MediaPortal
 
 /*
-    Copyright (C) 2007-2015 Team MediaPortal
+    Copyright (C) 2007-2017 Team MediaPortal
     http://www.team-mediaportal.com
 
     This file is part of MediaPortal 2
@@ -34,19 +34,9 @@ namespace MediaPortal.Plugins.SlimTv.Interfaces.Items
     String SeasonNumber { get; set; }
 
     /// <summary>
-    /// Gets or Sets the Number of an Episode. Format: [Episode]/[Total Episodes]
+    /// Gets or Sets the Number of an Episode.
     /// </summary>
     String EpisodeNumber { get; set; }
-
-    /// <summary>
-    /// Gets or Sets the Number of an Episode. Format: [Season].[Episode]/[Total Episodes].[Part]/[Total Parts]
-    /// </summary>
-    String EpisodeNumberDetailed { get; set; }
-
-    /// <summary>
-    /// Gets or Sets the Part of an Episode.
-    /// </summary>
-    String EpisodePart { get; set; }
 
     /// <summary>
     /// Gets or Sets the Title of an Episode.
