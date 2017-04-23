@@ -108,7 +108,7 @@ namespace MediaPortal.Plugins.MediaServer.ResourceAccess
       }
       else
       {
-        stream.Title = (string)dlnaItem.MediaSource[MediaAspect.Metadata].GetAttributeValue(MediaAspect.ATTR_TITLE);
+        stream.Title = (string)MediaItemHelper.GetAttributeValue(dlnaItem.MediaSource.Aspects, MediaAspect.ATTR_TITLE);
         stream.IsLive = false;
         stream.LiveChannelId = 0;
       }

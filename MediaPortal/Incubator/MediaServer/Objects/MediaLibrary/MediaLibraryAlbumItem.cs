@@ -53,22 +53,18 @@ namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
 
       if (Client.Profile.Settings.Metadata.Delivery == MetadataDelivery.All)
       {
-        SingleMediaItemAspect albumAspect;
-        if (MediaItemAspect.TryGetAspect(Item.Aspects, AudioAlbumAspect.Metadata, out albumAspect))
-        {
-          // TODO: the attribute is defined as IEnumerable<string>, why is it here IEnumerable<object>???
-          var genreObj = albumAspect.GetCollectionAttribute<object>(AudioAlbumAspect.ATTR_GENRES);
-          if (genreObj != null)
-            CollectionUtils.AddAll(Genre, genreObj.Cast<string>());
+        // TODO: the attribute is defined as IEnumerable<string>, why is it here IEnumerable<object>???
+        var genreObj = MediaItemHelper.GetCollectionAttributeValues<object>(Item.Aspects, GenreAspect.ATTR_GENRE);
+        if (genreObj != null)
+          CollectionUtils.AddAll(Genre, genreObj.Cast<string>());
 
-          var artistObj = albumAspect.GetCollectionAttribute<object>(AudioAlbumAspect.ATTR_ARTISTS);
-          if (artistObj != null)
-            CollectionUtils.AddAll(Artist, artistObj.Cast<string>());
+        var artistObj = MediaItemHelper.GetCollectionAttributeValues<object>(Item.Aspects, AudioAspect.ATTR_ALBUMARTISTS);
+        if (artistObj != null)
+          CollectionUtils.AddAll(Artist, artistObj.Cast<string>());
 
-          var composerObj = albumAspect.GetCollectionAttribute<object>(AudioAlbumAspect.ATTR_COMPOSERS);
-          if (composerObj != null)
-            CollectionUtils.AddAll(Contributor, composerObj.Cast<string>());
-        }
+	      var composerObj = MediaItemHelper.GetCollectionAttributeValues<object>(Item.Aspects, AudioAspect.ATTR_COMPOSERS);
+        if (composerObj != null)
+          CollectionUtils.AddAll(Contributor, composerObj.Cast<string>());
       }
 
       //Support alternative ways to get album art
