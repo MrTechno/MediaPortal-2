@@ -22,16 +22,44 @@
 
 #endregion
 
+using System;
+using System.Collections.Generic;
+using MediaPortal.Backend.MediaLibrary;
+using MediaPortal.Common;
+using MediaPortal.Common.General;
 using MediaPortal.Common.MediaManagement.DefaultItemAspects;
+using MediaPortal.Plugins.MediaServer.Objects.Basic;
 using MediaPortal.Plugins.MediaServer.Profiles;
 
 namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
 {
-  internal class MediaLibrarySeriesGenresContainer : MediaLibrarySeriesAttributeGroupsContainer
+  internal class MediaLibrarySeriesGenresContainer : BasicContainer
   {
     public MediaLibrarySeriesGenresContainer(string id, EndPointSettings client)
-      : base(id, VideoAspect.ATTR_GENRES, client)
+      : base(id, client)
     {
+    }
+
+    public HomogenousMap GetItems()
+    {
+      List<Guid> necessaryMias = new List<Guid>(NECESSARY_MUSIC_MIA_TYPE_IDS);
+      if (necessaryMias.Contains(AudioAspect.ASPECT_ID)) necessaryMias.Remove(AudioAspect.ASPECT_ID); //Group MIA cannot be present
+      IMediaLibrary library = ServiceRegistration.Get<IMediaLibrary>();
+      return library.GetValueGroups(GenreAspect.ATTR_GENRE, null, ProjectionFunction.None, necessaryMias.ToArray(), null, true, true);
+    }
+
+    public override void Initialise()
+    {
+      HomogenousMap items = GetItems();
+
+      foreach (KeyValuePair<object, object> item in items)
+      {
+        if (item.Key == null) continue;
+        string title = item.Key.ToString();
+        string key = Id + ":" + title;
+
+        Add(new MediaLibraryMusicGenreItem(key, title, Client));
+      }
     }
   }
 }
