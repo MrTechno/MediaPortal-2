@@ -90,7 +90,11 @@ namespace MediaPortal.Plugins.SlimTv.Interfaces.ResourceProvider
       if (tv != null)
         tv.DisposeSlot(_slotIndex);
     }
+        public static INetworkResourceAccessor GetResourceAccessor(string path)
+        {
+            throw new NotImplementedException();
+        }
 
-    #endregion
-  }
+        #endregion
+    }
 }
