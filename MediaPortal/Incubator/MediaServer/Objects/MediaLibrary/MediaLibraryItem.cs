@@ -38,7 +38,7 @@ namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
       : base(item.MediaItemId.ToString(), client)
     {
       Item = item;
-      Title = MediaItemHelper.GetAttributeValue(Item.Aspects, MediaAspect.ATTR_TITLE);
+      Title = MediaItemHelper.GetAttributeValue(Item.Aspects, MediaAspect.ATTR_TITLE) as string;
 
       AlbumArtUrls = new List<IDirectoryAlbumArt>();
       var albumArt = new MediaLibraryAlbumArt(item, client);
