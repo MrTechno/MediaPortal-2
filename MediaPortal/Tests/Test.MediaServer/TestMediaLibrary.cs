@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using MediaPortal.Backend.MediaLibrary;
 using MediaPortal.Common;
@@ -234,7 +235,80 @@ namespace Test.MediaServer
       Guid id = new Guid(shareId);
       ProviderPathSegment segment = new ProviderPathSegment(LocalFsResourceProviderBase.LOCAL_FS_RESOURCE_PROVIDER_ID, directory, true);
       ResourcePath path = new ResourcePath(new[] { segment });
-      _shares[id] = new Share(id, systemId, path, name, categories);
+      _shares[id] = new Share(id, systemId, path, name, false, categories);
+    }
+
+    public MediaItem LoadItem(string systemId, ResourcePath path, IEnumerable<Guid> necessaryRequestedMIATypeIDs, IEnumerable<Guid> optionalRequestedMIATypeIDs, Guid? userProfile = null)
+    {
+      Logger.Info("Loading {0}", path);
+      MediaItem item = new MediaItem(Guid.NewGuid());
+      return item;
+    }
+
+    public IList<MediaItem> Browse(Guid parentDirectoryId, IEnumerable<Guid> necessaryRequestedMIATypeIDs, IEnumerable<Guid> optionalRequestedMIATypeIDs, Guid? userProfile, bool includeVirtual, uint? offset = null, uint? limit = null)
+    {
+      Logger.Info("Browsing {0}", parentDirectoryId);
+      IList<MediaItem> items = new List<MediaItem>();
+      items.Add(new MediaItem(Guid.NewGuid()));
+      return items;
+    }
+
+    public IList<MediaItem> Search(MediaItemQuery query, bool filterOnlyOnline, Guid? userProfile, bool includeVirtual)
+    {
+      Logger.Info("Browsing {0}", query);
+      IList<MediaItem> items = new List<MediaItem>();
+      items.Add(new MediaItem(Guid.NewGuid()));
+      return items;
+    }
+
+    public HomogenousMap GetValueGroups(MediaItemAspectMetadata.AttributeSpecification attributeType, IFilter selectAttributeFilter, ProjectionFunction projectionFunction, IEnumerable<Guid> necessaryMIATypeIDs, IFilter filter, bool filterOnlyOnline, bool includeVirtual)
+    {
+      throw new NotImplementedException();
+    }
+
+    public Tuple<HomogenousMap, HomogenousMap> GetKeyValueGroups(MediaItemAspectMetadata.AttributeSpecification keyAttributeType, MediaItemAspectMetadata.AttributeSpecification valueAttributeType, IFilter selectAttributeFilter, ProjectionFunction projectionFunction, IEnumerable<Guid> necessaryMIATypeIDs, IFilter filter, bool filterOnlyOnline, bool includeVirtual)
+    {
+      throw new NotImplementedException();
+    }
+
+    public IList<MLQueryResultGroup> GroupValueGroups(MediaItemAspectMetadata.AttributeSpecification attributeType, IFilter selectAttributeFilter, ProjectionFunction projectionFunction, IEnumerable<Guid> necessaryMIATypeIDs, IFilter filter, bool filterOnlyOnline, GroupingFunction groupingFunction, bool includeVirtual)
+    {
+      throw new NotImplementedException();
+    }
+
+    public int CountMediaItems(IEnumerable<Guid> necessaryMIATypeIDs, IFilter filter, bool filterOnlyOnline, bool includeVirtual)
+    {
+      throw new NotImplementedException();
+    }
+
+    public Guid AddOrUpdateMediaItem(Guid parentDirectoryId, string systemId, ResourcePath path, IEnumerable<MediaItemAspect> mediaItemAspects, bool isRefresh)
+    {
+      throw new NotImplementedException();
+    }
+
+    public void UpdateMediaItem(Guid mediaItemId, IEnumerable<MediaItemAspect> mediaItemAspects, bool isRefresh)
+    {
+      throw new NotImplementedException();
+    }
+
+    public void NotifyPlayback(Guid mediaItemId, bool watched)
+    {
+      throw new NotImplementedException();
+    }
+
+    public void UserDataUpdated(Guid userProfileId, Guid mediaItemId, string userDataKey, string userData)
+    {
+      throw new NotImplementedException();
+    }
+
+    public Guid CreateShare(string systemId, ResourcePath baseResourcePath, string shareName, bool useShareWatcher, IEnumerable<string> mediaCategories)
+    {
+      throw new NotImplementedException();
+    }
+
+    public int UpdateShare(Guid shareId, ResourcePath baseResourcePath, string shareName, bool useShareWatcher, IEnumerable<string> mediaCategories, RelocationMode relocationMode)
+    {
+      throw new NotImplementedException();
     }
   }
 }
