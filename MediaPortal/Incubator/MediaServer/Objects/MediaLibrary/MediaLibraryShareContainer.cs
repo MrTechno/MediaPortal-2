@@ -71,8 +71,6 @@ namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
 
     public override void Initialise()
     {
-      Console.WriteLine("MediaLibraryShareContainer: Initialise");
-
       IDictionary<Guid, Share> shares = GetShares();
 
       IMediaLibrary library = ServiceRegistration.Get<IMediaLibrary>();
