@@ -36,8 +36,9 @@ namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
     public MediaLibrarySeasonItem(MediaItem item, IFilter episodeFilter, EndPointSettings client)
       : base(item, NECESSARY_EPISODE_MIA_TYPE_IDS, OPTIONAL_EPISODE_MIA_TYPE_IDS, 
           episodeFilter != null ? BooleanCombinationFilter.CombineFilters(BooleanOperator.And, episodeFilter, 
-            new RelationshipFilter(item.MediaItemId, SeasonAspect.ROLE_SEASON, EpisodeAspect.ROLE_EPISODE)) :
-           new RelationshipFilter(item.MediaItemId, SeasonAspect.ROLE_SEASON, EpisodeAspect.ROLE_EPISODE), client)
+						// From episode to season <ID supplied>
+            new RelationshipFilter(EpisodeAspect.ROLE_EPISODE, SeasonAspect.ROLE_SEASON, item.MediaItemId)) :
+           new RelationshipFilter(EpisodeAspect.ROLE_EPISODE, SeasonAspect.ROLE_SEASON, item.MediaItemId), client)
     {
       Genre = new List<string>();
       Artist = new List<string>();

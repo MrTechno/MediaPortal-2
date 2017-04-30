@@ -36,7 +36,8 @@ namespace MediaPortal.Plugins.MediaServer.Objects.MediaLibrary
   {
     public MediaLibraryAlbumItem(MediaItem item, EndPointSettings client)
       : base(item, NECESSARY_MUSIC_MIA_TYPE_IDS, OPTIONAL_MUSIC_MIA_TYPE_IDS, 
-          new RelationshipFilter(item.MediaItemId, AudioAlbumAspect.ROLE_ALBUM, AudioAspect.ROLE_TRACK), client)
+				  // From track to album <ID supplied>
+          new RelationshipFilter(AudioAspect.ROLE_TRACK, AudioAlbumAspect.ROLE_ALBUM, item.MediaItemId), client)
     {
     }
 
