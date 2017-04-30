@@ -33,7 +33,7 @@ namespace MediaPortal.Plugins.MediaServer
 {
   class MediaItemHelper
   {
-    public static object GetAttributeValue(IDictionary<Guid, IList<MediaItemAspect>> aspects, SingleMediaItemAspectMetadata.SingleAttributeSpecification attribute)
+    public static object GetAttributeValue(IDictionary<Guid, IList<MediaItemAspect>> aspects, MediaItemAspectMetadata.SingleAttributeSpecification attribute)
     {
       object value = null;
 
@@ -43,7 +43,7 @@ namespace MediaPortal.Plugins.MediaServer
       return value;
     }
 
-    public static IEnumerable<T> GetCollectionAttributeValues<T>(IDictionary<Guid, IList<MediaItemAspect>> aspects, SingleMediaItemAspectMetadata.SingleAttributeSpecification attribute)
+    public static IEnumerable<T> GetCollectionAttributeValues<T>(IDictionary<Guid, IList<MediaItemAspect>> aspects, MediaItemAspectMetadata.SingleAttributeSpecification attribute)
     {
       IEnumerable<T> value = null;
 
