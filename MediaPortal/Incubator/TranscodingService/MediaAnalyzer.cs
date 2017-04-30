@@ -238,6 +238,9 @@ namespace MediaPortal.Plugins.Transcoding.Service
       {
         ILocalFsResourceAccessor fileResource = (ILocalFsResourceAccessor)MediaResource;
         string fileName = fileResource.LocalFileSystemPath;
+        string ext = DosPathHelper.GetExtension(fileName).ToLowerInvariant();
+        if (!(_audioExtensions.Contains(ext) || _imageExtensions.Contains(ext) || _videoExtensions.Contains(ext)))
+          return null;
         string arguments = "";
         if (HasImageExtension(fileName))
         {
@@ -285,6 +288,9 @@ namespace MediaPortal.Plugins.Transcoding.Service
       else if (MediaResource is INetworkResourceAccessor)
       {
         string url = ((INetworkResourceAccessor)MediaResource).URL;
+        string ext = DosPathHelper.GetExtension(url).ToLowerInvariant();
+        if (!(_audioExtensions.Contains(ext) || _imageExtensions.Contains(ext) || _videoExtensions.Contains(ext)))
+          return null;
         string arguments = "";
         if (url.StartsWith("rtsp://", StringComparison.InvariantCultureIgnoreCase) == true)
         {
